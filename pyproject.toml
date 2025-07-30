@@ -1,0 +1,32 @@
+[tool.ruff]
+line-length = 79
+target-version = "py313"
+fix = true
+extend-include = ["*.ipynb"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+docstring-code-format = false
+docstring-code-line-length = "dynamic"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B"]
+ignore = ["E501"]
+
+[tool.ruff.lint.isort]
+force-sort-within-sections = true
+known-first-party = ["pynanzas"]
+
+
+[tool.basedpyright]
+typeCheckingMode = "standard"
+pythonVersion = "3.13"
+include = ["."]
+exclude = ["**/__pycache__", "**/node_modules", "**/.venv"]
+venvPath = "."
+venv = ".venv"
+reportMissingTypeStubs = false
+reportMissingImports = true
