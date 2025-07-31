@@ -6,19 +6,19 @@ from .producto import ProductoFinanciero
 
 class Portafolio:
     def __init__(
-        self, df_productos: pd.DataFrame, df_transacciones: pd.DataFrame
+        self, df_productos: pd.DataFrame, df_transacciones: pd.DataFrame, id_de_producto_key: str
     ) -> None:
         self.productos: dict[str, ProductoFinanciero] = self._crear_portafolio(
             df_productos
         )
-        self._procesar_trans(
-            df_productos=df_productos,
+        self.id_de_producto_key = id_de_producto_key
+        self._trans_a_prods(
             df_transacciones=df_transacciones,
             dict_productos=self.productos,
+            id_de_producto=self.id_de_producto_key
         )
         self.total: float = self._calcular_total()
         self.intereses_total: float = self._calcular_intereses()
-        self.rentabilidad_total: float = self.intereses_total / self.total
 
     def __str__(self):
         return f"Portafolio: ({self.productos.__len__}) productos. COP${self.total:.2f}"
@@ -52,41 +52,24 @@ class Portafolio:
                 productos[str(producto_id)] = nuevo_producto
             return productos
 
-    def _procesar_trans(
+    def _trans_a_prods(
         self,
-        df_productos: pd.DataFrame,
         df_transacciones: pd.DataFrame,
         dict_productos: dict[str, ProductoFinanciero],
+        id_de_producto: str
     ) -> None:
         """
-        Actualiza todos los productos del portafolio con sus transacciones correspondientes.
 
-        Args:
-            df_de_productos: DataFrame con información de productos
-            df_con_transacciones: DataFrame con todas las transacciones
-            dict_productos: Diccionario con objetos de productos del portafolio
-
-        Returns:
-            dict: Resultado con éxito/error y detalles
         """
         try:
-            if df_productos.index.name not in df_transacciones.columns:
-                error_msg = f"No se encontró la columna '{
-                    df_productos.index.name}'en las transacciones."
-                print(f"❌ ERROR: {error_msg}")
-            # productos_procesados = 0
-
             for producto_id, objeto_producto in dict_productos.items():
                 df_filtrado_para_producto = df_transacciones[
-                    df_transacciones[df_productos.index.name] == producto_id
+                    df_transacciones[id_de_producto] == producto_id
                 ]
                 objeto_producto.procesar_trans(df_filtrado_para_producto)
-                # productos_procesados += 1
-            # print(f"Procesados{productos_procesados}")# TODO: Pasar a logging.info
-
         except Exception as e:
             error_msg = f"Error inesperado durante la actualización: {str(e)}"
-            print(f"❌ ERROR: {error_msg}")
+            print(f"Portafolio._trans_a_productos() -> ERROR: {error_msg}")
 
     def _calcular_total(self) -> float:
         saldos = np.array(
@@ -112,42 +95,6 @@ class Portafolio:
 
     def saldos_porcent_hist(self):
         raise NotImplementedError("Este método no esta implementado.")
-
-
-def transacciones_a_producto(
-    df_de_productos: pd.DataFrame,
-    df_con_transacciones: pd.DataFrame,
-    dict_productos: dict[str, ProductoFinanciero],
-) -> None:
-    """
-    Actualiza todos los productos del portafolio con sus transacciones correspondientes.
-
-    Args:
-        df_de_productos: DataFrame con información de productos
-        df_con_transacciones: DataFrame con todas las transacciones
-        dict_productos: Diccionario con objetos de productos del portafolio
-
-    Returns:
-        dict: Resultado con éxito/error y detalles
-    """
-    try:
-        if df_de_productos.index.name not in df_con_transacciones.columns:
-            error_msg = f"No se encontró la columna '{
-                df_de_productos.index.name}' en las transacciones."
-            print(f"❌ ERROR: {error_msg}")
-        productos_procesados = 0
-
-        for id_producto, objeto_producto in dict_productos.items():
-            df_filtrado_para_producto = df_con_transacciones[
-                df_con_transacciones[df_de_productos.index.name] == id_producto
-            ]
-            objeto_producto.procesar_trans(df_filtrado_para_producto)
-            productos_procesados += 1
-        print(f"Procesados{productos_procesados}")
-
-    except Exception as e:
-        error_msg = f"Error inesperado durante la actualización: {str(e)}"
-        print(f"❌ ERROR: {error_msg}")
 
 
 def balancear_portafolio(
