@@ -20,6 +20,9 @@ class Portafolio:
         self.intereses_total: float = self._calcular_intereses()
         self.rentabilidad_total: float = self.intereses_total / self.total
 
+    def __str__(self):
+        return f"Portafolio: ({self.productos.__len__}) productos. COP${self.total:.2f}"
+
     def _crear_portafolio(
         self, df_productos: pd.DataFrame
     ) -> dict[str, ProductoFinanciero]:
