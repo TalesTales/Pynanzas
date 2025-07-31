@@ -1,3 +1,9 @@
+[project]
+name = "pynanzas"
+version = "0.3.0"
+description = "Análisis financiero personal con Python"
+authors = [{ name = "Felipe" }]
+
 [tool.ruff]
 line-length = 79
 target-version = "py313"
@@ -30,3 +36,10 @@ venvPath = "."
 venv = ".venv"
 reportMissingTypeStubs = false
 reportMissingImports = true
+
+[tool.commitizen]
+name = "cz_conventional_commits"
+tag_format = "0.2.2"
+version_scheme = "semver"
+version_provider = "pep621"
+update_changelog_on_bump = true
