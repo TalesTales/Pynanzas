@@ -1,9 +1,8 @@
 # %%
-from pynanzas import DF_PRODS, DF_TRANS, Portafolio
+from pynanzas import DF_PRODS, DF_TRANS, PROD_ID, Portafolio
 
-portafolio: Portafolio = Portafolio(
-    df_productos=DF_PRODS, df_transacciones=DF_TRANS)
+portafolio: Portafolio = Portafolio(DF_PRODS, DF_TRANS, PROD_ID)
 print(portafolio.productos.keys())
 
 # %%
-print(str(portafolio))
+portafolio.productos["FonNu"].hist_trans["saldo_historico"]

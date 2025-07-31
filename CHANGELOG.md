@@ -1,3 +1,13 @@
+## 0.6.0 (2025-07-31)
+
+### Feat
+
+- **pynanzas**: PROD_ID agragada como constante del módulo
+
+### Fix
+
+- **portafolio**: _trans_a_prods actualizado para no recibir un df_products sino sólo un id_de_producto: str
+
 ## 0.5.1 (2025-07-31)
 
 ### Refactor
