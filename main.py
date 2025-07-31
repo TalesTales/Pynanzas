@@ -15,3 +15,6 @@ df_transacciones: pd.DataFrame = trans_raw_to_df(datos["transacciones"])
 
 portafolio: Portafolio = Portafolio(df_prods, df_transacciones)
 print(portafolio.productos.keys())
+
+# %%
+print(portafolio.intereses_total)

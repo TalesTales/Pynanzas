@@ -17,6 +17,8 @@ class Portafolio:
             dict_productos=self.productos,
         )
         self.total: float = self._calcular_total()
+        self.intereses_total: float = self._calcular_intereses()
+        self.rentabilidad_total: float = self.intereses_total / self.total
 
     def _crear_portafolio(
         self, df_productos: pd.DataFrame
@@ -66,7 +68,8 @@ class Portafolio:
         """
         try:
             if df_productos.index.name not in df_transacciones.columns:
-                error_msg = f"No se encontró la columna '{df_productos.index.name}'en las transacciones."
+                error_msg = f"No se encontró la columna '{
+                    df_productos.index.name}'en las transacciones."
                 print(f"❌ ERROR: {error_msg}")
             # productos_procesados = 0
 
@@ -88,6 +91,14 @@ class Portafolio:
         )
         saldos_validos = saldos[~np.isnan(saldos)]
         total = np.sum(saldos_validos)
+        return total
+
+    def _calcular_intereses(self) -> float:
+        interes = np.array(
+            [producto.intereses for producto in self.productos.values()]
+        )
+        intereses_valido = interes[~np.isnan(interes)]
+        total = np.sum(intereses_valido)
         return total
 
     def balancear(self):
@@ -118,7 +129,8 @@ def transacciones_a_producto(
     """
     try:
         if df_de_productos.index.name not in df_con_transacciones.columns:
-            error_msg = f"No se encontró la columna '{df_de_productos.index.name}' en las transacciones."
+            error_msg = f"No se encontró la columna '{
+                df_de_productos.index.name}' en las transacciones."
             print(f"❌ ERROR: {error_msg}")
         productos_procesados = 0
 
