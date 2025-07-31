@@ -14,3 +14,4 @@
 - centralize logic in Portafolio class for simplified analysis workflow
 - **init**: move data loading logic to module initialization
 - **imports**: replace wildcard imports with specific imports
+
