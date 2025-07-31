@@ -13,10 +13,12 @@ from .portafolio import Portafolio
 from .producto import ProductoFinanciero
 
 __all__ = ["Portafolio", "ProductoFinanciero", "MOVIMIENTOS_APORTES",
-           "MOVIMIENTOS_INTERESES", "MOVIMIENTOS_NO_APORTANTES"]
+           "MOVIMIENTOS_INTERESES", "MOVIMIENTOS_NO_APORTANTES", "PROD_ID"]
 
 DATOS: dict[str, pd.DataFrame] = cargar_datos()
 DF_PRODS: pd.DataFrame = prods_raw_a_df(
     DATOS["productos"], DATOS["diccionario"])
 DF_TRANS: pd.DataFrame = trans_raw_to_df(DATOS["transacciones"])
+PROD_ID: str = DATOS["diccionario"]["Ficha"].iloc[0].lower().replace(" ", "_")
+
 print("Datos cargados")
