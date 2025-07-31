@@ -150,6 +150,107 @@ def transacciones_a_producto(
         print(f"❌ ERROR: {error_msg}")
 
 
+def balancear_portafolio(
+    portafolio: dict[str, ProductoFinanciero], monto_invertir: float
+) -> dict[str, float]:  # TODO:
+    # Agregar filtros tipo simulado, abierto, etc.
+    """Calcula la distribución óptima de una nueva inversión para rebalancear un portafolio.
+
+    Esta función analiza el portafolio actual y determina cómo distribuir una nueva
+    inversión para acercar los pesos de cada producto financiero a sus asignaciones
+    objetivo. Prioriza los productos que están más alejados de su peso objetivo.
+
+    Args:
+        portafolio: Diccionario donde las llaves son los tickers de los productos
+            financieros y los valores son objetos ProductoFinanciero que contienen
+            información sobre saldo actual, asignación objetivo y peso actual.
+        monto_invertir: Monto total en pesos que se desea invertir para rebalancear
+            el portafolio.
+
+    Returns:
+        Diccionario con la distribución sugerida donde las llaves son los tickers
+        y los valores son los montos en pesos que se deben invertir en cada producto.
+        La suma de todos los valores será igual a monto_invertir.
+
+    Note:
+        La función imprime información detallada del análisis y la distribución
+        sugerida en la consola, incluyendo pesos actuales vs objetivos y los
+        pesos resultantes después de la inversión.
+    """
+
+    portafolio_actual: float = calcular_pesos(portafolio)
+    portafolio_futuro: float = portafolio_actual + monto_invertir
+
+    # Calcular valores objetivos para cada producto
+    valores_actuales: dict[str, float] = {}
+    valores_objetivo: dict[str, float] = {}
+    diferencias: dict[str, float] = {}
+
+    for ticker, producto in portafolio.items():
+        if producto.asignacion >= 0:
+            valor_actual = producto.saldo_actual
+            valor_objetivo = portafolio_futuro * producto.asignacion
+            diferencia = valor_objetivo - valor_actual
+
+            valores_actuales[ticker] = valor_actual
+            valores_objetivo[ticker] = valor_objetivo
+            diferencias[ticker] = diferencia
+
+            print(f"\n{ticker}:")
+            print(f"  Peso actual: {producto.peso:.2%}")
+            print(f"  Peso objetivo: {producto.asignacion:.2%}")
+            print(f"  Valor actual: ${valor_actual:,.2f}")
+            print(f"  Valor objetivo: ${valor_objetivo:,.2f}")
+            print(f"  Diferencia: ${diferencia:,.2f}")
+
+    diferencias_positivas: dict[str, float] = {
+        k: v for k, v in diferencias.items() if v > 0
+    }
+
+    suma_diferencias_positivas: float = sum(diferencias_positivas.values())
+
+    distribucion: dict[str, float] = {}
+
+    if suma_diferencias_positivas > 0:
+        for ticker, diferencia in diferencias_positivas.items():
+            proporcion = diferencia / suma_diferencias_positivas
+            monto_asignado = monto_invertir * proporcion
+            distribucion[ticker] = monto_asignado
+    else:
+        for ticker, producto in portafolio.items():
+            if producto.asignacion >= 0 and not np.isnan(
+                producto.saldo_actual
+            ):
+                distribucion[ticker] = monto_invertir * producto.asignacion
+
+    print("DISTRIBUCIÓN SUGERIDA DE LA NUEVA INVERSIÓN:")
+
+    total_distribuido: float = 0
+    for ticker, monto in distribucion.items():
+        if monto > 0:
+            porcentaje = (monto / monto_invertir) * 100
+            print(f"{ticker}: ${monto:,.2f} ({porcentaje:.1f}%)")
+            total_distribuido += monto
+
+    print(f"\nTotal distribuido: ${total_distribuido:,.2f}")
+
+    print("PESOS RESULTANTES DESPUÉS DE LA INVERSIÓN:")
+
+    for ticker, producto in portafolio.items():
+        if producto.asignacion >= 0 and not np.isnan(producto.saldo_actual):
+            valor_final = valores_actuales[ticker] + distribucion.get(
+                ticker, 0
+            )
+            peso_final = valor_final / portafolio_futuro
+            diferencia_objetivo = peso_final - producto.asignacion
+
+            print(f"{ticker}:")
+            print(f"  Peso final: {peso_final:.2%}")
+            print(f"  Objetivo: {producto.asignacion:.2%}")
+            print(f"  Diferencia: {diferencia_objetivo:+.2%}")
+    return distribucion
+
+
 def calcular_pesos(portafolio: dict[str, ProductoFinanciero]) -> float:
     total_portafolio: float = 0
     for saldo in portafolio.values():
