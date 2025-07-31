@@ -1,3 +1,9 @@
+## 0.5.1 (2025-07-31)
+
+### Refactor
+
+- **analisis**: balancear_portafolio se movió a portafolio
+
 ## 0.5.0 (2025-07-31)
 
 ## 0.2.2 (2025-07-31)
