@@ -7,7 +7,6 @@ pd.set_option("future.no_silent_downcasting", True)
 
 def prods_raw_a_df(
     df_productos_raw: pd.DataFrame,
-    identificador_producto: str,
     df_diccionario_raw: pd.DataFrame,
 ) -> pd.DataFrame:
     """
@@ -24,8 +23,6 @@ def prods_raw_a_df(
     Args:
        df_productos_raw (pd.DataFrame): DataFrame crudo con los datos de productos tal como vienen del Excel.
            Se espera que tenga productos como columnas y atributos como filas.
-       identificador_producto (str): Nombre que se asignará al índice del DataFrame resultante para
-           identificar los productos.
        df_diccionario_raw (pd.DataFrame): DataFrame con el diccionario de datos que contiene el orden de las
            categorías para los atributos categóricos (riesgo, liquidez, plazos).
 
@@ -43,6 +40,8 @@ def prods_raw_a_df(
        - Convierte 'simulado' a tipo booleano
        - Aplica orden categórico a 'riesgo', 'liquidez' y 'plazos' según el diccionario
     """
+    identificador_producto: str = df_diccionario_raw["Ficha"].iloc[0].lower(
+    ).replace(" ", "_")
     df_diccionario: pd.DataFrame = df_diccionario_raw.copy()
     if not df_productos_raw.iloc[0].is_unique:
         print("Los primera fila de df_productos no tiene valores únicos!")
@@ -69,7 +68,7 @@ def prods_raw_a_df(
         if col in df_productos.columns:
             df_productos[col] = (
                 df_productos[col].fillna("N/A").infer_objects(copy=False)
-            )  # pyright: ignore[reportCallIssue]
+            )
     df_productos["simulado"] = (
         df_productos["simulado"].astype(int).astype(bool)
     )
