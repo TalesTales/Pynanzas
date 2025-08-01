@@ -5,4 +5,6 @@ portafolio: Portafolio = Portafolio(DF_PRODS, DF_TRANS, PROD_ID)
 print(portafolio.productos.keys())
 
 # %%
-portafolio.productos["FonNu"].hist_trans["saldo_historico"]
+a = (portafolio.productos["FonNu"].hist_trans)
+
+print(a)

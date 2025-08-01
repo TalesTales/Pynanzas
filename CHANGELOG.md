@@ -1,3 +1,9 @@
+## 0.7.0 (2025-07-31)
+
+### Feat
+
+- **portafolio**: Lógica de análisis del portafolio se movió a la clase Portafolio
+
 ## 0.6.0 (2025-07-31)
 
 ### Feat
