@@ -1,3 +1,4 @@
+from sys import exit
 import numpy as np
 import pandas as pd
 
@@ -19,6 +20,7 @@ class Portafolio:
         )
         self.total: float = self._calcular_total()
         self.intereses_total: float = self._calcular_intereses()
+        self._calcular_pesos()
 
     def __str__(self):
         return f"Portafolio: ({self.productos.__len__}) productos. COP${self.total:.2f}"
@@ -87,176 +89,178 @@ class Portafolio:
         total = np.sum(intereses_valido)
         return total
 
-    def balancear(self):
-        raise NotImplementedError("Este método no esta implementado.")
+    def _calcular_pesos(self) -> None:
+        producto: ProductoFinanciero
+        try:
+            for producto in self.productos.values():
+                if not np.isnan(producto.saldo_actual):
+                    producto.peso = producto.saldo_actual / self.total
+        except Exception as e:
+            print(f"E: Portafolio._calcular_pesos. -> {e}")
 
-    def saldos_hist(self):
-        raise NotImplementedError("Este método no esta implementado.")
+    def balancear(self, monto_invertir: float) -> dict[str, float]:
+        portafolio_actual: float = self.total
+        portafolio_futuro: float = portafolio_actual + monto_invertir
+        portafolio = self.productos
+        # Calcular valores objetivos para cada producto
+        valores_actuales: dict[str, float] = {}
+        valores_objetivo: dict[str, float] = {}
+        diferencias: dict[str, float] = {}
+
+        for ticker, producto in portafolio.items():
+            if producto.asignacion >= 0:
+                valor_actual = producto.saldo_actual
+                valor_objetivo = portafolio_futuro * producto.asignacion
+                diferencia = valor_objetivo - valor_actual
+
+                valores_actuales[ticker] = valor_actual
+                valores_objetivo[ticker] = valor_objetivo
+                diferencias[ticker] = diferencia
+
+                print(f"\n{ticker}:")
+                print(f"  Peso actual: {producto.peso:.2%}")
+                print(f"  Peso objetivo: {producto.asignacion:.2%}")
+                print(f"  Valor actual: ${valor_actual:,.2f}")
+                print(f"  Valor objetivo: ${valor_objetivo:,.2f}")
+                print(f"  Diferencia: ${diferencia:,.2f}")
+
+        diferencias_positivas: dict[str, float] = {
+            k: v for k, v in diferencias.items() if v > 0
+        }
+
+        suma_diferencias_positivas: float = sum(diferencias_positivas.values())
+
+        distribucion: dict[str, float] = {}
+
+        if suma_diferencias_positivas > 0:
+            for ticker, diferencia in diferencias_positivas.items():
+                proporcion = diferencia / suma_diferencias_positivas
+                monto_asignado = monto_invertir * proporcion
+                distribucion[ticker] = monto_asignado
+        else:
+            for ticker, producto in portafolio.items():
+                if producto.asignacion >= 0 and not np.isnan(
+                    producto.saldo_actual
+                ):
+                    distribucion[ticker] = monto_invertir * producto.asignacion
+
+        print("DISTRIBUCIÓN SUGERIDA DE LA NUEVA INVERSIÓN:")
+
+        total_distribuido: float = 0
+        for ticker, monto in distribucion.items():
+            if monto > 0:
+                porcentaje = (monto / monto_invertir) * 100
+                print(f"{ticker}: ${monto:,.2f} ({porcentaje:.1f}%)")
+                total_distribuido += monto
+
+        print(f"\nTotal distribuido: ${total_distribuido:,.2f}")
+
+        print("PESOS RESULTANTES DESPUÉS DE LA INVERSIÓN:")
+
+        for ticker, producto in portafolio.items():
+            if producto.asignacion >= 0 and not np.isnan(producto.saldo_actual):
+                valor_final = valores_actuales[ticker] + distribucion.get(
+                    ticker, 0
+                )
+                peso_final = valor_final / portafolio_futuro
+                diferencia_objetivo = peso_final - producto.asignacion
+
+                print(f"{ticker}:")
+                print(f"  Peso final: {peso_final:.2%}")
+                print(f"  Objetivo: {producto.asignacion:.2%}")
+                print(f"  Diferencia: {diferencia_objetivo:+.2%}")
+        return distribucion
+
+    def xirr_historicas(
+        self,
+        abiertos: bool | None = True,
+        simulados: bool | None = False,
+    ) -> pd.DataFrame:
+        portafolio: dict[str, ProductoFinanciero] = self.productos
+        xirr_historicas_df: pd.DataFrame = pd.DataFrame()
+
+        for i, (ticker, producto) in enumerate(portafolio.items()):
+            if abiertos is not None and abiertos != producto.abierto:
+                continue
+
+            if simulados is not None and simulados != producto.simulado:
+                continue
+
+            if (
+                producto.hist_trans.empty
+                or "xirr_historica" not in producto.hist_trans.columns
+            ):
+                continue
+
+            producto_xirr = producto.hist_trans[[
+                "fecha", "xirr_historica"]].copy()
+            producto_xirr = producto_xirr[~producto_xirr["xirr_historica"].isna(
+            )]
+
+            if producto_xirr.empty:
+                continue
+            producto_xirr = producto_xirr.groupby("fecha").last()
+            # producto_xirr = producto_xirr.set_index("fecha")
+            producto_xirr = producto_xirr.rename(
+                columns={"xirr_historica": ticker}
+            )
+
+            if xirr_historicas_df.empty:
+                xirr_historicas_df = producto_xirr
+            else:
+                xirr_historicas_df = pd.concat(
+                    [xirr_historicas_df, producto_xirr], axis=1
+                )
+
+        if not xirr_historicas_df.empty:
+            xirr_historicas_df = xirr_historicas_df.sort_index()
+            xirr_historicas_df = xirr_historicas_df.ffill()
+            # último valor
+        return xirr_historicas_df
+
+    def saldos_hist(self, abiertos: bool = True, simulados: bool = False) -> pd.DataFrame:
+        portafolio = self.productos
+        historico_acumulado_df: pd.DataFrame = pd.DataFrame()
+
+        for i, (ticker, producto) in enumerate(portafolio.items()):
+            if abiertos is not None and abiertos != producto.abierto:
+                continue
+
+            if simulados is not None and simulados != producto.simulado:
+                continue
+
+            if (
+                producto.hist_trans.empty
+                or "saldo_historico" not in producto.hist_trans.columns
+            ):
+                continue
+
+            producto_saldo = producto.hist_trans[
+                ["fecha", "saldo_historico"]
+            ].copy()
+            producto_saldo = producto_saldo[
+                ~producto_saldo["saldo_historico"].isna()
+            ]
+
+            if producto_saldo.empty:
+                continue
+            producto_saldo = producto_saldo.groupby("fecha").last()
+            producto_saldo = producto_saldo.rename(
+                columns={"saldo_historico": ticker}
+            )
+
+            if historico_acumulado_df.empty:
+                historico_acumulado_df = producto_saldo
+            else:
+                historico_acumulado_df = pd.concat(
+                    [historico_acumulado_df, producto_saldo], axis=1
+                )
+
+        if not historico_acumulado_df.empty:
+            historico_acumulado_df = historico_acumulado_df.sort_index()
+            historico_acumulado_df = historico_acumulado_df.ffill()
+            # último valor
+        return historico_acumulado_df
 
     def saldos_porcent_hist(self):
         raise NotImplementedError("Este método no esta implementado.")
-
-
-def balancear_portafolio(
-    portafolio: dict[str, ProductoFinanciero], monto_invertir: float
-) -> dict[str, float]:  # TODO:
-    # Agregar filtros tipo simulado, abierto, etc.
-    """Calcula la distribución óptima de una nueva inversión para rebalancear un portafolio.
-
-    Esta función analiza el portafolio actual y determina cómo distribuir una nueva
-    inversión para acercar los pesos de cada producto financiero a sus asignaciones
-    objetivo. Prioriza los productos que están más alejados de su peso objetivo.
-
-    Args:
-        portafolio: Diccionario donde las llaves son los tickers de los productos
-            financieros y los valores son objetos ProductoFinanciero que contienen
-            información sobre saldo actual, asignación objetivo y peso actual.
-        monto_invertir: Monto total en pesos que se desea invertir para rebalancear
-            el portafolio.
-
-    Returns:
-        Diccionario con la distribución sugerida donde las llaves son los tickers
-        y los valores son los montos en pesos que se deben invertir en cada producto.
-        La suma de todos los valores será igual a monto_invertir.
-
-    Note:
-        La función imprime información detallada del análisis y la distribución
-        sugerida en la consola, incluyendo pesos actuales vs objetivos y los
-        pesos resultantes después de la inversión.
-    """
-
-    portafolio_actual: float = calcular_pesos(portafolio)
-    portafolio_futuro: float = portafolio_actual + monto_invertir
-
-    # Calcular valores objetivos para cada producto
-    valores_actuales: dict[str, float] = {}
-    valores_objetivo: dict[str, float] = {}
-    diferencias: dict[str, float] = {}
-
-    for ticker, producto in portafolio.items():
-        if producto.asignacion >= 0:
-            valor_actual = producto.saldo_actual
-            valor_objetivo = portafolio_futuro * producto.asignacion
-            diferencia = valor_objetivo - valor_actual
-
-            valores_actuales[ticker] = valor_actual
-            valores_objetivo[ticker] = valor_objetivo
-            diferencias[ticker] = diferencia
-
-            print(f"\n{ticker}:")
-            print(f"  Peso actual: {producto.peso:.2%}")
-            print(f"  Peso objetivo: {producto.asignacion:.2%}")
-            print(f"  Valor actual: ${valor_actual:,.2f}")
-            print(f"  Valor objetivo: ${valor_objetivo:,.2f}")
-            print(f"  Diferencia: ${diferencia:,.2f}")
-
-    diferencias_positivas: dict[str, float] = {
-        k: v for k, v in diferencias.items() if v > 0
-    }
-
-    suma_diferencias_positivas: float = sum(diferencias_positivas.values())
-
-    distribucion: dict[str, float] = {}
-
-    if suma_diferencias_positivas > 0:
-        for ticker, diferencia in diferencias_positivas.items():
-            proporcion = diferencia / suma_diferencias_positivas
-            monto_asignado = monto_invertir * proporcion
-            distribucion[ticker] = monto_asignado
-    else:
-        for ticker, producto in portafolio.items():
-            if producto.asignacion >= 0 and not np.isnan(
-                producto.saldo_actual
-            ):
-                distribucion[ticker] = monto_invertir * producto.asignacion
-
-    print("DISTRIBUCIÓN SUGERIDA DE LA NUEVA INVERSIÓN:")
-
-    total_distribuido: float = 0
-    for ticker, monto in distribucion.items():
-        if monto > 0:
-            porcentaje = (monto / monto_invertir) * 100
-            print(f"{ticker}: ${monto:,.2f} ({porcentaje:.1f}%)")
-            total_distribuido += monto
-
-    print(f"\nTotal distribuido: ${total_distribuido:,.2f}")
-
-    print("PESOS RESULTANTES DESPUÉS DE LA INVERSIÓN:")
-
-    for ticker, producto in portafolio.items():
-        if producto.asignacion >= 0 and not np.isnan(producto.saldo_actual):
-            valor_final = valores_actuales[ticker] + distribucion.get(
-                ticker, 0
-            )
-            peso_final = valor_final / portafolio_futuro
-            diferencia_objetivo = peso_final - producto.asignacion
-
-            print(f"{ticker}:")
-            print(f"  Peso final: {peso_final:.2%}")
-            print(f"  Objetivo: {producto.asignacion:.2%}")
-            print(f"  Diferencia: {diferencia_objetivo:+.2%}")
-    return distribucion
-
-
-def calcular_pesos(portafolio: dict[str, ProductoFinanciero]) -> float:
-    total_portafolio: float = 0
-    for saldo in portafolio.values():
-        if not np.isnan(saldo.saldo_actual):
-            total_portafolio += saldo.saldo_actual
-
-    _producto: ProductoFinanciero
-    for _producto in portafolio.values():
-        if not np.isnan(_producto.saldo_actual):
-            _producto.peso = _producto.saldo_actual / total_portafolio
-    print(f"\nPortafolio calculado: {total_portafolio:.2f}")
-    return total_portafolio
-
-
-def crear_portafolio(
-    df_productos: pd.DataFrame,
-) -> dict[str, ProductoFinanciero]:
-    """Crea un portafolio de productos financieros a partir de un DataFrame.
-
-    Convierte cada fila del DataFrame en un objeto ProductoFinanciero y los organiza
-    en un diccionario donde las claves son los identificadores de los productos.
-
-    Args:
-        df_productos (pd.DataFrame): DataFrame con información de productos financieros.
-            Cada fila representa un producto y debe contener columnas con los atributos
-            necesarios para crear objetos ProductoFinanciero.
-
-    Returns:
-        dict[str, ProductoFinanciero]: Diccionario donde las claves son los identificadores
-            de los productos (índice del DataFrame convertido a string) y los valores son
-            objetos ProductoFinanciero inicializados con los datos de cada fila.
-
-    Note:
-        - Utiliza el índice del DataFrame como identificador de producto.
-        - Para atributos faltantes, utiliza valores predeterminados.
-        - Imprime un mensaje de confirmación con el número de productos creados.
-        - No procesa transacciones; para eso se debe llamar a transacciones_a_producto().
-    """
-    productos: dict[str, ProductoFinanciero] = {}
-    for indice, fila in df_productos.iterrows():
-        producto = ProductoFinanciero(
-            producto_id=str(indice),
-            ticker=fila.get("ticket", "N/A"),
-            simulado=fila.get("simulado", False),
-            nombre_completo=fila.get("nombre", "Sin Nombre"),
-            administrador=fila.get("administrador", "N/A"),
-            moneda=fila.get("moneda", "COP"),
-            plataforma=fila.get("plataforma", "N/A"),
-            tipo_de_producto=fila.get("tipo_de_producto", "N/A"),
-            liquidez=fila.get("liquidez", "N/A"),
-            tipo_de_inversion=fila.get("tipo_de_inversion", "N/A"),
-            categoria=fila.get("categoria", "N/A"),
-            objetivo=fila.get("objetivo", "N/A"),
-            riesgo=fila.get("riesgo", "N/A"),
-            plazo=fila.get("plazo", "N/A"),
-            asignacion=fila.get("asignacion", 0.0),
-        )
-        productos[str(indice)] = producto
-    print(
-        f"\n✅ Portafolio creado AUTOMÁTICAMENTE con {len(productos)} productos"
-    )
-    return productos
