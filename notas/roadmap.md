@@ -1,15 +1,32 @@
 # Pyfinanzas Hoja de ruta
 
-## En desarrollo
+## En Desarrollo
 
-- [*] Desarrollar la clase Portafolio
+- [*] PORTAFOLIO: ver riesgos: Poder ver en un dict o en print por cada Riesgo, qué porcentaje de mi portafolio hay. De pronto es:
+
+```
+python
+    dict(Alto:dict[producto_id:float:.2%],Medio:...,Bajo:...).
+```
+
+- [ ] PORTAFOLIO: Poder filtrar todas las funciones por Plataforma (!), Riesgo, Plazo, etc.
+- [*] Producto: str que muestre la información completa.
+
+## Hecho
+
+- [x] Desarrollar la clase Portafolio
+- [x] Ver la TIR de cada producto y poderla comparar como un DataFrame
+- [x] Crear un `README.md` completo con la descripción del proyecto, instrucciones de instalación y ejemplos de uso
+- [x] Crear una estructura de paquete de Python adecuada con archivos `__init__.py`
 
 ## Backlog y parqueadero
 
 ### MIS IDEAS
 
+- [ ] PORTAFOLIO: De pronto la función "balancear" no se llama asi? En cualquier caso, debe tener un varificador de "inversión mínima", atada a una propiedad del ProductoFinanciero. Por ejemplo: en TYBA es de COP5000, pero en IBKR cambia dependiendo del producto. Esto haría que cuando se ejecute el algoritmo, si la asignación es menor a la inversión, se deba transferir esa parte a otra parte del portafolio.
+- [ ] PORTAFOLIO: Agregar una función para ver el retorno mensual.
+- [ ] PORTAFOLIO: Hacer el total de retorno en un df.
 - [ ] Ver la evolución histórica de mi portafolio desde enero de 2025
-- [x] Ver la TIR de cada producto y poderla comparar como un DataFrame
 - [ ] Calcular cuánto puedo retirar (la "regla del 4%")
 - [ ] Poder clasificar por tipo de riesgo cómo ha rendido al día de hoy
 - [ ] Que pueda ver en un gráfico de torta cómo está conformado hoy y compararlo con otra fecha
@@ -45,12 +62,10 @@
 - [ ] Crear un dashboard para monitorear el rendimiento del portafolio
 - [ ] Añadir capacidades de pronóstico y análisis de escenarios
 - [ ] Implementar algoritmos de optimización de portafolio
-- [x] Crear un `README.md` completo con la descripción del proyecto, instrucciones de instalación y ejemplos de uso
 - [ ] Documentar el esquema de datos y los formatos esperados
 - [ ] Crear un diccionario de datos que explique todos los términos financieros utilizados
 - [ ] Documentar la arquitectura del proyecto y las decisiones de diseño
 - [ ] Generar documentación de la API usando una herramienta como Sphinx
-- [x] Crear una estructura de paquete de Python adecuada con archivos `__init__.py`
 - [ ] Añadir tests unitarios para todos los módulos, empezando por la funcionalidad principal
 - [ ] Implementar un sistema de gestión de configuración (ej. usando archivos `.env`)
 - [ ] Crear una interfaz de línea de comandos (CLI) para ejecutar análisis
