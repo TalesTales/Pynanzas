@@ -28,7 +28,7 @@ known-first-party = ["pynanzas"]
 
 
 [tool.basedpyright]
-typeCheckingMode = "standard"
+typeCheckingMode = "recommended"
 pythonVersion = "3.13"
 include = ["."]
 exclude = ["**/__pycache__", "**/node_modules", "**/.venv"]
