@@ -15,7 +15,7 @@ class Portafolio:
         self.productos: dict[str, ProductoFinanciero] = self._crear_portafolio(
             df_productos
         )
-        self.id_de_producto_key: str  = id_de_producto_key
+        self.id_de_producto_key: str = id_de_producto_key
         self._trans_a_prods(
             df_transacciones=df_transacciones,
             dict_productos=self.productos,
@@ -292,3 +292,7 @@ class Portafolio:
         )
         df_saldos_porcent_hist: pd.DataFrame = saldos.div(totales, axis=0)
         return df_saldos_porcent_hist
+
+    def dist_riesgo(self) -> dict[str, dict[str, float]]:
+        dist_riesgo: dict[str, dict[str, float]] = {}
+        return dist_riesgo
