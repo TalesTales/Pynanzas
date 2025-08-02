@@ -18,7 +18,11 @@ sin aportes adicionales del inversionista.
 """
 
 MOVIMIENTOS_NO_APORTANTES: list[str] = [
-    "saldo_inicial", "comisiones", "comisión", "impuesto"] + MOVIMIENTOS_INTERESES
+    "saldo_inicial",
+    "comisiones",
+    "comisión",
+    "impuesto",
+] + MOVIMIENTOS_INTERESES
 """
 Lista de tipos de movimientos que no constituyen aportes directos del inversionista.
 
@@ -26,8 +30,13 @@ Incluye movimientos como saldos iniciales, comisiones, impuestos y los movimient
 de intereses definidos en MOVIMIENTOS_INTERESES.
 """
 
-MOVIMIENTOS_APORTES: list[str] = ["transferencia",
-                                  "compra", "venta", "retiro", "apertura"]
+MOVIMIENTOS_APORTES: list[str] = [
+    "transferencia",
+    "compra",
+    "venta",
+    "retiro",
+    "apertura",
+]
 """
 Lista de tipos de movimientos que representan aportes o retiros directos del inversionista.
 

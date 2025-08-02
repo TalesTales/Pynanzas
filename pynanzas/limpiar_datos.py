@@ -40,8 +40,9 @@ def prods_raw_a_df(
        - Convierte 'simulado' a tipo booleano
        - Aplica orden categórico a 'riesgo', 'liquidez' y 'plazos' según el diccionario
     """
-    identificador_producto: str = df_diccionario_raw["Ficha"].iloc[0].lower(
-    ).replace(" ", "_")
+    identificador_producto: str = (
+        df_diccionario_raw["Ficha"].iloc[0].lower().replace(" ", "_")
+    )
     df_diccionario: pd.DataFrame = df_diccionario_raw.copy()
     if not df_productos_raw.iloc[0].is_unique:
         print("Los primera fila de df_productos no tiene valores únicos!")

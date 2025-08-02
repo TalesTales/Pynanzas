@@ -15,7 +15,7 @@ class Portafolio:
         self.productos: dict[str, ProductoFinanciero] = self._crear_portafolio(
             df_productos
         )
-        self.id_de_producto_key = id_de_producto_key
+        self.id_de_producto_key: str  = id_de_producto_key
         self._trans_a_prods(
             df_transacciones=df_transacciones,
             dict_productos=self.productos,

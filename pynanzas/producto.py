@@ -130,8 +130,10 @@ class ProductoFinanciero:
             str: Representación en texto del producto financiero con sus atributos clave.
         """
         abierto_tag = "[ABIERTO]" if self.abierto else "[CERRADO]"
-        rep = (f"| Producto: {self.producto_id} | Estado: {abierto_tag} | "
-               f"Tipo{self.tipo_de_producto}")
+        rep = (
+            f"| Producto: {self.producto_id} | Estado: {abierto_tag} | "
+            f"Tipo{self.tipo_de_producto}"
+        )
         if self.abierto:
             xirr_display = (
                 f"{self.xirr:.2%}"
