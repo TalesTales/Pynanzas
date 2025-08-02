@@ -131,8 +131,8 @@ class ProductoFinanciero:
         """
         abierto_tag = "[ABIERTO]" if self.abierto else "[CERRADO]"
         rep = (
-            f"| Producto: {self.producto_id} | Estado: {abierto_tag} | "
-            f"Tipo{self.tipo_de_producto}"
+            f"| {self.nombre_completo} | {abierto_tag} | "
+            f"Plataforma: {self.plataforma}, Tipo: {self.tipo_de_producto}, Riesgo: {self.riesgo}, Plazo: {self.plazo}"
         )
         if self.abierto:
             xirr_display = (
@@ -140,7 +140,7 @@ class ProductoFinanciero:
                 if (self.xirr is not None and not np.isnan(self.xirr))
                 else "N/A"
             )
-            rep += f"| Saldo: COP ${self.saldo_actual:.2f}"
+            rep += f"| Saldo: COP ${self.saldo_actual:,.2f}"  # TODO: Modificar moneda
             rep += f" | XIRR: {xirr_display}"
             rep += (
                 f" | Peso: {self.peso:.2%}"
@@ -149,12 +149,11 @@ class ProductoFinanciero:
             )
             rep += (
                 f" | Asignación: {self.asignacion:.2%}"
-                if (
-                    self.asignacion is not None
-                    and not np.isnan(self.asignacion)
-                )
+                if (self.asignacion is not np.isnan(self.asignacion))
                 else "N/A"
             )
+
+            rep += f" | Administrado por {self.administrador}"
         return rep
 
     def procesar_trans(self, df_transacciones_producto: pd.DataFrame) -> None:
