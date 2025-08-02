@@ -1,3 +1,9 @@
+## 0.8.0 (2025-08-01)
+
+### Feat
+
+- **portafolio**: saldos_porcent_hist implementado
+
 ## 0.7.0 (2025-07-31)
 
 ### Feat
