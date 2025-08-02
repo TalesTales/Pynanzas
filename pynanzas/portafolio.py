@@ -1,13 +1,16 @@
-from sys import exit
 import numpy as np
 import pandas as pd
+from pandas import Series
 
 from .producto import ProductoFinanciero
 
 
 class Portafolio:
     def __init__(
-        self, df_productos: pd.DataFrame, df_transacciones: pd.DataFrame, id_de_producto_key: str
+        self,
+        df_productos: pd.DataFrame,
+        df_transacciones: pd.DataFrame,
+        id_de_producto_key: str,
     ) -> None:
         self.productos: dict[str, ProductoFinanciero] = self._crear_portafolio(
             df_productos
@@ -16,14 +19,17 @@ class Portafolio:
         self._trans_a_prods(
             df_transacciones=df_transacciones,
             dict_productos=self.productos,
-            id_de_producto=self.id_de_producto_key
+            id_de_producto=self.id_de_producto_key,
         )
         self.total: float = self._calcular_total()
         self.intereses_total: float = self._calcular_intereses()
         self._calcular_pesos()
 
     def __str__(self):
-        return f"Portafolio: ({self.productos.__len__}) productos. COP${self.total:.2f}"
+        return (
+            f"Portafolio: ({len(self.productos)}) productos. COP"
+            f"${self.total:,.2f}"
+        )  # TODO: asegurar que total se calcule cop
 
     def _crear_portafolio(
         self, df_productos: pd.DataFrame
@@ -51,6 +57,9 @@ class Portafolio:
                     asignacion=fila.get("asignacion", 0.0),
                 )
                 setattr(self, nuevo_producto.producto_id, nuevo_producto)
+                print(
+                    f"Portafolio._crear_portafolio. Creado: {producto_id}"
+                )  # Test
                 productos[str(producto_id)] = nuevo_producto
             return productos
 
@@ -58,11 +67,8 @@ class Portafolio:
         self,
         df_transacciones: pd.DataFrame,
         dict_productos: dict[str, ProductoFinanciero],
-        id_de_producto: str
+        id_de_producto: str,
     ) -> None:
-        """
-
-        """
         try:
             for producto_id, objeto_producto in dict_productos.items():
                 df_filtrado_para_producto = df_transacciones[
@@ -75,18 +81,27 @@ class Portafolio:
 
     def _calcular_total(self) -> float:
         saldos = np.array(
-            [producto.saldo_actual for producto in self.productos.values()]
+            [
+                producto.saldo_actual
+                for producto in self.productos.values()
+                if producto.moneda == "COP"
+            ]
         )
         saldos_validos = saldos[~np.isnan(saldos)]
+
         total = np.sum(saldos_validos)
         return total
 
     def _calcular_intereses(self) -> float:
         interes = np.array(
-            [producto.intereses for producto in self.productos.values()]
+            [
+                producto.intereses
+                for producto in self.productos.values()
+                if producto.moneda == "COP"
+            ]
         )
-        intereses_valido = interes[~np.isnan(interes)]
-        total = np.sum(intereses_valido)
+        intereses_validos = interes[~np.isnan(interes)]
+        total = np.sum(intereses_validos)
         return total
 
     def _calcular_pesos(self) -> None:
@@ -158,7 +173,9 @@ class Portafolio:
         print("PESOS RESULTANTES DESPUÉS DE LA INVERSIÓN:")
 
         for ticker, producto in portafolio.items():
-            if producto.asignacion >= 0 and not np.isnan(producto.saldo_actual):
+            if producto.asignacion >= 0 and not np.isnan(
+                producto.saldo_actual
+            ):
                 valor_final = valores_actuales[ticker] + distribucion.get(
                     ticker, 0
                 )
@@ -192,10 +209,12 @@ class Portafolio:
             ):
                 continue
 
-            producto_xirr = producto.hist_trans[[
-                "fecha", "xirr_historica"]].copy()
-            producto_xirr = producto_xirr[~producto_xirr["xirr_historica"].isna(
-            )]
+            producto_xirr = producto.hist_trans[
+                ["fecha", "xirr_historica"]
+            ].copy()
+            producto_xirr = producto_xirr[
+                ~producto_xirr["xirr_historica"].isna()
+            ]
 
             if producto_xirr.empty:
                 continue
@@ -218,7 +237,9 @@ class Portafolio:
             # último valor
         return xirr_historicas_df
 
-    def saldos_hist(self, abiertos: bool = True, simulados: bool = False) -> pd.DataFrame:
+    def saldos_hist(
+        self, abiertos: bool = True, simulados: bool = False
+    ) -> pd.DataFrame:
         portafolio = self.productos
         historico_acumulado_df: pd.DataFrame = pd.DataFrame()
 
@@ -262,5 +283,12 @@ class Portafolio:
             # último valor
         return historico_acumulado_df
 
-    def saldos_porcent_hist(self):
-        raise NotImplementedError("Este método no esta implementado.")
+    def saldos_porcent_hist(
+        self, abiertos: bool = True, simulados: bool = False
+    ) -> pd.DataFrame:
+        saldos: pd.DataFrame = self.saldos_hist(abiertos, simulados)
+        totales: Series[float] = self.saldos_hist(abiertos, simulados).sum(
+            axis=1
+        )
+        df_saldos_porcent_hist: pd.DataFrame = saldos.div(totales, axis=0)
+        return df_saldos_porcent_hist
