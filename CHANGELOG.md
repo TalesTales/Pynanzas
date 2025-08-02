@@ -1,3 +1,13 @@
+## 0.9.0 (2025-08-02)
+
+### Feat
+
+- **portafolio**: inicio de función dist_riesgo
+
+### Refactor
+
+- **portafolio**: actualizada __str__
+
 ## 0.8.0 (2025-08-01)
 
 ### Feat
