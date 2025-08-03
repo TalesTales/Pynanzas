@@ -60,13 +60,14 @@ def cargar_datos(
                 "diccionario": df_diccionario_read,
             }
             print(
-                "✅ ¡Éxito! Hojas 'Transacciones', 'Diccionario' y 'Productos' cargadas desde Excel."
+                 "cargar_datos: Hojas 'Transacciones', 'Diccionario' y "
+                 "'Productos' cargadas desde Excel."
             )
         else:
-            print("Archivo cargado, pero df vacíos.")
+            print("cargar_datos: Archivo cargado, pero df vacíos.")
     except FileNotFoundError:
         print(
-            f"⚠️ No se encontró {
+            f"cargar_datos:⚠️ No se encontró {
                 archivo_path.name
             }. Buscando archivos CSV individuales..."
         )
@@ -91,22 +92,22 @@ def cargar_datos(
                     "productos": df_productos_read,
                     "diccionario": df_diccionario_read,
                 }
-                print("✅ ¡Éxito! Archivos CSV cargados como alternativa.")
+                print("cargar_datos: Archivos CSV cargados.")
             else:
-                print("Archivo cargado, pero df vacíos.")
+                print("cargar_datos: Archivo cargado, pero df vacíos.")
         except FileNotFoundError:
             print(
-                "❌ ERROR: No se encontró el archivo Excel principal ni los CSV individuales."
+                "cargar_datos: ERROR: No se encontró el archivo Excel principal ni los CSV individuales."
             )
             raise
     except Exception as e:
         print(
-            f"❌ ERROR: Ocurrió un problema al leer las hojas del archivo Excel: {e}"
+            f"cargar_datos: ERROR: Ocurrió un problema al leer las hojas del archivo Excel: {e}"
         )
         raise
 
     if not data_path or not os.path.exists(data_path):
-        print("\n⚠️ ¡ATENCIÓN! La variable BASE_PATH no está configurada.")
+        print("\ncargar_datos:️ ¡ATENCIÓN! La variable BASE_PATH no está configurada.")
     else:
-        print("✅ Archivo leído exitosamente.")
+        print("cargar_datos: Archivo leído exitosamente.")
     return data

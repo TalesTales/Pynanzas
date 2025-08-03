@@ -2,8 +2,6 @@
 Pynanzas: Un paquete para el análisis y seguimiento de portafolios de inversión.
 """
 
-from pathlib import Path
-import os
 import pandas as pd
 
 from .constants import (
@@ -32,4 +30,4 @@ DF_PRODS: pd.DataFrame = prods_raw_a_df(
 DF_TRANS: pd.DataFrame = trans_raw_to_df(DATOS["transacciones"])
 PROD_ID: str = DATOS["diccionario"]["Ficha"].iloc[0].lower().replace(" ", "_")
 
-print("Datos cargados")
+print("__init__:Datos cargados")
