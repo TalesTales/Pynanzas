@@ -21,6 +21,9 @@ __all__ = [
     "MOVIMIENTOS_INTERESES",
     "MOVIMIENTOS_NO_APORTANTES",
     "PROD_ID",
+    "DF_PRODS",
+    "DF_TRANS",
+    "PROD_ID",
 ]
 
 DATOS: dict[str, pd.DataFrame] = cargar_datos()
