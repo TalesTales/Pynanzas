@@ -1,3 +1,9 @@
+## 0.9.3 (2025-08-04)
+
+### Refactor
+
+- **producto**: _str_ actualizado para mostrar un repr según py
+
 ## 0.9.2 (2025-08-04)
 
 ### Refactor
