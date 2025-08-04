@@ -75,7 +75,7 @@ class ProductoFinanciero:
         return self.producto_id == other.producto_id
 
     @override
-    def __str__(self):
+    def __str__(self)-> str:
 
         abierto_tag: str = "[ABIERTO]" if self.abierto else "[CERRADO]"
         string: str = (
@@ -103,6 +103,10 @@ class ProductoFinanciero:
                 else "N/A"
             )
         return string
+
+    @override
+    def __repr__(self) -> str: #TODO: Mejorar representación
+       return f"pynanzas.producto.ProductoFinancierto: {self.producto_id}"
 
     def procesar_trans(self, df_transacciones_producto: pd.DataFrame) -> None:
         """Procesa todas las transacciones del producto y calcula métricas.
