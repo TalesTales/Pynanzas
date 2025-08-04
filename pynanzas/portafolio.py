@@ -89,7 +89,7 @@ class Portafolio:
         )
         saldos_validos = saldos[~np.isnan(saldos)]
 
-        total = np.sum(saldos_validos)
+        total: float = np.sum(saldos_validos)
         return total
 
     def _calcular_intereses(self) -> float:

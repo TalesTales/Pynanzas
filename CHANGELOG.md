@@ -1,3 +1,9 @@
+## 0.9.1 (2025-08-04)
+
+### Refactor
+
+- **producto**: __str__ mejor representado
+
 ## 0.9.0 (2025-08-02)
 
 ### Feat
