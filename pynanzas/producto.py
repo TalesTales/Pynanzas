@@ -11,48 +11,6 @@ from .constants import MOVIMIENTOS_APORTES, MOVIMIENTOS_INTERESES
 
 @dataclass
 class ProductoFinanciero:
-    """
-    Representa un único producto o activo financiero dentro del portafolio.
-
-    v 4.0
-
-    Esta clase encapsula toda la información y lógica relacionada con un producto
-    financiero individual, incluyendo sus características, historial de transacciones,
-    métricas de rendimiento y cálculos de rentabilidad.
-
-    La clase maneja automáticamente el procesamiento de transacciones y el cálculo
-    de métricas como XIRR, saldos, aportes e intereses.
-
-    Attributes:
-        producto_id (str): Identificador único del producto.
-        nombre_completo (str): Nombre completo del producto financiero.
-        ticker (str): Símbolo o ticker del producto.
-        simulado (bool): Indica si es un producto simulado o real.
-        administrador (str): Entidad que administra el producto.
-        moneda (str): Moneda en la que se denomina el producto.
-        plataforma (str): Plataforma donde se opera el producto.
-        tipo_de_producto (str): Tipo de producto financiero.
-        liquidez (str): Nivel de liquidez del producto.
-        tipo_de_inversion (str): Tipo de inversión.
-        categoria (str): Categoría del producto.
-        objetivo (str): Objetivo de inversión.
-        riesgo (str): Nivel de riesgo del producto.
-        plazo (str): Plazo de inversión.
-        asignacion (float): Porcentaje de asignación objetivo en el portafolio.
-        abierto (bool): Indica si el producto está actualmente abierto.
-        peso (float): Peso actual del producto en el portafolio.
-        saldo_inicial (float): Saldo inicial del producto.
-        saldo_actual (float): Saldo actual del producto.
-        aportes_totales (float): Total de aportes realizados.
-        intereses (float): Total de intereses generados.
-        rentabilidad_acumulada (float): Rentabilidad acumulada del producto.
-        historial_transacciones (pd.DataFrame): Historial completo de transacciones.
-        fecha_primera_transaccion (date): Fecha de la primera transacción.
-        fecha_ultima_transaccion (date): Fecha de la última transacción.
-        xirr (float): Tasa interna de retorno del producto.
-        es_instrumento_mercado (bool): Indica si es un instrumento de mercado.
-    """
-
     producto_id: str
     nombre_completo: str
     ticker: str
@@ -118,21 +76,13 @@ class ProductoFinanciero:
 
     @override
     def __str__(self):
-        """
-        Genera una representación en texto del producto financiero.
 
-        Crea una cadena de texto con información clave del producto, incluyendo su ID,
-        estado (abierto/cerrado) y tipo. Si el producto está abierto, también incluye
-        información financiera como saldo actual, XIRR, peso en el portafolio y
-        asignación objetivo.
-
-        Returns:
-            str: Representación en texto del producto financiero con sus atributos clave.
-        """
-        abierto_tag = "[ABIERTO]" if self.abierto else "[CERRADO]"
-        rep = (
-            f"| {self.nombre_completo} | {abierto_tag} | "
-            f"Plataforma: {self.plataforma}, Tipo: {self.tipo_de_producto}, Riesgo: {self.riesgo}, Plazo: {self.plazo}"
+        abierto_tag: str = "[ABIERTO]" if self.abierto else "[CERRADO]"
+        string: str = (
+            f"{self.nombre_completo}: {self.ticker} | {abierto_tag} | "
+            f"Plataforma: {self.plataforma}, Tipo: {self.tipo_de_producto}, "
+            f"Riesgo: {self.riesgo}, Plazo: {self.plazo}, "
+            f"Administrado por {self.administrador}"
         )
         if self.abierto:
             xirr_display = (
@@ -140,21 +90,19 @@ class ProductoFinanciero:
                 if (self.xirr is not None and not np.isnan(self.xirr))
                 else "N/A"
             )
-            rep += f"| Saldo: COP ${self.saldo_actual:,.2f}"  # TODO: Modificar moneda
-            rep += f" | XIRR: {xirr_display}"
-            rep += (
+            string += f"| Saldo: COP ${self.saldo_actual:,.2f}"  # TODO: Modificar moneda
+            string += f" | XIRR: {xirr_display}"
+            string += (
                 f" | Peso: {self.peso:.2%}"
                 if (self.peso is not None and not np.isnan(self.peso))
                 else "N/A"
             )
-            rep += (
+            string += (
                 f" | Asignación: {self.asignacion:.2%}"
                 if (self.asignacion is not np.isnan(self.asignacion))
                 else "N/A"
             )
-
-            rep += f" | Administrado por {self.administrador}"
-        return rep
+        return string
 
     def procesar_trans(self, df_transacciones_producto: pd.DataFrame) -> None:
         """Procesa todas las transacciones del producto y calcula métricas.
