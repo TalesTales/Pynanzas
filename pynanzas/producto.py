@@ -2,9 +2,9 @@ from dataclasses import dataclass, field
 from datetime import date
 
 import numpy as np
-from overrides import override
 import pandas as pd
 import pyxirr
+from overrides import override
 
 from .constants import MOVIMIENTOS_APORTES, MOVIMIENTOS_INTERESES
 
@@ -75,7 +75,7 @@ class ProductoFinanciero:
         return self.producto_id == other.producto_id
 
     @override
-    def __str__(self)-> str:
+    def __str__(self) -> str:
 
         abierto_tag: str = "[ABIERTO]" if self.abierto else "[CERRADO]"
         string: str = (
@@ -105,8 +105,9 @@ class ProductoFinanciero:
         return string
 
     @override
-    def __repr__(self) -> str: #TODO: Mejorar representación
-       return f"pynanzas.producto.ProductoFinanciero: {self.producto_id}"
+    def __repr__(self) -> str:  # TODO: Mejorar representación
+        return (f"<pynanzas.producto.ProductoFinanciero: {self.producto_id} "
+                f"at {hex(id(self))}>")
 
     def procesar_trans(self, df_transacciones_producto: pd.DataFrame) -> None:
         """Procesa todas las transacciones del producto y calcula métricas.
@@ -148,7 +149,7 @@ class ProductoFinanciero:
         """Calcula saldos, aportes e intereses."""
         self.saldo_inicial = self.hist_trans[
             self.hist_trans["movimiento"] == "saldo_inicial"
-        ]["valor"].sum()
+            ]["valor"].sum()
 
         self.aportes_totales = self.hist_trans[
             self.hist_trans["movimiento"].isin(values=MOVIMIENTOS_APORTES)
@@ -167,12 +168,12 @@ class ProductoFinanciero:
         self.abierto = False if self.saldo_actual == 0.0 else True
 
         self.rentabilidad_acumulada = (
-            self.saldo_actual - self.aportes_totales - self.saldo_inicial
+                self.saldo_actual - self.aportes_totales - self.saldo_inicial
         )
 
         df_movimientos_reales: pd.DataFrame = self.hist_trans[
             self.hist_trans["movimiento"] != "saldo_inicial"
-        ]
+            ]
 
         if not df_movimientos_reales.empty:
             self.fecha_primera_transaccion = df_movimientos_reales[
@@ -240,10 +241,10 @@ class ProductoFinanciero:
             try:
                 resultado: float | None = pyxirr.xirr(fechas, valores)
                 if (
-                    resultado is not None
-                    and not np.isinf(resultado)
-                    and not np.isnan(resultado)
-                    and -10 < resultado < 10
+                        resultado is not None
+                        and not np.isinf(resultado)
+                        and not np.isnan(resultado)
+                        and -10 < resultado < 10
                 ):
                     xirr_actual = resultado
             except Exception as e:
@@ -277,8 +278,8 @@ class ProductoFinanciero:
             de manipular directamente el historial completo de transacciones.
         """
         if (
-            self.hist_trans.empty
-            or "xirr_historica" not in self.hist_trans.columns
+                self.hist_trans.empty
+                or "xirr_historica" not in self.hist_trans.columns
         ):
             return pd.DataFrame()
         else:
