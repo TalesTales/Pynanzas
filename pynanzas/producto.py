@@ -106,7 +106,7 @@ class ProductoFinanciero:
 
     @override
     def __repr__(self) -> str: #TODO: Mejorar representación
-       return f"pynanzas.producto.ProductoFinancierto: {self.producto_id}"
+       return f"pynanzas.producto.ProductoFinanciero: {self.producto_id}"
 
     def procesar_trans(self, df_transacciones_producto: pd.DataFrame) -> None:
         """Procesa todas las transacciones del producto y calcula métricas.
