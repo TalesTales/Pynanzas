@@ -14,6 +14,7 @@ python
 
 ## Hecho
 
+- [ ] Agregar DocString a todo
 - [x] Desarrollar la clase Portafolio
 - [x] Ver la TIR de cada producto y poderla comparar como un DataFrame
 - [x] Crear un `README.md` completo con la descripción del proyecto, instrucciones de instalación y ejemplos de uso
