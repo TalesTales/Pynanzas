@@ -1,3 +1,10 @@
+## 0.9.2 (2025-08-04)
+
+### Refactor
+
+- **pynanzas.init**: Se agregaron DF_PRODS, DF_TRANS, PRODU_ID al __all__
+- **producto**: __repr__ se @override para representar mejor las instancias de ProductoFinanciero
+
 ## 0.9.1 (2025-08-04)
 
 ### Refactor
