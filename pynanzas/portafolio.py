@@ -7,10 +7,10 @@ from .producto import ProductoFinanciero
 
 class Portafolio:
     def __init__(
-        self,
-        df_productos: pd.DataFrame,
-        df_transacciones: pd.DataFrame,
-        id_de_producto_key: str,
+            self,
+            df_productos: pd.DataFrame,
+            df_transacciones: pd.DataFrame,
+            id_de_producto_key: str,
     ) -> None:
         self.productos: dict[str, ProductoFinanciero] = self._crear_portafolio(
             df_productos
@@ -32,7 +32,7 @@ class Portafolio:
         )  # TODO: asegurar que total se calcule cop
 
     def _crear_portafolio(
-        self, df_productos: pd.DataFrame
+            self, df_productos: pd.DataFrame
     ) -> dict[str, ProductoFinanciero]:
         if df_productos.empty:
             raise ValueError("df_productos cannot be empty")
@@ -63,17 +63,17 @@ class Portafolio:
                 productos[str(producto_id)] = nuevo_producto
             return productos
 
+    @staticmethod
     def _trans_a_prods(
-        self,
-        df_transacciones: pd.DataFrame,
-        dict_productos: dict[str, ProductoFinanciero],
-        id_de_producto: str,
+            df_transacciones: pd.DataFrame,
+            dict_productos: dict[str, ProductoFinanciero],
+            id_de_producto: str,
     ) -> None:
         try:
             for producto_id, objeto_producto in dict_productos.items():
                 df_filtrado_para_producto = df_transacciones[
                     df_transacciones[id_de_producto] == producto_id
-                ]
+                    ]
                 objeto_producto.procesar_trans(df_filtrado_para_producto)
         except Exception as e:
             error_msg = f"Error inesperado durante la actualización: {str(e)}"
@@ -155,7 +155,7 @@ class Portafolio:
         else:
             for ticker, producto in portafolio.items():
                 if producto.asignacion >= 0 and not np.isnan(
-                    producto.saldo_actual
+                        producto.saldo_actual
                 ):
                     distribucion[ticker] = monto_invertir * producto.asignacion
 
@@ -174,7 +174,7 @@ class Portafolio:
 
         for ticker, producto in portafolio.items():
             if producto.asignacion >= 0 and not np.isnan(
-                producto.saldo_actual
+                    producto.saldo_actual
             ):
                 valor_final = valores_actuales[ticker] + distribucion.get(
                     ticker, 0
@@ -189,9 +189,9 @@ class Portafolio:
         return distribucion
 
     def xirr_historicas(
-        self,
-        abiertos: bool | None = True,
-        simulados: bool | None = False,
+            self,
+            abiertos: bool | None = True,
+            simulados: bool | None = False,
     ) -> pd.DataFrame:
         portafolio: dict[str, ProductoFinanciero] = self.productos
         xirr_historicas_df: pd.DataFrame = pd.DataFrame()
@@ -204,8 +204,8 @@ class Portafolio:
                 continue
 
             if (
-                producto.hist_trans.empty
-                or "xirr_historica" not in producto.hist_trans.columns
+                    producto.hist_trans.empty
+                    or "xirr_historica" not in producto.hist_trans.columns
             ):
                 continue
 
@@ -238,7 +238,7 @@ class Portafolio:
         return xirr_historicas_df
 
     def saldos_hist(
-        self, abiertos: bool = True, simulados: bool = False
+            self, abiertos: bool = True, simulados: bool = False
     ) -> pd.DataFrame:
         portafolio = self.productos
         historico_acumulado_df: pd.DataFrame = pd.DataFrame()
@@ -251,8 +251,8 @@ class Portafolio:
                 continue
 
             if (
-                producto.hist_trans.empty
-                or "saldo_historico" not in producto.hist_trans.columns
+                    producto.hist_trans.empty
+                    or "saldo_historico" not in producto.hist_trans.columns
             ):
                 continue
 
@@ -284,7 +284,7 @@ class Portafolio:
         return historico_acumulado_df
 
     def saldos_porcent_hist(
-        self, abiertos: bool = True, simulados: bool = False
+            self, abiertos: bool = True, simulados: bool = False
     ) -> pd.DataFrame:
         saldos: pd.DataFrame = self.saldos_hist(abiertos, simulados)
         totales: Series[float] = self.saldos_hist(abiertos, simulados).sum(
@@ -293,6 +293,24 @@ class Portafolio:
         df_saldos_porcent_hist: pd.DataFrame = saldos.div(totales, axis=0)
         return df_saldos_porcent_hist
 
-    def dist_riesgo(self) -> dict[str, dict[str, float]]:
-        dist_riesgo: dict[str, dict[str, float]] = {}
+    def dist_riesgo(self) -> pd.DataFrame:
+        dist_riesgo: dict[str, float] | pd.DataFrame = {
+            "Altísimo": 0,
+            "Alto":     0,
+            "Medio":    0,
+            "Bajo":     0,
+        }
+
+        for producto in self.productos.values():
+            if producto.riesgo == "Altísimo":
+                dist_riesgo["Altísimo"] += producto.saldo_actual
+            elif producto.riesgo == "Alto":
+                dist_riesgo["Alto"] += producto.saldo_actual
+            elif producto.riesgo == "Medio":
+                dist_riesgo["Medio"] += producto.saldo_actual
+            elif producto.riesgo == "Bajo":
+                dist_riesgo["Bajo"] += producto.saldo_actual
+            else:
+                pass
+        dist_riesgo = pd.DataFrame(dist_riesgo, index=[0])
         return dist_riesgo
