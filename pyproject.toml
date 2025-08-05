@@ -32,10 +32,7 @@ typeCheckingMode = "standard"
 pythonVersion = "3.13"
 include = ["."]
 exclude = ["**/__pycache__", "**/node_modules", "**/.venv"]
-venvPath = "."
-venv = ".venv"
 reportMissingTypeStubs = false
-reportMissingImports = true
 
 [tool.commitizen]
 name = "cz_conventional_commits"
