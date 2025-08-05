@@ -1,3 +1,9 @@
+## 0.10.0 (2025-08-04)
+
+### Feat
+
+- **portafolio**: se creó la función dist_riesgo
+
 ## 0.9.3 (2025-08-04)
 
 ### Refactor
