@@ -51,20 +51,10 @@ readme = "README.md"
 python = ">=3.13, <3.14"
 pandas = "^2.3.1"
 numpy = "^2.3.2"
-yfinance = "^0.2.65"
 pyxirr = "^0.10.7"
 pandas-stubs = "^2.3.0.250703"
 openpyxl = "^3.1.5"
-streamlit = "^1.47.1"
-matplotlib = "^3.10.5"
-plotly = "^6.2.0"
-ruff = "^0.12.7"
-ipykernel = "^6.30.1"
-basedpyright = "^1.31.1"
-pyright = "^1.1.403"
-ipython = "^9.4.0"
 overrides = "^7.7.0"
-notebook = "^7.4.5"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -75,6 +65,7 @@ ipykernel = "^6.30.1"
 ipython = "^9.4.0"
 overrides = "^7.7.0"
 commitizen = "^4.8.3"
+notebook = "^7.4.5"
 
 [build-system]
 requires = ["poetry-core"]
