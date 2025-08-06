@@ -2,19 +2,12 @@
 
 ## En Desarrollo
 
-- [*] PORTAFOLIO: ver riesgos: Poder ver en un dict o en print por cada Riesgo, qué porcentaje de mi portafolio hay. De
-  pronto es:
-
-```
-python
-    dict(Alto:dict[producto_id:float:.2%],Medio:...,Bajo:...).
-```
-
-- [ ] PORTAFOLIO: Poder filtrar todas las funciones por Plataforma (!), Riesgo, Plazo, etc.
+- [*] PORTAFOLIO: Poder filtrar todas las funciones por Plataforma (!), Riesgo, Plazo, etc.
 
 ## Hecho
 
 - [ ] Agregar DocString a todo
+- [x] PORTAFOLIO: ver riesgos: Poder ver en un dict o en print por cada Riesgo, qué porcentaje de mi portafolio hay. De
 - [x] Desarrollar la clase Portafolio
 - [x] Ver la TIR de cada producto y poderla comparar como un DataFrame
 - [x] Crear un `README.md` completo con la descripción del proyecto, instrucciones de instalación y ejemplos de uso
