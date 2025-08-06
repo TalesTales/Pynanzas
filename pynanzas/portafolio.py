@@ -293,8 +293,8 @@ class Portafolio:
         df_saldos_porcent_hist: pd.DataFrame = saldos.div(totales, axis=0)
         return df_saldos_porcent_hist
 
-    def dist_riesgo(self) -> pd.DataFrame:
-        dist_riesgo: dict[str, float] | pd.DataFrame = {
+    def dist_riesgo(self) -> pd.Series:#TODO: Se puede optimizar
+        dist_riesgo: dict[str, float] | pd.Series = {
             "Altísimo": 0,
             "Alto":     0,
             "Medio":    0,
@@ -312,5 +312,5 @@ class Portafolio:
                 dist_riesgo["Bajo"] += producto.saldo_actual
             else:
                 pass
-        dist_riesgo = pd.DataFrame(dist_riesgo, index=[0])
+        dist_riesgo = pd.Series(dist_riesgo, name="dist_riesgo", dtype="float")
         return dist_riesgo
