@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 from pandas import Series
 
+from .analisis import dist_riesgo
 from .producto import ProductoFinanciero
 
 
@@ -294,23 +295,4 @@ class Portafolio:
         return df_saldos_porcent_hist
 
     def dist_riesgo(self) -> pd.Series:#TODO: Se puede optimizar
-        dist_riesgo: dict[str, float] | pd.Series = {
-            "Altísimo": 0,
-            "Alto":     0,
-            "Medio":    0,
-            "Bajo":     0,
-        }
-
-        for producto in self.productos.values():
-            if producto.riesgo == "Altísimo":
-                dist_riesgo["Altísimo"] += producto.saldo_actual
-            elif producto.riesgo == "Alto":
-                dist_riesgo["Alto"] += producto.saldo_actual
-            elif producto.riesgo == "Medio":
-                dist_riesgo["Medio"] += producto.saldo_actual
-            elif producto.riesgo == "Bajo":
-                dist_riesgo["Bajo"] += producto.saldo_actual
-            else:
-                pass
-        dist_riesgo = pd.Series(dist_riesgo, name="dist_riesgo", dtype="float")
-        return dist_riesgo
+        return dist_riesgo(productos=self.productos)

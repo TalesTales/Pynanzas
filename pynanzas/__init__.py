@@ -4,6 +4,7 @@ Pynanzas: Un paquete para el análisis y seguimiento de portafolios de inversió
 
 import pandas as pd
 
+from .analisis import dist_riesgo
 from .constants import (
     MOVIMIENTOS_APORTES,
     MOVIMIENTOS_INTERESES,
@@ -24,6 +25,7 @@ __all__ = [
     "DF_PRODS",
     "DF_TRANS",
     "PROD_ID",
+    "dist_riesgo"
 ]
 
 DATOS: dict[str, pd.DataFrame] = cargar_datos()
