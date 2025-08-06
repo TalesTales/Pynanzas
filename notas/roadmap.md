@@ -18,6 +18,9 @@
 
 ### MIS IDEAS
 
+- BUG: Cuando se envía un NAN a balancear en Portafolio, se le asigna la completa totalidad del saldo
+- [ ] ProductoFinanciero o portafolio: encontrar la forma de simular un pd.Dataframe o un ProductoFinanciero despues
+  de "balancer" para que pueda ver la dist_riesgo antes y después, todo con filtros.
 - [ ] GLOBAL: Enums para Riesgo, plataforma, etc.
 - [ ] PORTAFOLIO: De pronto la función "balancear" no se llama asi? En cualquier caso, debe tener un varificador de "
   inversión mínima", atada a una propiedad del ProductoFinanciero. Por ejemplo: en TYBA es de COP5000, pero en IBKR
