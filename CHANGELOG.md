@@ -1,3 +1,9 @@
+## 0.12.2 (2025-08-06)
+
+### Refactor
+
+- **analisis**: dist_riesgo ahora es una función fuera del scope de portafolio
+
 ## 0.12.1 (2025-08-05)
 
 ### Fix
