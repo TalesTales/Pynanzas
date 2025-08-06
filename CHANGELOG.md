@@ -1,3 +1,9 @@
+## 0.12.1 (2025-08-05)
+
+### Fix
+
+- **portafolio**: balancear ahora se trunca
+
 ## 0.12.0 (2025-08-05)
 
 ### Feat
