@@ -132,12 +132,12 @@ class Portafolio:
                 valores_objetivo[ticker] = valor_objetivo
                 diferencias[ticker] = diferencia
 
-                print(f"\n{ticker}:")
-                print(f"  Peso actual: {producto.peso:.2%}")
-                print(f"  Peso objetivo: {producto.asignacion:.2%}")
-                print(f"  Valor actual: ${valor_actual:,.2f}")
-                print(f"  Valor objetivo: ${valor_objetivo:,.2f}")
-                print(f"  Diferencia: ${diferencia:,.2f}")
+                # print(f"\n{ticker}:")
+                # print(f"  Peso actual: {producto.peso:.2%}")
+                # print(f"  Peso objetivo: {producto.asignacion:.2%}")
+                # print(f"  Valor actual: ${valor_actual:,.2f}")
+                # print(f"  Valor objetivo: ${valor_objetivo:,.2f}")
+                # print(f"  Diferencia: ${diferencia:,.2f}")
 
         diferencias_positivas: dict[str, float] = {
             k: v for k, v in diferencias.items() if v > 0
@@ -150,7 +150,7 @@ class Portafolio:
         if suma_diferencias_positivas > 0:
             for ticker, diferencia in diferencias_positivas.items():
                 proporcion = diferencia / suma_diferencias_positivas
-                monto_asignado = monto_invertir * proporcion
+                monto_asignado = np.trunc(monto_invertir * proporcion)
                 distribucion[ticker] = monto_asignado
         else:
             for ticker, producto in portafolio.items():
@@ -159,18 +159,18 @@ class Portafolio:
                 ):
                     distribucion[ticker] = monto_invertir * producto.asignacion
 
-        print("DISTRIBUCIÓN SUGERIDA DE LA NUEVA INVERSIÓN:")
+        # print("DISTRIBUCIÓN SUGERIDA DE LA NUEVA INVERSIÓN:")
 
         total_distribuido: float = 0
         for ticker, monto in distribucion.items():
             if monto > 0:
                 porcentaje = (monto / monto_invertir) * 100
-                print(f"{ticker}: ${monto:,.2f} ({porcentaje:.1f}%)")
+                # print(f"{ticker}: ${monto:,.2f} ({porcentaje:.1f}%)")
                 total_distribuido += monto
 
-        print(f"\nTotal distribuido: ${total_distribuido:,.2f}")
-
-        print("PESOS RESULTANTES DESPUÉS DE LA INVERSIÓN:")
+        # print(f"\nTotal distribuido: ${total_distribuido:,.2f}")
+        #
+        # print("PESOS RESULTANTES DESPUÉS DE LA INVERSIÓN:")
 
         for ticker, producto in portafolio.items():
             if producto.asignacion >= 0 and not np.isnan(
@@ -182,10 +182,10 @@ class Portafolio:
                 peso_final = valor_final / portafolio_futuro
                 diferencia_objetivo = peso_final - producto.asignacion
 
-                print(f"{ticker}:")
-                print(f"  Peso final: {peso_final:.2%}")
-                print(f"  Objetivo: {producto.asignacion:.2%}")
-                print(f"  Diferencia: {diferencia_objetivo:+.2%}")
+                # print(f"{ticker}:")
+                # print(f"  Peso final: {peso_final:.2%}")
+                # print(f"  Objetivo: {producto.asignacion:.2%}")
+                # print(f"  Diferencia: {diferencia_objetivo:+.2%}")
         return distribucion
 
     def xirr_historicas(
