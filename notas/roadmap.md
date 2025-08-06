@@ -18,6 +18,7 @@
 
 ### MIS IDEAS
 
+- [ ] GLOBAL: Enums para Riesgo, plataforma, etc.
 - [ ] PORTAFOLIO: De pronto la función "balancear" no se llama asi? En cualquier caso, debe tener un varificador de "
   inversión mínima", atada a una propiedad del ProductoFinanciero. Por ejemplo: en TYBA es de COP5000, pero en IBKR
   cambia dependiendo del producto. Esto haría que cuando se ejecute el algoritmo, si la asignación es menor a la
