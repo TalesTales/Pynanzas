@@ -1,3 +1,13 @@
+## 0.11.0 (2025-08-05)
+
+### Feat
+
+- **portafolio**: se creó la función dist_riesgo
+
+### Refactor
+
+- **producto**: _str_ actualizado para mostrar un repr según py
+
 ## 0.10.0 (2025-08-04)
 
 ### Feat
