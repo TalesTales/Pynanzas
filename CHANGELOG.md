@@ -1,3 +1,9 @@
+## 0.12.0 (2025-08-05)
+
+### Feat
+
+- **portafolio**: dist_riesgo ahora devuelve un pd.Series con float de saldo_total
+
 ## 0.11.0 (2025-08-05)
 
 ### Feat
