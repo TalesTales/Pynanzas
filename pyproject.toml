@@ -26,7 +26,6 @@ ignore = ["E501"]
 force-sort-within-sections = true
 known-first-party = ["pynanzas"]
 
-
 [tool.basedpyright]
 typeCheckingMode = "standard"
 pythonVersion = "3.13"
@@ -40,3 +39,42 @@ tag_format = "$version"
 version_scheme = "semver"
 version_provider = "pep621"
 update_changelog_on_bump = true
+
+[tool.poetry]
+name = "pynanzas"
+version = "0.1.0"
+description = ""
+authors = ["TalesTales <servicios@pipebonilla.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.13, <3.14"
+pandas = "^2.3.1"
+numpy = "^2.3.2"
+yfinance = "^0.2.65"
+pyxirr = "^0.10.7"
+pandas-stubs = "^2.3.0.250703"
+openpyxl = "^3.1.5"
+streamlit = "^1.47.1"
+matplotlib = "^3.10.5"
+plotly = "^6.2.0"
+ruff = "^0.12.7"
+ipykernel = "^6.30.1"
+basedpyright = "^1.31.1"
+pyright = "^1.1.403"
+ipython = "^9.4.0"
+overrides = "^7.7.0"
+notebook = "^7.4.5"
+
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.12.7"
+basedpyright = "^1.31.1"
+pyright = "^1.1.403"
+ipykernel = "^6.30.1"
+ipython = "^9.4.0"
+overrides = "^7.7.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
