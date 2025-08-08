@@ -42,7 +42,7 @@ update_changelog_on_bump = true
 
 [tool.poetry]
 name = "pynanzas"
-version = "0.1.0"
+version = "0.12.2"
 description = ""
 authors = ["TalesTales <servicios@pipebonilla.com>"]
 readme = "README.md"
@@ -55,6 +55,7 @@ pyxirr = "^0.10.7"
 pandas-stubs = "^2.3.0.250703"
 openpyxl = "^3.1.5"
 overrides = "^7.7.0"
+notebook = "^7.4.5"
 
 
 [tool.poetry.group.dev.dependencies]
