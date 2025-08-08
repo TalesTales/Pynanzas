@@ -1,3 +1,9 @@
+## 1.0.0 (2025-08-08)
+
+### BREAKING CHANGE
+
+- Se va a adoptar un enfoque diferente para no manejar datos en xlsx, sino en sqlite
+
 ## 0.12.2 (2025-08-06)
 
 ### Refactor
