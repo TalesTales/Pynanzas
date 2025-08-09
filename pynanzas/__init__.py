@@ -6,6 +6,7 @@ import pandas as pd
 
 from .analisis import dist_riesgo
 from .constants import (
+    BD_SQLITE,
     MOVIMIENTOS_APORTES,
     MOVIMIENTOS_INTERESES,
     MOVIMIENTOS_NO_APORTANTES,
@@ -14,6 +15,7 @@ from .data_loader import cargar_datos
 from .limpiar_datos import prods_raw_a_df, trans_raw_to_df
 from .portafolio import Portafolio
 from .producto import ProductoFinanciero
+from .sql import crear_tabla_prods
 
 __all__ = [
     "Portafolio",
@@ -25,7 +27,9 @@ __all__ = [
     "DF_PRODS",
     "DF_TRANS",
     "PROD_ID",
-    "dist_riesgo"
+    "dist_riesgo",
+    "BD_SQLITE",
+    'crear_tabla_prods'
 ]
 
 DATOS: dict[str, pd.DataFrame] = cargar_datos()

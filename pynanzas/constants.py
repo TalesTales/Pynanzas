@@ -8,6 +8,8 @@ incluyendo categorías de movimientos financieros y rutas de directorios.
 import os
 from pathlib import Path
 
+BD_SQLITE: str = 'pynanzas_db.sqlite'
+
 # Categorías de movimientos financieros
 MOVIMIENTOS_INTERESES: list[str] = ["intereses", "dividendos", "rendimientos"]
 """

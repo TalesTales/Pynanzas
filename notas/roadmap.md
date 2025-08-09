@@ -3,9 +3,14 @@
 ## En Desarrollo
 
 - [*] Empezar a usar SQLite
+-
+    - [x] crear tabla de productos
+-
+    - [*] Subir los datos de los productos a la tabla
 
 ## Hecho
 
+- [ ] PRODUCTOS: Agregar holdings
 - [ ] PORTAFOLIO: Poder filtrar todas las funciones por Plataforma (!), Riesgo, Plazo, etc.
 - [ ] Agregar DocString a todo
 - [x] PORTAFOLIO: ver riesgos: Poder ver en un dict o en print por cada Riesgo, qué porcentaje de mi portafolio hay. De
