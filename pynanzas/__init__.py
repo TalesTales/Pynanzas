@@ -15,7 +15,7 @@ from .data_loader import cargar_datos
 from .limpiar_datos import prods_raw_a_df, trans_raw_to_df
 from .portafolio import Portafolio
 from .producto import ProductoFinanciero
-from .sql import crear_tabla_prods
+from .sql import crear_tabla_prods, crear_tabla_trans
 
 __all__ = [
     "Portafolio",
@@ -29,7 +29,8 @@ __all__ = [
     "PROD_ID",
     "dist_riesgo",
     "BD_SQLITE",
-    'crear_tabla_prods'
+    'crear_tabla_prods',
+    'crear_tabla_trans'
 ]
 
 DATOS: dict[str, pd.DataFrame] = cargar_datos()
