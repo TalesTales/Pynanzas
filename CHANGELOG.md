@@ -1,3 +1,9 @@
+## 1.1.0 (2025-08-08)
+
+### Feat
+
+- **sql**: crear_tabla_prods desarrollada
+
 ## 1.0.0 (2025-08-08)
 
 ### BREAKING CHANGE
