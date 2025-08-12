@@ -2,11 +2,11 @@ from dataclasses import dataclass, field
 from datetime import date
 
 import numpy as np
+from overrides import override
 import pandas as pd
 import pyxirr
-from overrides import override
 
-from .constants import MOVIMIENTOS_APORTES, MOVIMIENTOS_INTERESES
+from .constants import MOVS_APORTES, MOVS_INTERESES
 
 
 @dataclass
@@ -152,11 +152,11 @@ class ProductoFinanciero:
             ]["valor"].sum()
 
         self.aportes_totales = self.hist_trans[
-            self.hist_trans["movimiento"].isin(values=MOVIMIENTOS_APORTES)
+            self.hist_trans["movimiento"].isin(values=MOVS_APORTES)
         ]["valor"].sum()
 
         self.intereses = self.hist_trans[
-            self.hist_trans["movimiento"].isin(values=MOVIMIENTOS_INTERESES)
+            self.hist_trans["movimiento"].isin(values=MOVS_INTERESES)
         ]["valor"].sum()
 
         self.saldo_actual = (
@@ -171,7 +171,8 @@ class ProductoFinanciero:
                 self.saldo_actual - self.aportes_totales - self.saldo_inicial
         )
 
-        df_movimientos_reales: pd.DataFrame = self.hist_trans[
+        df_movimientos_reales: pd.DataFrame = self.hist_trans[ #TODO:
+            # Cambiar trans por movs
             self.hist_trans["movimiento"] != "saldo_inicial"
             ]
 
@@ -220,7 +221,7 @@ class ProductoFinanciero:
                 : i + 1
             ].copy()
             df_flujos: pd.DataFrame = historial_hasta_fecha[
-                historial_hasta_fecha["movimiento"].isin(MOVIMIENTOS_APORTES)
+                historial_hasta_fecha["movimiento"].isin(MOVS_APORTES)
             ].copy()
             if df_flujos.empty:
                 xirr_historica.append(np.nan)
