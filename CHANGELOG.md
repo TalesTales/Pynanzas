@@ -1,3 +1,13 @@
+## 1.2.2 (2025-08-12)
+
+### Fix
+
+- **sql**: Se ajustaron todos los parametros para que usen las constantes correctas
+
+### Perf
+
+- **constants**: Se agregaron las constantes BD_TEST, TABLA_PRODS, TABLA_MOVS
+
 ## 1.2.1 (2025-08-12)
 
 ### Fix
