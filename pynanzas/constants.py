@@ -9,18 +9,22 @@ import os
 from pathlib import Path
 
 BD_SQLITE: str = 'pynanzas_bd.sqlite'
+BD_TEST: str = 'pynanzas_bd_test.sqlite'
+
+TABLA_PRODS: str = 'productos'
+TABLA_MOVS: str = 'movimientos'
 
 PROD_ID: str = 'producto_id'
 
 # Categorías de movimientos financieros
-MOVIMIENTOS_INTERESES: list[str] = ["intereses", "dividendos", "rendimientos"]
-MOVIMIENTOS_NO_APORTANTES: list[str] = [
+MOVS_INTERESES: list[str] = ["intereses", "dividendos", "rendimientos"]
+MOVS_NO_APORTES: list[str] = [
     "saldo_inicial",
     "comisiones",
     "comisión",
     "impuesto",
-] + MOVIMIENTOS_INTERESES
-MOVIMIENTOS_APORTES: list[str] = [
+] + MOVS_INTERESES
+MOVS_APORTES: list[str] = [
     "transferencia",
     "compra",
     "venta",
