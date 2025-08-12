@@ -1,3 +1,10 @@
+## 1.2.1 (2025-08-12)
+
+### Fix
+
+- **constants**: Se cambió la constante PROD_ID a producto_id, para que sea consistente con el SQLite
+- **init**: se movió la lógica de cargar datos al notebook
+
 ## 1.2.0 (2025-08-09)
 
 ### Feat
