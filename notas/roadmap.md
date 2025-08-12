@@ -12,6 +12,7 @@
 
 - [ ] PRODUCTOS: Agregar holdings
 - [ ] PORTAFOLIO: Poder filtrar todas las funciones por Plataforma (!), Riesgo, Plazo, etc.
+- [ ] PORTAFOLIO: Balancear debe aceptar valores negativos (retiros)
 - [ ] Agregar DocString a todo
 - [x] PORTAFOLIO: ver riesgos: Poder ver en un dict o en print por cada Riesgo, qué porcentaje de mi portafolio hay. De
 - [x] Desarrollar la clase Portafolio
