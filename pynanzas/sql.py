@@ -1,7 +1,7 @@
 import sqlite3
 from typing import Optional
 
-from pynanzas import BD_SQLITE
+from .constants import BD_SQLITE
 
 
 def crear_tabla_prods(nombre_tabla: str = 'productos',
@@ -147,8 +147,9 @@ def crear_tabla_trans(nombre_tabla: str = 'transacciones',
         with sqlite3.connect(nombre_bd) as conn:
             cursor: sqlite3.Cursor = conn.cursor()
             if not _tabla_prods_existe(cursor, nombre_bd, nombre_tabla_prods):
-                crear_tabla_prods(nombre_tabla=nombre_tabla_prods, nombre_bd=nombre_bd)
-            ddl_completo: str = f"""CREATE TABLE IF NOT EXISTS {nombre_tabla} (\n{orden_ddl}\n);"""
+                crear_tabla_prods(nombre_tabla=nombre_tabla_prods,
+                                  nombre_bd=nombre_bd)
+            ddl_completo: str = f"CREATE TABLE IF NOT EXISTS {nombre_tabla} (\n{orden_ddl}\n);"
             print(ddl_completo)  #TODO: logging
             cursor.execute(ddl_completo)
             conn.commit()
