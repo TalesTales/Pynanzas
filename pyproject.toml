@@ -2,7 +2,7 @@
 name = "pynanzas"
 version = "1.2.0"
 description = "Análisis financiero personal con Python"
-authors = [{ name = "Felipe" }]
+authors = [{ name = "TalesTales" }]
 
 [tool.ruff]
 line-length = 79
@@ -42,8 +42,8 @@ update_changelog_on_bump = true
 
 [tool.poetry]
 name = "pynanzas"
-version = "0.12.2"
-description = ""
+version = "1.2.0"
+description = "$description"
 authors = ["TalesTales <servicios@pipebonilla.com>"]
 readme = "README.md"
 
