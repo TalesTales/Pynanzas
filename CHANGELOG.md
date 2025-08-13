@@ -1,3 +1,10 @@
+## 1.4.0 (2025-08-13)
+
+### Feat
+
+- **sql**: Se agregaron las clases EsquemasBase(ABC), EsquemaProds y EsquemaMovs para manejar mejor los esquemas de las tablas SQLite
+- **constants**: se creó la Enum ColumDDL para tener una enumeración clara en las querys DDL de SQL
+
 ## 1.3.0 (2025-08-12)
 
 ### Feat

@@ -2,11 +2,10 @@
 
 ## En Desarrollo
 
-- BUG: administrador y tipo_inversion no reconocidos por sqlite
+- [] Actualizas DDL de TABLE productos
+
 - [*] Empezar a usar SQLite
--
-    - [x] crear tabla de productos
--
+    - [*] Empezar a usar enumeraciones
     - [*] Subir los datos de los productos a la tabla
 
 ## Hecho
@@ -15,7 +14,12 @@
 - [ ] PORTAFOLIO: Poder filtrar todas las funciones por Plataforma (!), Riesgo, Plazo, etc.
 - [ ] PORTAFOLIO: Balancear debe aceptar valores negativos (retiros)
 - [ ] Agregar DocString a todo
+- [x] crear tabla de productos
+- [x] Agregar: abierto, saldo, aportes, intereses, rentabilidad, ultima_tran, xirr a la TABLE productos
+- [x] Actualizar el esquema de Productos
+- [x] Agregar un esquema general
 - [x] PORTAFOLIO: ver riesgos: Poder ver en un dict o en print por cada Riesgo, qué porcentaje de mi portafolio hay. De
+- [x] BUG: administrador y tipo_inversion no reconocidos por sqlite
 - [x] Desarrollar la clase Portafolio
 - [x] Ver la TIR de cada producto y poderla comparar como un DataFrame
 - [x] Crear un `README.md` completo con la descripción del proyecto, instrucciones de instalación y ejemplos de uso
