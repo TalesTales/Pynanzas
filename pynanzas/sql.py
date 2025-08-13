@@ -1,130 +1,137 @@
-from dataclasses import dataclass
+from abc import ABC, abstractmethod
+from dataclasses import asdict, dataclass, field
 import sqlite3
 from typing import Any, ItemsView, KeysView, Optional, ValuesView
 
-from .constants import BD_SQLITE, PROD_ID, TABLA_MOVS, TABLA_PRODS
+from .constants import BD_SQLITE, PROD_ID, TABLA_MOVS, TABLA_PRODS, ColumDDL
 
+
+class EsquemaBase(ABC):
+    """Clase base abstracta para esquemas de tabla."""
+
+    @abstractmethod
+    def obtener_colums(self) -> dict[str, str]:
+        """Retorna el diccionario de columnas y sus definiciones SQL."""
+        pass
+
+    @abstractmethod
+    def obtener_colums_oblig(self) -> list[str]:
+        """Retorna lista de columnas que son obligatorias."""
+        pass
+
+    def validar_esquema_propio(self, colums_propias: dict[str, str]) -> bool:
+        """Valida que un schema personalizado tenga las columnas requeridas."""
+        obligatorias = set(self.obtener_colums_oblig())
+        propias = set(colums_propias.keys())
+
+        faltantes = obligatorias - propias
+        if faltantes:
+            raise ValueError(
+                f"Faltan columnas requeridas en schema personalizado: {faltantes}"
+            )
+        return True
 
 @dataclass
-class DDLProducto:
-    producto_id: str ="TEXT NOT NULL PRIMARY KEY"
-    nombre: str = "TEXT NOT NULL UNIQUE"
-    ticket: str ="TEXT NOT NULL UNIQUE"
-    simulado: bool | str ="BOOLEAN NOT NULL DEFAULT FALSE"
-    moneda: str ="TEXT NOT NULL DEFAULT 'cop'"
-    riesgo: str = "TEXT NOT NULL"
-    liquidez: str = "TEXT NOT NULL"
-    plazo: str  = "TEXT NOT NULL"
-    asignacion: float | str =  "REAL NOT NULL DEFAULT 0.0"
-    objetivo: str  = "TEXT NOT NULL"
-    administrador: str = "TEXT NOT NULL"
-    plataforma: str = "TEXT NOT NULL"
-    tipo_producto: str = "TEXT NOT NULL"
-    tipo_inversion:str = "TEXT NOT NULL"
+class EsquemaProds(EsquemaBase):
+    producto_id: str = field(default=ColumDDL.TXT_PK.value)
+    nombre: str = field(default=ColumDDL.TXT_UNIQUE.value)
+
+    # Columnas opcionales pero recomendadas
+    ticket: str = field(default=ColumDDL.TXT_UNIQUE.value)
+    simulado: str = field(default=ColumDDL.BOOL_FALSE.value)
+    moneda: str = field(default=ColumDDL.txt_default('cop'))
+    riesgo: str = field(default=ColumDDL.TXT_NOT_NULL.value)
+    liquidez: str = field(default=ColumDDL.TXT_NOT_NULL.value)
+    plazo: str = field(default=ColumDDL.TXT_NOT_NULL.value)
+    asignacion: str = field(default=ColumDDL.REAL_DEFAULT_CERO.value)
+    objetivo: str = field(default=ColumDDL.TXT_NOT_NULL.value)
+    administrador: str = field(default=ColumDDL.TXT_NOT_NULL.value)
+    plataforma: str = field(default=ColumDDL.TXT_NOT_NULL.value)
+    tipo_producto: str = field(default=ColumDDL.TXT_NOT_NULL.value)
+    tipo_inversion: str = field(default=ColumDDL.TXT_NOT_NULL.value)
+
+    abierto: str = field(init=False, default=ColumDDL.BOOL_TRUE.value)
+    saldo: str = field(init=False, default=ColumDDL.REAL_DEFAULT_CERO.value)
+    aportes: str = field(init=False, default=ColumDDL.REAL_DEFAULT_CERO.value)
+    intereses: str = field(init=False,
+                           default=ColumDDL.REAL_DEFAULT_CERO.value)
+    xirr: str = field(init=False,default=ColumDDL.REAL_DEFAULT_CERO.value)
+
+
+    def obtener_colums(self) -> dict[str, str]:
+        return asdict(self)
+
+    def obtener_colums_oblig(self) -> list[str]:
+        return ['producto_id']
 
     def __len__(self) -> int:
-        return len(self.__dict__)
+        return len(asdict(self))
 
     def keys(self) -> KeysView[str]:
-        return self.__dict__.keys()
+        return asdict(self).keys()
 
     def items(self) -> ItemsView[str, Any]:
-        return self.__dict__.items()
+        return asdict(self).items()
 
     def values(self) -> ValuesView[Any]:
-        return self.__dict__.values()
-    
+        return asdict(self).values()
+
+@dataclass
+class EsquemaMovs(EsquemaBase):
+    id: str = field(default=ColumDDL.INT_PK_AUTO.value)
+    producto_id: str = field(default=ColumDDL.TXT_NOT_NULL.value)
+
+    fecha: str = field(default=ColumDDL.DATE_NOT_NULL.value)
+    tipo: str = field(default=ColumDDL.TXT_NOT_NULL.value)
+    valor: str = field(default=ColumDDL.REAL_NOT_NULL.value)
+    unidades: str = field(default=ColumDDL.REAL.value)
+    valor_unidades: str = field(default=ColumDDL.REAL.value)
+
+    fecha_agregada: str = field(init=False, default=ColumDDL.DATE_ACTUAL.value)
+
+    def obtener_colums(self) -> dict[str, str]:
+        return asdict(self)
+
+    def obtener_colums_oblig(self) -> list[str]:
+        return ['id', 'producto_id', 'fecha', 'tipo', 'valor']
+
+    def __len__(self) -> int:
+        return len(asdict(self))
+
+    def keys(self) -> KeysView[str]:
+        return asdict(self).keys()
+
+    def items(self) -> ItemsView[str, Any]:
+        return asdict(self).items()
+
+    def values(self) -> ValuesView[Any]:
+        return asdict(self).values()
+
+
 def crear_tabla_prods(
-    tabla_prods: str = TABLA_PRODS,
-    nombre_columnas: Optional[dict[str, str] | DDLProducto] = None,
-    nombre_bd: str = BD_SQLITE,
+    nom_tabla_prods: str = TABLA_PRODS,
+    nom_bd: str = BD_SQLITE,
+    esquema_prods: Optional[EsquemaProds] = None,
 ) -> None:
     """Crea una tabla de productos financieros en una base de datos SQLite.
-
-    Esta función permite crear una tabla con un esquema predefinido para almacenar
-    información sobre productos de inversión, incluyendo características como riesgo,
-    liquidez, plazo, y detalles de administración.
-
-    Args:
-        tabla_prods: Nombre de la tabla a crear en la base de datos.
-        nombre_columnas: Diccionario que define las columnas y sus tipos/restricciones
-            SQL. Si no se proporciona, se utilizará un esquema predefinido para
-            productos financieros. Formato: {'nombre_columna': 'TIPO_SQL RESTRICCIONES'}.
-        nombre_bd: Ruta del archivo de base de datos SQLite.
-
-    Raises:
-        ValueError: Si nombre_bd o nombre_tabla están vacíos.
-        sqlite3.Error: Si ocurre un error durante la creación de la tabla.
-
-    Examples:
-        Crear tabla con esquema por defecto:
-
-            crear_tabla_prods()
-
-        Crear tabla personalizada:
-
-            columnas_custom = {
-                "id": "INTEGER PRIMARY KEY",
-                "nombre": "TEXT NOT NULL",
-                "precio": "REAL"
-            }
-            crear_tabla_prods(nombre_tabla='mi_tabla', nombre_columnas=columnas_custom)
-
-    Note:
-        Esquema por defecto:
-
-            "producto_id":    "TEXT NOT NULL PRIMARY KEY",
-
-            "nombre":         "TEXT NOT NULL UNIQUE",
-
-            "ticket":         "TEXT NOT NULL UNIQUE",
-
-            "simulado":       "BOOLEAN NOT NULL DEFAULT FALSE",
-
-            "moneda":         "TEXT NOT NULL DEFAULT 'cop'",
-
-            "riesgo":         "TEXT NOT NULL",
-
-            "liquidez":       "TEXT NOT NULL",
-
-            "plazo":          "TEXT NOT NULL",
-
-            "asignacion":     "REAL NOT NULL DEFAULT 0.0",
-
-            "objetivo":       "TEXT NOT NULL",
-
-            "administrador":  "TEXT NOT NULL",
-
-            "plataforma":     "TEXT NOT NULL",
-
-            "tipo_producto":  "TEXT NOT NULL",
-
-            "tipo_inversion": "TEXT NOT NULL",
-
-        La función utiliza CREATE TABLE IF NOT EXISTS, por lo que es segura para
-        ejecutar múltiples veces. Si no se proporciona una conexión, se creará
-        y cerrará automáticamente. El esquema por defecto incluye 14 columnas
-        específicas para productos financieros.
-
-    Author:
-        TalesTales - Documentación creada con Claude.
     """
-    if nombre_bd == "":
+    if nom_bd == "":
         raise ValueError("crear_tabla_prods: nombre_bd vacio")
-    if tabla_prods == "":
-        raise ValueError("crear_tabla_prods: nombre_tabla vacio")
-    if nombre_columnas is None or len(nombre_columnas) == 0:
-        nombre_columnas = DDLProducto()
+    if nom_tabla_prods == "":
+        nom_tabla_prods = TABLA_PRODS
+    if esquema_prods is None or len(esquema_prods) == 0:
+        esquema_prods = EsquemaProds()
+
     columnas_ddl: list[str] = []
-    for k, v in nombre_columnas.items():
+    for k, v in esquema_prods.items():
         columnas_ddl.append(f"{k} {v}")
     orden_ddl: str = ",\n".join(columnas_ddl)
 
     try:
-        with sqlite3.connect(nombre_bd) as conn:
+        with sqlite3.connect(nom_bd) as conn:
             cursor: sqlite3.Cursor = conn.cursor()
-            query: str = f"""CREATE TABLE IF NOT EXISTS {tabla_prods}
-            (\n{orden_ddl}\n);"""
+            query: str = f"CREATE TABLE IF NOT EXISTS {nom_tabla_prods}"
+            query += f"(\n{orden_ddl}\n);"
             print(f'crear_tabla_prod:\n{query}')  # TODO: logging
             cursor.execute(query)
             conn.commit()
@@ -133,81 +140,69 @@ def crear_tabla_prods(
 
 
 def crear_tabla_movs(
-    nombre_tabla: str = TABLA_MOVS,
-    nombre_columnas: Optional[dict[str, str]] = None,
-    nombre_tabla_prods: str = TABLA_PRODS,
+    nom_tabla_movs: str = TABLA_MOVS,
+    nom_tabla_prods: str = TABLA_PRODS,
     producto_id: str = PROD_ID,
-    nombre_bd: str = BD_SQLITE,
+    nom_bd: str = BD_SQLITE,
+    esquema_movs: Optional[EsquemaMovs] = None,
 ) -> None:
-    if nombre_bd == "":
-        raise ValueError("crear_tabla_movs: nombre_bd vacio")
-    if nombre_tabla == "":
-        raise ValueError("crear_tabla_movs: nombre_tabla vacio")
-    if nombre_tabla_prods == "":
-        raise ValueError("crear_tabla_movs: nombre_tabla_prods vacio")
-    if nombre_columnas is None or len(nombre_columnas) == 0:
-        nombre_columnas = {
-            "id": "INTEGER PRIMARY KEY AUTOINCREMENT",
-            producto_id: "TEXT NOT NULL",
-            "fecha": "DATE NOT NULL",
-            "tipo": "TEXT NOT NULL",
-            "valor": "REAL NOT NULL",
-            "unidades": "REAL",
-            "valor_unidad": "REAL",
-        }
-    orden_ddl: str = ""
-    for k, v in nombre_columnas.items():
-        orden_ddl += f"{k} {v}"
-        orden_ddl += ",\n"
-    orden_ddl = (
-        orden_ddl
-        + f"""FOREIGN KEY ({producto_id}) REFERENCES
-    {nombre_tabla_prods} ({producto_id})"""
-    )
+    if nom_bd == "":
+        raise ValueError("crear_tabla_movs: nom_bd vacio")
+    if nom_tabla_movs == "":
+        raise ValueError("crear_tabla_movs: nom_tabla_movs vacio")
+    if nom_tabla_prods == "":
+        raise ValueError("crear_tabla_movs: nom_tabla_prods vacio")
+    if esquema_movs is None or len(esquema_movs) == 0:
+        esquema_movs = EsquemaMovs()
+
+    columnas_ddl: list[str] = []
+    for k, v in esquema_movs.items():
+        columnas_ddl.append(f"{k} {v}")
+    orden_ddl = (',\n'.join(columnas_ddl))
+    orden_ddl += (f"\nFOREIGN KEY ({producto_id}) REFERENCES"
+                 f" {nom_tabla_prods} ({producto_id})")
     try:
-        with sqlite3.connect(nombre_bd) as conn:
+        with sqlite3.connect(nom_bd) as conn:
             cursor: sqlite3.Cursor = conn.cursor()
-            if not tabla_prods_existe(cursor, nombre_tabla_prods):
-                crear_tabla_prods(
-                    tabla_prods=nombre_tabla_prods, nombre_bd=nombre_bd
-                )
-            ddl_completo: str = f"""CREATE TABLE IF NOT EXISTS {nombre_tabla}
-            (\n{orden_ddl}\n);"""
-            print(ddl_completo)  # TODO: logging
-            cursor.execute(ddl_completo)
+            if not tabla_prods_existe(cursor, nom_tabla_prods):
+                crear_tabla_prods(nom_tabla_prods, nom_bd)
+            query: str = (f"CREATE TABLE IF NOT EXISTS {nom_tabla_movs}"
+                                 f"(\n{orden_ddl}\n);")
+            print(query)  # TODO: logging
+            cursor.execute(query)
             conn.commit()
     except sqlite3.Error as e:
         print(f"sql.crear_tabla_movs: error sql {e}")
 
-
 def tabla_prods_existe(
-    cursor,
-    nombre_tabla_prods: str = TABLA_PRODS,
+    cursor: sqlite3.Cursor,
+    nom_tabla_prods: str = TABLA_PRODS,
 ) -> bool:
-    query_tabla_prods: str = f"""SELECT name FROM sqlite_master WHERE
-    type='table' AND name='{nombre_tabla_prods}'"""
-    cursor.execute(query_tabla_prods)
+    query: str = ("SELECT name FROM sqlite_master WHERE type='table' AND "
+                  "name=?")
+    cursor.execute(query, nom_tabla_prods)
     return bool(cursor.fetchall())
 
 def insertar_prod(
-    producto: dict[str, Any] | DDLProducto,
-    tabla_prods: str = TABLA_PRODS,
-    nombre_bd: str = BD_SQLITE
+    producto: EsquemaProds,
+    nom_tabla_prods: str = TABLA_PRODS,
+    nom_bd: str = BD_SQLITE
 )->None:
     columnas: str = ','.join(producto.keys())
     placeholders: str = ','.join(['?'] * len(producto))
     valores = tuple(producto.values())
     try:
-        with sqlite3.connect(nombre_bd) as conn:
+        with sqlite3.connect(nom_bd) as conn:
             cursor: sqlite3.Cursor = conn.cursor()
-            if not tabla_prods_existe(cursor, tabla_prods):
-                crear_tabla_prods(
-                    tabla_prods=tabla_prods, nombre_bd=nombre_bd
-                )
-            query: str = f"""INSERT INTO {tabla_prods} ({columnas}) VALUES
-            (\n{placeholders}\n);"""
+            if not tabla_prods_existe(cursor, nom_tabla_prods):
+                crear_tabla_prods(nom_tabla_prods, nom_bd)
+            query: str = (f"INSERT INTO {nom_tabla_prods} ({columnas}) VALUES "
+                          f"(\n{placeholders}\n);")
             cursor.execute(query, valores)
             print(f'sql.insertar_prod:\n{query},{valores}')  # TODO: logging
             conn.commit()
     except sqlite3.Error as e:
         print(f"sql.insertar_prod: error sql {e}")
+
+def actualizar_tabla(nom_bd, nom_tabla, esquema)->None:
+    pass
