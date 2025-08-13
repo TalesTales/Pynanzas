@@ -1,3 +1,9 @@
+## 1.3.0 (2025-08-12)
+
+### Feat
+
+- **sql**: creada la clase DDLProducto y la función insertar_producto
+
 ## 1.2.2 (2025-08-12)
 
 ### Fix
