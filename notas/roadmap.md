@@ -2,6 +2,7 @@
 
 ## En Desarrollo
 
+- BUG: administrador y tipo_inversion no reconocidos por sqlite
 - [*] Empezar a usar SQLite
 -
     - [x] crear tabla de productos
