@@ -1,10 +1,4 @@
-"""
-Constantes utilizadas en el proyecto de análisis de inversiones.
-
-Este módulo define constantes globales que se utilizan en todo el proyecto,
-incluyendo categorías de movimientos financieros y rutas de directorios.
-"""
-
+from enum import StrEnum
 import os
 from pathlib import Path
 
@@ -37,3 +31,26 @@ except NameError:
     directorio_base = Path(os.getcwd()).resolve().parent
 
 BASE_PATH: Path = directorio_base
+
+# Enumeraciones
+
+class ColumDDL(StrEnum):
+    """Enum para tipos de columna SQL comunes."""
+    INT_PK = "INTEGER PRIMARY KEY"
+    INT_PK_AUTO = "INTEGER PRIMARY KEY AUTOINCREMENT"
+    TXT_NOT_NULL = "TEXT NOT NULL"
+    TXT_UNIQUE = "TEXT NOT NULL UNIQUE"
+    TXT_PK = "TEXT NOT NULL PRIMARY KEY"
+    REAL = "REAL"
+    REAL_NOT_NULL = "REAL NOT NULL"
+    REAL_DEFAULT_CERO = "REAL NOT NULL DEFAULT 0.0"
+    BOOL_FALSE = "BOOLEAN NOT NULL DEFAULT FALSE"
+    BOOL_TRUE = "BOOLEAN NOT NULL DEFAULT TRUE"
+    DATE = "DATE NOT NULL"
+    DATE_NOT_NULL = "DATE NOT NULL"
+    DATE_ACTUAL = "DATE DEFAULT CURRENT_TIMESTAMP"
+    @staticmethod
+    def txt_default(default: str) -> str:
+        """Genera un tipo TEXT NOT NULL con valor por defecto."""
+        return f"TEXT NOT NULL DEFAULT '{default}'"
+
