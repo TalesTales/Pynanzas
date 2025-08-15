@@ -9,7 +9,6 @@ TABLA_MOVS: str = 'movimientos'
 
 PROD_ID: str = 'producto_id'
 
-# Categorías de movimientos financieros
 try:
     directorio_base: Path = Path(__file__).resolve().parent.parent
 except NameError:

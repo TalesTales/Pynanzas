@@ -85,7 +85,3 @@ class Moneda(StrEnum):
     GBP = 'gbp'
     EUR = 'eur'
     BTC = 'btc'
-
-if __name__ == "__main__":
-    for r in Riesgo:
-        print(r.name, r.value)
