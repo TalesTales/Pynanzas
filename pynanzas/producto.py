@@ -6,7 +6,10 @@ from overrides import override
 import pandas as pd
 import pyxirr
 
-from .constants import MOVS_APORTES, MOVS_INTERESES
+from pynanzas.diccionario import MovsAportes, MovsIntereses
+
+MOVS_APORTES = [m.value for m in MovsAportes]
+MOVS_INTERESES = [m.value for m in MovsIntereses]
 
 
 @dataclass
