@@ -2,12 +2,24 @@
 
 ## En Desarrollo
 
-- [*] PORTAFOLIO: Poder filtrar todas las funciones por Plataforma (!), Riesgo, Plazo, etc.
+- [] Actualizas DDL de TABLE productos
+
+- [*] Empezar a usar SQLite
+    - [*] Empezar a usar enumeraciones
+    - [*] Subir los datos de los productos a la tabla
 
 ## Hecho
 
+- [ ] PRODUCTOS: Agregar holdings
+- [ ] PORTAFOLIO: Poder filtrar todas las funciones por Plataforma (!), Riesgo, Plazo, etc.
+- [ ] PORTAFOLIO: Balancear debe aceptar valores negativos (retiros)
 - [ ] Agregar DocString a todo
+- [x] crear tabla de productos
+- [x] Agregar: abierto, saldo, aportes, intereses, rentabilidad, ultima_tran, xirr a la TABLE productos
+- [x] Actualizar el esquema de Productos
+- [x] Agregar un esquema general
 - [x] PORTAFOLIO: ver riesgos: Poder ver en un dict o en print por cada Riesgo, qué porcentaje de mi portafolio hay. De
+- [x] BUG: administrador y tipo_inversion no reconocidos por sqlite
 - [x] Desarrollar la clase Portafolio
 - [x] Ver la TIR de cada producto y poderla comparar como un DataFrame
 - [x] Crear un `README.md` completo con la descripción del proyecto, instrucciones de instalación y ejemplos de uso
@@ -18,6 +30,7 @@
 
 ### MIS IDEAS
 
+- [] Pasar todo a SQLite
 - BUG: Cuando se envía un NAN a balancear en Portafolio, se le asigna la completa totalidad del saldo
 - [ ] ProductoFinanciero o portafolio: encontrar la forma de simular un pd.Dataframe o un ProductoFinanciero despues
   de "balancer" para que pueda ver la dist_riesgo antes y después, todo con filtros.
@@ -63,7 +76,6 @@
 - [ ] Implementar la exportación de datos a varios formatos (CSV, Excel)
 - [ ] Implementar la comparación del rendimiento contra índices de mercado (benchmarking)
 - [ ] Añadir soporte para fuentes de datos externas (APIs de datos de mercado)
-- [ ] Crear un dashboard para monitorear el rendimiento del portafolio
 - [ ] Añadir capacidades de pronóstico y análisis de escenarios
 - [ ] Implementar algoritmos de optimización de portafolio
 - [ ] Documentar el esquema de datos y los formatos esperados
@@ -73,7 +85,7 @@
 - [ ] Añadir tests unitarios para todos los módulos, empezando por la funcionalidad principal
 - [ ] Implementar un sistema de gestión de configuración (ej. usando archivos `.env`)
 - [ ] Crear una interfaz de línea de comandos (CLI) para ejecutar análisis
-- [ ] Implementar un almacenamiento en base de datos en lugar de archivos CSV/Excel
+- [*] Implementar un almacenamiento en base de datos en lugar de archivos CSV/Excel
 - [ ] Optimizar el rendimiento de los cálculos de XIRR para grandes volúmenes de datos
 - [ ] Crear contenedores de Docker para la aplicación
 - [ ] Configurar integración continua (CI) para tests automáticos

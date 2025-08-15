@@ -2,37 +2,51 @@
 Pynanzas: Un paquete para el análisis y seguimiento de portafolios de inversión.
 """
 
-import pandas as pd
-
 from .analisis import dist_riesgo
 from .constants import (
-    MOVIMIENTOS_APORTES,
-    MOVIMIENTOS_INTERESES,
-    MOVIMIENTOS_NO_APORTANTES,
+    BD_SQLITE,
+    PROD_ID,
 )
 from .data_loader import cargar_datos
+from .diccionario import (
+    MovsAportes,
+    MovsIntereses,
+    MovsNoAportes,
+    NomBD,
+    NomTablas,
+    Riesgo,
+)
 from .limpiar_datos import prods_raw_a_df, trans_raw_to_df
 from .portafolio import Portafolio
 from .producto import ProductoFinanciero
+from .sql import (
+    EsquemaMovs,
+    EsquemaProds,
+    actualizar_tabla,
+    crear_tabla_movs,
+    crear_tabla_prods,
+    insertar_prod,
+)
 
 __all__ = [
     "Portafolio",
     "ProductoFinanciero",
-    "MOVIMIENTOS_APORTES",
-    "MOVIMIENTOS_INTERESES",
-    "MOVIMIENTOS_NO_APORTANTES",
     "PROD_ID",
-    "DF_PRODS",
-    "DF_TRANS",
-    "PROD_ID",
-    "dist_riesgo"
+    "dist_riesgo",
+    "BD_SQLITE",
+    'crear_tabla_prods',
+    'crear_tabla_movs',
+    'cargar_datos',
+    'prods_raw_a_df',
+    'trans_raw_to_df',
+    'EsquemaMovs',
+    'EsquemaProds',
+    'insertar_prod',
+    'NomTablas',
+    'NomBD',
+    'Riesgo',
+    'MovsAportes',
+    'MovsNoAportes',
+    'MovsIntereses',
+    'actualizar_tabla'
 ]
-
-DATOS: dict[str, pd.DataFrame] = cargar_datos()
-DF_PRODS: pd.DataFrame = prods_raw_a_df(
-    DATOS["productos"], DATOS["diccionario"]
-)
-DF_TRANS: pd.DataFrame = trans_raw_to_df(DATOS["transacciones"])
-PROD_ID: str = DATOS["diccionario"]["Ficha"].iloc[0].lower().replace(" ", "_")
-
-print("__init__:Datos cargados")

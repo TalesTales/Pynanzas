@@ -1,3 +1,74 @@
+## 1.6.0 (2025-08-15)
+
+### Feat
+
+- **sql**: se agregó la función Actualizar_tabla()
+
+## 1.5.0 (2025-08-15)
+
+### Feat
+
+- **diccionario**: creado el archivo diccionario para las Enums del módulo
+
+### Fix
+
+- **sql**: se modificó la lógica para usar Enums
+- **diccionario**: implementada toda la lógica de las Enums en diccionario
+- **init**: agregado dicionario a la importacion global del modulo
+
+### Refactor
+
+- **producto**: Se modificó Producto para que sea compatible con las Enum
+- **constants**: se movio toda la logica de constantes a diccionario
+
+## 1.4.0 (2025-08-13)
+
+### Feat
+
+- **sql**: Se agregaron las clases EsquemasBase(ABC), EsquemaProds y EsquemaMovs para manejar mejor los esquemas de las tablas SQLite
+- **constants**: se creó la Enum ColumDDL para tener una enumeración clara en las querys DDL de SQL
+
+## 1.3.0 (2025-08-12)
+
+### Feat
+
+- **sql**: creada la clase DDLProducto y la función insertar_producto
+
+## 1.2.2 (2025-08-12)
+
+### Fix
+
+- **sql**: Se ajustaron todos los parametros para que usen las constantes correctas
+
+### Perf
+
+- **constants**: Se agregaron las constantes BD_TEST, TABLA_PRODS, TABLA_MOVS
+
+## 1.2.1 (2025-08-12)
+
+### Fix
+
+- **constants**: Se cambió la constante PROD_ID a producto_id, para que sea consistente con el SQLite
+- **init**: se movió la lógica de cargar datos al notebook
+
+## 1.2.0 (2025-08-09)
+
+### Feat
+
+- **sql**: crear_tabla_trans agregado
+
+## 1.1.0 (2025-08-08)
+
+### Feat
+
+- **sql**: crear_tabla_prods desarrollada
+
+## 1.0.0 (2025-08-08)
+
+### BREAKING CHANGE
+
+- Se va a adoptar un enfoque diferente para no manejar datos en xlsx, sino en sqlite
+
 ## 0.12.2 (2025-08-06)
 
 ### Refactor
