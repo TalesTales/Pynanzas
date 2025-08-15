@@ -1,3 +1,9 @@
+## 1.6.0 (2025-08-15)
+
+### Feat
+
+- **sql**: se agregó la función Actualizar_tabla()
+
 ## 1.5.0 (2025-08-15)
 
 ### Feat
