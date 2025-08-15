@@ -1,3 +1,20 @@
+## 1.5.0 (2025-08-15)
+
+### Feat
+
+- **diccionario**: creado el archivo diccionario para las Enums del módulo
+
+### Fix
+
+- **sql**: se modificó la lógica para usar Enums
+- **diccionario**: implementada toda la lógica de las Enums en diccionario
+- **init**: agregado dicionario a la importacion global del modulo
+
+### Refactor
+
+- **producto**: Se modificó Producto para que sea compatible con las Enum
+- **constants**: se movio toda la logica de constantes a diccionario
+
 ## 1.4.0 (2025-08-13)
 
 ### Feat
