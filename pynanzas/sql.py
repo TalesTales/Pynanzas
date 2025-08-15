@@ -211,7 +211,6 @@ def actualizar_tabla(nom_tabla: NomTablas,
                      nom_bd: NomBD = NomBD.BD_SQLITE,
                      cursor: Optional[sqlite3.Cursor] = None
                      )->None:
-    set_colums: dict[str, str] = esquema.obtener_colums()
     with (sqlite3.connect(nom_bd) as con):
         if cursor is None:
             cursor = con.cursor()
@@ -226,11 +225,23 @@ def actualizar_tabla(nom_tabla: NomTablas,
                 crear_tabla_movs(esquema, nom_tabla,NomTablas.PRODS,
                 PROD_ID, nom_bd)
             return
-        query: str = f"PRAGMA table_info({nom_tabla})"
-        cursor.execute(query)
+        cursor.execute(f"PRAGMA table_info ({nom_tabla})")
         resultado: list[Any] = cursor.fetchall()
-        set_colums_resultado: set[str] =set([n[1] for n in resultado])
-        if set_colums_resultado == set_colums:
+        set_colums_pragma: set[str] =set([n[1] for n in resultado])
+        if set_colums_pragma == set(esquema.keys()):
             return
         else:
-            pass
+            colums_drop: set[str] = set_colums_pragma - set(esquema.keys())
+            colums_add: set[str] = set(esquema.keys()) - set_colums_pragma
+            if len(colums_add) > 0:
+                for colum in colums_add:
+                    tipo = esquema.obtener_colums()[colum]
+                    cursor.execute(
+                        f"ALTER TABLE {nom_tabla} ADD COLUMN {colum} {tipo}")
+                con.commit()
+            if len(colums_drop) > 0:
+                for colum in colums_drop:
+                    cursor.execute(
+                        f"ALTER TABLE {nom_tabla} DROP COLUMN {colum}")
+                con.commit()
+            return

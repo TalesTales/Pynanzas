@@ -22,6 +22,7 @@ from .producto import ProductoFinanciero
 from .sql import (
     EsquemaMovs,
     EsquemaProds,
+    actualizar_tabla,
     crear_tabla_movs,
     crear_tabla_prods,
     insertar_prod,
@@ -47,4 +48,5 @@ __all__ = [
     'MovsAportes',
     'MovsNoAportes',
     'MovsIntereses',
+    'actualizar_tabla'
 ]
