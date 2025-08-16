@@ -4,7 +4,7 @@ from typing import Optional
 from numpy import empty
 import pandas as pd
 
-from .producto import ProductoFinanciero
+from pynanzas.producto import ProductoFinanciero
 
 
 def dist_riesgo(productos: dict[str, ProductoFinanciero],

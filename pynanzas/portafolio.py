@@ -2,8 +2,8 @@ import numpy as np
 import pandas as pd
 from pandas import Series
 
-from .analisis import dist_riesgo
-from .producto import ProductoFinanciero
+from pynanzas.analisis import dist_riesgo
+from pynanzas.producto import ProductoFinanciero
 
 
 class Portafolio:

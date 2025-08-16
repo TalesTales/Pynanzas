@@ -2,24 +2,22 @@
 Pynanzas: Un paquete para el análisis y seguimiento de portafolios de inversión.
 """
 
-from .analisis import dist_riesgo
-from .constants import (
+from pynanzas.analisis import dist_riesgo
+from pynanzas.constants import (
     BD_SQLITE,
     PROD_ID,
 )
-from .data_loader import cargar_datos
-from .diccionario import (
+from pynanzas.data_loader import cargar_datos
+from pynanzas.diccionario import (
     MovsAportes,
     MovsIntereses,
     MovsNoAportes,
-    NomBD,
-    NomTablas,
     Riesgo,
 )
-from .limpiar_datos import prods_raw_a_df, trans_raw_to_df
-from .portafolio import Portafolio
-from .producto import ProductoFinanciero
-from .sql import (
+from pynanzas.limpiar_datos import prods_raw_a_df, trans_raw_to_df
+from pynanzas.portafolio import Portafolio
+from pynanzas.producto import ProductoFinanciero
+from pynanzas.sql import (
     EsquemaMovs,
     EsquemaProds,
     actualizar_tabla,
@@ -27,6 +25,7 @@ from .sql import (
     crear_tabla_prods,
     insertar_prod,
 )
+from pynanzas.sql.diccionario import NomBD, NomTablas
 
 __all__ = [
     "Portafolio",

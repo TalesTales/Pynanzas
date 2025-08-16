@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from .constants import BASE_PATH
+from pynanzas.constants import BASE_PATH
 
 
 def cargar_datos(

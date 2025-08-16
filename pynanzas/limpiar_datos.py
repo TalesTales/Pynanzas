@@ -45,7 +45,7 @@ def prods_raw_a_df(
     )
     df_diccionario: pd.DataFrame = df_diccionario_raw.copy()
     if not df_productos_raw.iloc[0].is_unique:
-        print("Los primera fila de df_productos no tiene valores únicos!")
+        print("La primera fila de df_productos no tiene valores únicos!")
         columna_unica: list = list(range(len(df_productos_raw.columns)))
         fila_unica: pd.DataFrame = pd.DataFrame(
             [columna_unica], columns=df_productos_raw.columns
