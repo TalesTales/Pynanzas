@@ -1,3 +1,9 @@
+## 1.6.2 (2025-08-16)
+
+### Fix
+
+- **sql/base**: se creó un .py llamado base que contiene la clase abstracta EsquemaBase
+
 ## 1.6.1 (2025-08-16)
 
 ### Refactor
