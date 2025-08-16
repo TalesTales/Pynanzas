@@ -1,3 +1,9 @@
+## 1.6.1 (2025-08-16)
+
+### Refactor
+
+- **sql**: se agregó un nuevo submódulo llamado sql para manejar la lógica de sqlite
+
 ## 1.6.0 (2025-08-15)
 
 ### Feat
