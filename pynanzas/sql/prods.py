@@ -2,8 +2,8 @@ from dataclasses import asdict, dataclass, field
 import sqlite3
 from typing import Any, ItemsView, KeysView, Optional, ValuesView
 
+from pynanzas.sql.base import EsquemaBase
 from pynanzas.sql.diccionario import ColumDDL, NomBD, NomTablas
-from pynanzas.sql.sqlite import EsquemaBase
 
 
 @dataclass

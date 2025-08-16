@@ -3,9 +3,9 @@ import sqlite3
 from typing import Any, ItemsView, KeysView, Optional, ValuesView
 
 from pynanzas.constants import PROD_ID
+from pynanzas.sql.base import EsquemaBase
 from pynanzas.sql.diccionario import ColumDDL, NomBD, NomTablas
 from pynanzas.sql.prods import crear_tabla_prods, tabla_prods_existe
-from pynanzas.sql.sqlite import EsquemaBase
 
 
 @dataclass
