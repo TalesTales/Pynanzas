@@ -1,3 +1,14 @@
+## 1.7.0 (2025-08-19)
+
+### Feat
+
+- **pynanzas/init**: se ajustó para agregar mas funciones desde SQL
+- **movs**: insertar_movs creada
+
+### Fix
+
+- esquema
+
 ## 1.6.2 (2025-08-16)
 
 ### Fix
