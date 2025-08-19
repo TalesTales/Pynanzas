@@ -20,12 +20,14 @@ from pynanzas.producto import ProductoFinanciero
 from pynanzas.sql import (
     EsquemaMovs,
     EsquemaProds,
+    NomBD,
+    NomTablas,
     actualizar_tabla,
     crear_tabla_movs,
     crear_tabla_prods,
+    insertar_mov,
     insertar_prod,
 )
-from pynanzas.sql.diccionario import NomBD, NomTablas
 
 __all__ = [
     "Portafolio",
@@ -47,5 +49,6 @@ __all__ = [
     'MovsAportes',
     'MovsNoAportes',
     'MovsIntereses',
-    'actualizar_tabla'
+    'actualizar_tabla',
+    'insertar_mov'
 ]
