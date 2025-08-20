@@ -2,7 +2,7 @@
 
 ## En Desarrollo
 
-[*] BUG: en .portafolio_transacciones_a_productos
+[ ] BUG: Cuando se crea la tabla productos las columnas que son enumeraciones se crean como texto
 
 ## Hecho
 
@@ -10,6 +10,7 @@
 - [ ] PORTAFOLIO: Poder filtrar todas las funciones por Plataforma (!), Riesgo, Plazo, etc.
 - [ ] PORTAFOLIO: Balancear debe aceptar valores negativos (retiros)
 - [ ] Agregar DocString a todo
+- [X] BUG: en .portafolio_transacciones_a_productos
 - [x] Empezar a usar SQLite
     - [x] Empezar a usar enumeraciones
     - [x] Subir los datos de los productos a la tabla
