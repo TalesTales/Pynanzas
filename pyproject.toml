@@ -1,6 +1,6 @@
 [project]
 name = "pynanzas"
-version = "1.7.0"
+version = "1.7.1"
 description = "Análisis financiero personal con Python"
 authors = [{ name = "TalesTales" }]
 

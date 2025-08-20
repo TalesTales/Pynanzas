@@ -111,3 +111,44 @@ def cargar_datos(
     else:
         print("cargar_datos: Archivo leído exitosamente.")
     return data
+
+def init_once()-> None:
+    
+    from pynanzas.diccionario import Liquidez, Plazo, Riesgo
+    from pynanzas.limpiar_datos import prods_raw_a_df, trans_raw_to_df
+    from pynanzas.sql.esquemas import EsquemaMovs, EsquemaProds
+    from pynanzas.sql.movs import insertar_mov
+    from pynanzas.sql.prods import insertar_prod
+
+    datos: dict[str, pd.DataFrame] = cargar_datos()
+    df_prods: pd.DataFrame = prods_raw_a_df(
+        datos["productos"], datos["diccionario"]
+    )
+    df_trans: pd.DataFrame = trans_raw_to_df(datos["transacciones"])
+    for i in df_prods.index:
+        print(i)
+        prod = EsquemaProds(i,
+                            df_prods.loc[i]['nombre'],
+                            df_prods.loc[i]['ticket'],
+                            bool(df_prods.loc[i]['simulado']),
+                            str(df_prods.loc[i]['moneda']).lower(),
+                            Riesgo[df_prods.loc[i]['riesgo']],
+                            Liquidez[df_prods.loc[i]['liquidez']],
+                            Plazo[df_prods.loc[i]['plazo']],
+                            df_prods.loc[i]['objetivo'],
+                            df_prods.loc[i]['administrador'],
+                            df_prods.loc[i]['plataforma'],
+                            df_prods.loc[i]['tipo_de_producto'],
+                            df_prods.loc[i]['tipo_de_inversion'])
+        insertar_prod(prod)
+
+    for m in df_trans.index:
+        mov = EsquemaMovs(
+            df_trans.loc[m]['producto_id'],
+            df_trans.loc[m]['fecha'].to_pydatetime(),
+            df_trans.loc[m]['movimiento'],
+            df_trans.loc[m]['valor'],
+            df_trans.loc[m]['unidades'],
+            df_trans.loc[m]['precio_de_la_unidad'],
+        )
+        insertar_mov(mov)

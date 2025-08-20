@@ -1,3 +1,9 @@
+## 1.7.1 (2025-08-19)
+
+### Fix
+
+- **sql/movs**: se eliminan las claves "id" y "fecha_agregada" para que SQLite las maneje correctamente
+
 ## 1.7.0 (2025-08-19)
 
 ### Feat

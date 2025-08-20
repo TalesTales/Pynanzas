@@ -9,9 +9,11 @@ from pynanzas.constants import (
 )
 from pynanzas.data_loader import cargar_datos
 from pynanzas.diccionario import (
+    Liquidez,
     MovsAportes,
     MovsIntereses,
     MovsNoAportes,
+    Plazo,
     Riesgo,
 )
 from pynanzas.limpiar_datos import prods_raw_a_df, trans_raw_to_df
@@ -46,6 +48,8 @@ __all__ = [
     'NomTablas',
     'NomBD',
     'Riesgo',
+    'Liquidez',
+    'Plazo',
     'MovsAportes',
     'MovsNoAportes',
     'MovsIntereses',
