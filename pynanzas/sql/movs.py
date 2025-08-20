@@ -1,3 +1,4 @@
+from dataclasses import asdict
 import sqlite3
 
 from pynanzas.constants import PROD_ID
@@ -23,9 +24,14 @@ def insertar_mov(
 ) -> None:
     from pynanzas.sql.sqlite import tabla_existe
 
-    columnas: str = ','.join(movimiento.keys())
-    placeholders: str = ','.join(['?'] * len(movimiento.keys()))
-    valores: tuple = tuple(movimiento.values())  # Corregido: debe ser tupla
+    mov = asdict(movimiento)
+    
+    mov.pop('id', None)
+    mov.pop('fecha_agregada', None)
+    
+    columnas: str = ','.join(mov.keys())
+    placeholders: str = ','.join(['?'] * len(mov.keys()))
+    valores: tuple = tuple(mov.values())
 
     with sqlite3.connect(nom_bd) as conn:
         cursor: sqlite3.Cursor = conn.cursor()
@@ -50,7 +56,7 @@ def crear_tabla_movs(esquema_movs: EsquemaMovs = EsquemaMovsDDL,
     if nom_tabla_prods == "":
         raise ValueError("crear_tabla_movs: nom_tabla_prods vacio")
     if esquema_movs is None or len(esquema_movs) == 0:
-        esquema_movs = EsquemaMovs()
+        esquema_movs = EsquemaMovsDDL
 
     columnas_ddl: list[str] = []
     for k, v in esquema_movs.items():
