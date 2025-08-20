@@ -2,9 +2,10 @@ import numpy as np
 import pandas as pd
 from pandas import Series
 
+from pynanzas import Moneda
 from pynanzas.analisis import dist_riesgo
-from pynanzas.constants import PROD_ID
 from pynanzas.producto import ProductoFinanciero
+from pynanzas.sql.consultas import movs_filtrados_prod
 
 
 class Portafolio:
@@ -13,10 +14,7 @@ class Portafolio:
         self.productos: dict[str, ProductoFinanciero] = self._crear_portafolio(
             df_productos
         )
-        self._trans_a_prods(
-            df_transacciones=df_transacciones,
-            dict_productos=self.productos,
-        )
+        self._trans_a_prods(dict_prods=self.productos)
         self.total: float = self._calcular_total()
         self.intereses_total: float = self._calcular_intereses()
         self._calcular_pesos()
@@ -46,7 +44,7 @@ class Portafolio:
                     tipo_producto=fila.get("tipo_de_producto", "N/A"),
                     liquidez=fila.get("liquidez", "N/A"),
                     tipo_inversion=fila.get("tipo_de_inversion", "N/A"),
-                    categoria=fila.get("categoria", "N/A"),
+                    # categoria=fila.get("categoria", "N/A"),
                     objetivo=fila.get("objetivo", "N/A"),
                     riesgo=fila.get("riesgo", "N/A"),
                     plazo=fila.get("plazo", "N/A"),
@@ -60,16 +58,12 @@ class Portafolio:
             return productos
 
     @staticmethod
-    def _trans_a_prods(
-            df_transacciones: pd.DataFrame,
-            dict_productos: dict[str, ProductoFinanciero],
-    ) -> None:
+    def _trans_a_prods(dict_prods: dict[str, ProductoFinanciero]) -> None:
         try:
-            for producto_id, objeto_producto in dict_productos.items():
-                df_filtrado_para_producto = df_transacciones[
-                    df_transacciones[PROD_ID] == producto_id
-                    ]
-                objeto_producto.procesar_trans(df_filtrado_para_producto)
+            for producto_id, objeto_producto in dict_prods.items():
+                df_movs_filtrados_prod: pd.DataFrame = movs_filtrados_prod(
+                    producto_id)
+                objeto_producto.procesar_movs(df_movs_filtrados_prod)
         except Exception as e:
             error_msg = f"Error inesperado durante la actualización: {str(e)}"
             print(f"Portafolio._trans_a_productos() -> ERROR: {error_msg}")
@@ -79,7 +73,7 @@ class Portafolio:
             [
                 producto.saldo
                 for producto in self.productos.values()
-                if producto.moneda == "COP"
+                if producto.moneda == Moneda.COP
             ]
         )
         saldos_validos = saldos[~np.isnan(saldos)]
@@ -199,12 +193,12 @@ class Portafolio:
                 continue
 
             if (
-                    producto.hist_trans.empty
-                    or "xirr_historica" not in producto.hist_trans.columns
+                    producto.movs_hist.empty
+                    or "xirr_historica" not in producto.movs_hist.columns
             ):
                 continue
 
-            producto_xirr = producto.hist_trans[
+            producto_xirr = producto.movs_hist[
                 ["fecha", "xirr_historica"]
             ].copy()
             producto_xirr = producto_xirr[
@@ -246,12 +240,12 @@ class Portafolio:
                 continue
 
             if (
-                    producto.hist_trans.empty
-                    or "saldo_historico" not in producto.hist_trans.columns
+                    producto.movs_hist.empty
+                    or "saldo_historico" not in producto.movs_hist.columns
             ):
                 continue
 
-            producto_saldo = producto.hist_trans[
+            producto_saldo = producto.movs_hist[
                 ["fecha", "saldo_historico"]
             ].copy()
             producto_saldo = producto_saldo[
