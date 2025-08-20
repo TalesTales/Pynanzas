@@ -1,3 +1,9 @@
+## 1.8.0 (2025-08-19)
+
+### Feat
+
+- **data_loader**: agrega la función tabla_sql_a_df para conectar al lógica de negocio anterior con la persistencia en SQL
+
 ## 1.7.1 (2025-08-19)
 
 ### Fix
