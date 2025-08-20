@@ -1,11 +1,15 @@
 import os
 from pathlib import Path
+import sqlite3
+from warnings import deprecated
 
 import pandas as pd
 
-from pynanzas.constants import BASE_PATH
+from pynanzas.constants import BASE_PATH, PROD_ID
+from pynanzas.sql.diccionario import NomBD, NomTablas
 
 
+@deprecated('Se eliminará en el futuro')
 def cargar_datos(
     data_dir: str = "data", nombre_archivo: str = "Inversiones_Data.xlsx"
 ) -> dict[str, pd.DataFrame]:
@@ -111,6 +115,23 @@ def cargar_datos(
     else:
         print("cargar_datos: Archivo leído exitosamente.")
     return data
+
+def tabla_sql_a_df(
+    nom_tabla: NomTablas,
+    nom_bd: NomBD = NomBD.BD_SQLITE
+) -> pd.DataFrame:
+    try:
+        with sqlite3.connect(nom_bd) as conn:
+            query = f"SELECT * FROM {nom_tabla}"
+            if nom_tabla == NomTablas.PRODS:
+                df = pd.read_sql_query(query, conn, index_col=PROD_ID)
+            else:
+                df = pd.read_sql_query(query, conn)
+            return df
+    except sqlite3.Error as e:
+        print(f"data_loader.tabla_sql_a_df: Error al leer la tabla "
+              f"'{nom_tabla}': {e}")
+        return pd.DataFrame()
 
 def init_once()-> None:
     

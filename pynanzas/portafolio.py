@@ -3,6 +3,7 @@ import pandas as pd
 from pandas import Series
 
 from pynanzas.analisis import dist_riesgo
+from pynanzas.constants import PROD_ID
 from pynanzas.producto import ProductoFinanciero
 
 
@@ -20,7 +21,6 @@ class Portafolio:
         self._trans_a_prods(
             df_transacciones=df_transacciones,
             dict_productos=self.productos,
-            id_de_producto=self.id_de_producto_key,
         )
         self.total: float = self._calcular_total()
         self.intereses_total: float = self._calcular_intereses()
@@ -68,12 +68,11 @@ class Portafolio:
     def _trans_a_prods(
             df_transacciones: pd.DataFrame,
             dict_productos: dict[str, ProductoFinanciero],
-            id_de_producto: str,
     ) -> None:
         try:
             for producto_id, objeto_producto in dict_productos.items():
                 df_filtrado_para_producto = df_transacciones[
-                    df_transacciones[id_de_producto] == producto_id
+                    df_transacciones[PROD_ID] == producto_id
                     ]
                 objeto_producto.procesar_trans(df_filtrado_para_producto)
         except Exception as e:

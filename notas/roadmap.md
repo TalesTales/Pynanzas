@@ -2,10 +2,7 @@
 
 ## En Desarrollo
 
-- [ ] Subir transacciones a TABLE movimientos
-- [*] Empezar a usar SQLite
-    - [*] Empezar a usar enumeraciones
-    - [*] Subir los datos de los productos a la tabla
+[*] BUG: en .portafolio_transacciones_a_productos
 
 ## Hecho
 
@@ -13,6 +10,10 @@
 - [ ] PORTAFOLIO: Poder filtrar todas las funciones por Plataforma (!), Riesgo, Plazo, etc.
 - [ ] PORTAFOLIO: Balancear debe aceptar valores negativos (retiros)
 - [ ] Agregar DocString a todo
+- [x] Empezar a usar SQLite
+    - [x] Empezar a usar enumeraciones
+    - [x] Subir los datos de los productos a la tabla
+- [X] Subir transacciones a TABLE movimientos
 - [X] Actualizas DDL de TABLE productos
 - [x] crear tabla de productos
 - [x] Agregar: abierto, saldo, aportes, intereses, rentabilidad, ultima_tran, xirr a la TABLE productos
@@ -30,11 +31,9 @@
 
 ### MIS IDEAS
 
-- [*] Pasar todo a SQLite
 - BUG: Cuando se envía un NAN a balancear en Portafolio, se le asigna la completa totalidad del saldo
 - [ ] ProductoFinanciero o portafolio: encontrar la forma de simular un pd.Dataframe o un ProductoFinanciero despues
   de "balancer" para que pueda ver la dist_riesgo antes y después, todo con filtros.
-- [* ] GLOBAL: Enums para Riesgo, plataforma, etc.
 - [ ] PORTAFOLIO: De pronto la función "balancear" no se llama asi? En cualquier caso, debe tener un varificador de "
   inversión mínima", atada a una propiedad del ProductoFinanciero. Por ejemplo: en TYBA es de COP5000, pero en IBKR
   cambia dependiendo del producto. Esto haría que cuando se ejecute el algoritmo, si la asignación es menor a la
@@ -85,7 +84,7 @@
 - [ ] Añadir tests unitarios para todos los módulos, empezando por la funcionalidad principal
 - [ ] Implementar un sistema de gestión de configuración (ej. usando archivos `.env`)
 - [ ] Crear una interfaz de línea de comandos (CLI) para ejecutar análisis
-- [*] Implementar un almacenamiento en base de datos en lugar de archivos CSV/Excel
+- [X] Implementar un almacenamiento en base de datos en lugar de archivos CSV/Excel
 - [ ] Optimizar el rendimiento de los cálculos de XIRR para grandes volúmenes de datos
 - [ ] Crear contenedores de Docker para la aplicación
 - [ ] Configurar integración continua (CI) para tests automáticos

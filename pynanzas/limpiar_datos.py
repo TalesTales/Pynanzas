@@ -1,10 +1,12 @@
+from warnings import deprecated
+
 import numpy as np
 import pandas as pd
 from pandas import CategoricalDtype
 
 pd.set_option("future.no_silent_downcasting", True)
 
-
+@deprecated('Se eliminará en el futuro')
 def prods_raw_a_df(
     df_productos_raw: pd.DataFrame,
     df_diccionario_raw: pd.DataFrame,
@@ -68,7 +70,7 @@ def prods_raw_a_df(
     for col in df_productos.columns:
         if col in df_productos.columns:
             df_productos[col] = (
-                df_productos[col].fillna("N/A").infer_objects(copy=False)
+                df_productos[col].fillna("N/A").infer_objects(copy=False)  # pyright: ignore[reportCallIssue]
             )
     df_productos["simulado"] = (
         df_productos["simulado"].astype(int).astype(bool)
@@ -95,7 +97,7 @@ def prods_raw_a_df(
             ].astype(tipo_categorico_ordenado)
     return df_productos
 
-
+@deprecated('Se eliminará en el futuro')
 def trans_raw_to_df(
     df_transacciones_raw: pd.DataFrame,
 ) -> pd.DataFrame:

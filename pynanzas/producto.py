@@ -113,26 +113,6 @@ class ProductoFinanciero:
                 f"at {hex(id(self))}>")
 
     def procesar_trans(self, df_transacciones_producto: pd.DataFrame) -> None:
-        """Procesa todas las transacciones del producto y calcula métricas.
-
-        Toma un DataFrame con las transacciones del producto, las ordena cronológicamente,
-        calcula el saldo histórico acumulado y actualiza todas las métricas del producto
-        como saldos, aportes, intereses y XIRR.
-
-        Args:
-            df_transacciones_producto (pd.DataFrame): DataFrame con las transacciones
-                del producto. Debe contener al menos las columnas 'fecha' y 'valor'.
-
-        Returns:
-            None: La función actualiza los atributos del objeto directamente.
-
-        Note:
-            - Si el DataFrame está vacío, marca el producto como cerrado.
-            - Ordena las transacciones por fecha antes de procesarlas.
-            - Calcula el saldo histórico acumulado usando cumsum().
-            - Llama a los métodos internos _calcular_metricas_basicas() y
-              _calcular_xirr_historica() para actualizar todas las métricas.
-        """
         if df_transacciones_producto.empty:
             self.abierto = False
             self.hist_trans = pd.DataFrame()
