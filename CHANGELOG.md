@@ -1,3 +1,9 @@
+## 1.8.1 (2025-08-19)
+
+### Fix
+
+- **sql/prods**: Corregido un error del DDL de la tabla productos que ordenaba la creación de las columnas Riesgo, Plazo y Liquidez como si fueran texto, pero deben crearse siendo ints
+
 ## 1.8.0 (2025-08-19)
 
 ### Feat

@@ -6,7 +6,14 @@ from overrides import override
 import pandas as pd
 import pyxirr
 
-from pynanzas.diccionario import MovsAportes, MovsIntereses
+from pynanzas.diccionario import (
+    Liquidez,
+    Moneda,
+    MovsAportes,
+    MovsIntereses,
+    Plazo,
+    Riesgo,
+)
 
 MOVS_APORTES = [m.value for m in MovsAportes]
 MOVS_INTERESES = [m.value for m in MovsIntereses]
@@ -15,28 +22,29 @@ MOVS_INTERESES = [m.value for m in MovsIntereses]
 @dataclass
 class ProductoFinanciero:
     producto_id: str
-    nombre_completo: str
+    nombre: str
     ticker: str
     simulado: bool
-    administrador: str
-    moneda: str
-    plataforma: str
-    tipo_de_producto: str
-    liquidez: str
-    tipo_de_inversion: str
-    categoria: str
+    moneda: Moneda
+    riesgo: Riesgo
+    liquidez: Liquidez
+    plazo: Plazo
     objetivo: str
-    riesgo: str
-    plazo: str
-    asignacion: float
-
+    administrador: str
+    plataforma: str
+    tipo_producto: str
+    tipo_inversion: str
+    # categoria: str
     abierto: bool = True
+    asignacion: float = 0
+    saldo: float = field(init=False, default=0)
+    aportes: float = field(init=False, default=np.nan)
+    intereses: float = field(init=False, default=np.nan)
+    xirr: float | None = field(init=False, default=np.nan)
+
     peso: float = 0.0
 
     saldo_inicial: float = field(init=False, default=np.nan)
-    saldo_actual: float = field(init=False, default=0)
-    aportes_totales: float = field(init=False, default=np.nan)
-    intereses: float = field(init=False, default=np.nan)
     rentabilidad_acumulada: float = field(init=False, default=np.nan)
 
     hist_trans: pd.DataFrame = field(init=False, default_factory=pd.DataFrame)
@@ -52,7 +60,6 @@ class ProductoFinanciero:
         init=False, default_factory=pd.DataFrame
     )
 
-    xirr: float | None = field(init=False, default=np.nan)
 
     es_instrumento_mercado: bool = field(init=False, default=False)
 
@@ -82,8 +89,8 @@ class ProductoFinanciero:
 
         abierto_tag: str = "[ABIERTO]" if self.abierto else "[CERRADO]"
         string: str = (
-            f"{self.nombre_completo}: {self.ticker} | {abierto_tag} | "
-            f"Plataforma: {self.plataforma}, Tipo: {self.tipo_de_producto}, "
+            f"{self.nombre}: {self.ticker} | {abierto_tag} | "
+            f"Plataforma: {self.plataforma}, Tipo: {self.tipo_producto}, "
             f"Riesgo: {self.riesgo}, Plazo: {self.plazo}, "
             f"Administrado por {self.administrador}"
         )
@@ -93,7 +100,7 @@ class ProductoFinanciero:
                 if (self.xirr is not None and not np.isnan(self.xirr))
                 else "N/A"
             )
-            string += f"| Saldo: COP ${self.saldo_actual:,.2f}"  # TODO: Modificar moneda
+            string += f"| Saldo: COP ${self.saldo:,.2f}"  # TODO: Modificar moneda
             string += f" | XIRR: {xirr_display}"
             string += (
                 f" | Peso: {self.peso:.2%}"
@@ -134,7 +141,7 @@ class ProductoFinanciero:
             self.hist_trans["movimiento"] == "saldo_inicial"
             ]["valor"].sum()
 
-        self.aportes_totales = self.hist_trans[
+        self.aportes = self.hist_trans[
             self.hist_trans["movimiento"].isin(values=MOVS_APORTES)
         ]["valor"].sum()
 
@@ -142,16 +149,16 @@ class ProductoFinanciero:
             self.hist_trans["movimiento"].isin(values=MOVS_INTERESES)
         ]["valor"].sum()
 
-        self.saldo_actual = (
+        self.saldo = (
             self.hist_trans["saldo_historico"].iloc[-1]
             if not self.hist_trans.empty
             else 0.0
         )
 
-        self.abierto = False if self.saldo_actual == 0.0 else True
+        self.abierto = False if self.saldo == 0.0 else True
 
         self.rentabilidad_acumulada = (
-                self.saldo_actual - self.aportes_totales - self.saldo_inicial
+                self.saldo - self.aportes - self.saldo_inicial
         )
 
         df_movimientos_reales: pd.DataFrame = self.hist_trans[ #TODO:

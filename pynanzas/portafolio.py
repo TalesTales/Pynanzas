@@ -8,16 +8,11 @@ from pynanzas.producto import ProductoFinanciero
 
 
 class Portafolio:
-    def __init__(
-            self,
-            df_productos: pd.DataFrame,
-            df_transacciones: pd.DataFrame,
-            id_de_producto_key: str,
-    ) -> None:
+    def __init__(self, df_productos: pd.DataFrame,
+                 df_transacciones: pd.DataFrame) -> None:
         self.productos: dict[str, ProductoFinanciero] = self._crear_portafolio(
             df_productos
         )
-        self.id_de_producto_key: str = id_de_producto_key
         self._trans_a_prods(
             df_transacciones=df_transacciones,
             dict_productos=self.productos,
@@ -44,13 +39,13 @@ class Portafolio:
                     producto_id=str(producto_id),
                     ticker=fila.get("ticket", "N/A"),
                     simulado=fila.get("simulado", False),
-                    nombre_completo=fila.get("nombre", "Sin Nombre"),
+                    nombre=fila.get("nombre", "Sin Nombre"),
                     administrador=fila.get("administrador", "N/A"),
                     moneda=fila.get("moneda", "COP"),
                     plataforma=fila.get("plataforma", "N/A"),
-                    tipo_de_producto=fila.get("tipo_de_producto", "N/A"),
+                    tipo_producto=fila.get("tipo_de_producto", "N/A"),
                     liquidez=fila.get("liquidez", "N/A"),
-                    tipo_de_inversion=fila.get("tipo_de_inversion", "N/A"),
+                    tipo_inversion=fila.get("tipo_de_inversion", "N/A"),
                     categoria=fila.get("categoria", "N/A"),
                     objetivo=fila.get("objetivo", "N/A"),
                     riesgo=fila.get("riesgo", "N/A"),
@@ -82,7 +77,7 @@ class Portafolio:
     def _calcular_total(self) -> float:
         saldos = np.array(
             [
-                producto.saldo_actual
+                producto.saldo
                 for producto in self.productos.values()
                 if producto.moneda == "COP"
             ]
@@ -108,8 +103,8 @@ class Portafolio:
         producto: ProductoFinanciero
         try:
             for producto in self.productos.values():
-                if not np.isnan(producto.saldo_actual):
-                    producto.peso = producto.saldo_actual / self.total
+                if not np.isnan(producto.saldo):
+                    producto.peso = producto.saldo / self.total
         except Exception as e:
             print(f"E: Portafolio._calcular_pesos. -> {e}")
 
@@ -124,7 +119,7 @@ class Portafolio:
 
         for ticker, producto in portafolio.items():
             if producto.asignacion >= 0:
-                valor_actual = producto.saldo_actual
+                valor_actual = producto.saldo
                 valor_objetivo = portafolio_futuro * producto.asignacion
                 diferencia = valor_objetivo - valor_actual
 
@@ -155,7 +150,7 @@ class Portafolio:
         else:
             for ticker, producto in portafolio.items():
                 if producto.asignacion >= 0 and not np.isnan(
-                        producto.saldo_actual
+                        producto.saldo
                 ):
                     distribucion[ticker] = monto_invertir * producto.asignacion
 
@@ -174,7 +169,7 @@ class Portafolio:
 
         for ticker, producto in portafolio.items():
             if producto.asignacion >= 0 and not np.isnan(
-                    producto.saldo_actual
+                    producto.saldo
             ):
                 valor_final = valores_actuales[ticker] + distribucion.get(
                     ticker, 0

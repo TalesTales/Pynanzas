@@ -21,7 +21,7 @@ def dist_riesgo(productos: dict[str, ProductoFinanciero],
         "Bajo":     0,
     }
     if saldos is None:
-       saldos = {prod.producto_id: prod.saldo_actual for prod in productos.values()}
+       saldos = {prod.producto_id: prod.saldo for prod in productos.values()}
     for producto in productos.values():
         if producto.riesgo in dict_dist_riesgo:
             dict_dist_riesgo[producto.riesgo] += saldos.get(

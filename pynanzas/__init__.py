@@ -7,16 +7,16 @@ from pynanzas.constants import (
     BD_SQLITE,
     PROD_ID,
 )
-from pynanzas.data_loader import cargar_datos
+from pynanzas.data_loader import tabla_sql_a_df
 from pynanzas.diccionario import (
     Liquidez,
+    Moneda,
     MovsAportes,
     MovsIntereses,
     MovsNoAportes,
     Plazo,
     Riesgo,
 )
-from pynanzas.limpiar_datos import prods_raw_a_df, trans_raw_to_df
 from pynanzas.portafolio import Portafolio
 from pynanzas.producto import ProductoFinanciero
 from pynanzas.sql import (
@@ -39,9 +39,7 @@ __all__ = [
     "BD_SQLITE",
     'crear_tabla_prods',
     'crear_tabla_movs',
-    'cargar_datos',
-    'prods_raw_a_df',
-    'trans_raw_to_df',
+    'tabla_sql_a_df',
     'EsquemaMovs',
     'EsquemaProds',
     'insertar_prod',
@@ -54,5 +52,6 @@ __all__ = [
     'MovsNoAportes',
     'MovsIntereses',
     'actualizar_tabla',
-    'insertar_mov'
+    'insertar_mov',
+    'Moneda'
 ]
