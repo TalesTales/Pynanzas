@@ -1,3 +1,13 @@
+## 1.9.0 (2025-08-19)
+
+### Feat
+
+- **sql-consultas**: se agregó un nuevo .py al sub´modulo sql
+
+### Fix
+
+- **portafolio**: saldo total daba cero, pero no se puede dividir por cero
+
 ## 1.8.1 (2025-08-19)
 
 ### Fix
