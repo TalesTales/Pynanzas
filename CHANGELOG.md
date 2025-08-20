@@ -1,3 +1,9 @@
+## 1.10.0 (2025-08-20)
+
+### Feat
+
+- **BD_SQL**: Se agregó una cosntante que depende de si el entorno es de pruebas o no
+
 ## 1.9.0 (2025-08-19)
 
 ### Feat

@@ -2,7 +2,15 @@
 
 ## En Desarrollo
 
-[ ] BUG: Cuando se crea la tabla productos las columnas que son enumeraciones se crean como texto
+[] Eliminar completamente la dependencia de Excel y dejar sólo lectura de CSV.
+
+- [] Borrar la lectura de Excel de data_loader
+- [] Dejar solamente lectura de CSV
+- [] Función para exportar los datos a CSV en la carpeta correcta (.data)
+
+[] No eliminar Diccionario.csv (buscar forma de generarlo desde py o desde sqlite)
+
+[*] Ingresar transacciones desde lo que hay ahora
 
 ## Hecho
 
@@ -10,6 +18,7 @@
 - [ ] PORTAFOLIO: Poder filtrar todas las funciones por Plataforma (!), Riesgo, Plazo, etc.
 - [ ] PORTAFOLIO: Balancear debe aceptar valores negativos (retiros)
 - [ ] Agregar DocString a todo
+- [X] BUG: Cuando se crea la tabla productos las columnas que son enumeraciones se crean como texto
 - [X] BUG: en .portafolio_transacciones_a_productos
 - [x] Empezar a usar SQLite
     - [x] Empezar a usar enumeraciones
