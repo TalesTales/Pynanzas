@@ -1,6 +1,7 @@
+from dataclasses import asdict
 import sqlite3
 
-from pynanzas.sql.diccionario import ColumDDL, NomBD, NomTablas
+from pynanzas.sql.diccionario import BD_SQL, ColumDDL, NomBD, NomTablas
 from pynanzas.sql.esquemas import EsquemaProds
 
 EsquemaProdsDDL: EsquemaProds = EsquemaProds(
@@ -22,16 +23,19 @@ EsquemaProdsDDL: EsquemaProds = EsquemaProds(
     saldo = ColumDDL.REAL_DEFAULT_CERO,
     aportes = ColumDDL.REAL_DEFAULT_CERO,
     intereses = ColumDDL.REAL_DEFAULT_CERO,
-    xirr = ColumDDL.REAL_DEFAULT_CERO
+    xirr = ColumDDL.REAL_DEFAULT_CERO,
+    fecha_actualizacion = ColumDDL.DATE_ACTUAL
 )
 def insertar_prod(producto: EsquemaProds,
         nom_tabla_prods: NomTablas = NomTablas.PRODS,
-        nom_bd: NomBD = NomBD.BD_SQLITE
+        nom_bd: NomBD = BD_SQL
 ) -> None:
     from pynanzas.sql.sqlite import tabla_existe
-    columnas: str = ','.join(producto.keys())
-    placeholders: str = ','.join(['?'] * len(producto))
-    valores = tuple(producto.values())
+    prod = asdict(producto)
+    prod.pop('fecha_actualizacion', None)
+    columnas: str = ','.join(prod.keys())
+    placeholders: str = ','.join(['?'] * len(prod))
+    valores = tuple(prod.values())
     try:
         with sqlite3.connect(nom_bd) as conn:
             cursor: sqlite3.Cursor = conn.cursor()
@@ -49,7 +53,7 @@ def insertar_prod(producto: EsquemaProds,
 
 def crear_tabla_prods(esquema_prods: EsquemaProds = EsquemaProdsDDL,
                       nom_tabla_prods: NomTablas = NomTablas.PRODS,
-                      nom_bd: NomBD = NomBD.BD_SQLITE) -> None:
+                      nom_bd: NomBD = BD_SQL) -> None:
     if esquema_prods is None or len(esquema_prods) == 0:
         esquema_prods = EsquemaProdsDDL
 

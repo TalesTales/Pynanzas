@@ -1,8 +1,7 @@
 import os
 from pathlib import Path
 
-BD_SQLITE: str = 'pynanzas_bd.sqlite'
-BD_TEST: str = 'pynanzas_bd_test.sqlite'
+TEST = False
 
 TABLA_PRODS: str = 'productos'
 TABLA_MOVS: str = 'movimientos'
@@ -15,3 +14,4 @@ except NameError:
     directorio_base = Path(os.getcwd()).resolve().parent
 
 BASE_PATH: Path = directorio_base
+

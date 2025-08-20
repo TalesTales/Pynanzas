@@ -161,8 +161,7 @@ class ProductoFinanciero:
                 self.saldo - self.aportes - self.saldo_inicial
         )
 
-        df_movs_reales: pd.DataFrame = self.movs_hist[ #TODO:
-            # Cambiar trans por movs
+        df_movs_reales: pd.DataFrame = self.movs_hist[
             self.movs_hist["tipo"] != "saldo_inicial"
             ]
 

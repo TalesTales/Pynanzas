@@ -82,6 +82,7 @@ class EsquemaProds(EsquemaBase):
     aportes: float | ColumDDL = 0
     intereses: float | ColumDDL = 0
     xirr: float | ColumDDL = 0
+    fecha_actualizacion: ColumDDL | None = None
 
     def obtener_colums(self) -> dict[str, str]:
         return asdict(self)

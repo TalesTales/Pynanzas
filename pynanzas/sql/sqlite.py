@@ -2,16 +2,16 @@ import sqlite3
 from typing import Any, Optional
 
 from pynanzas.constants import PROD_ID
-from pynanzas.sql.diccionario import NomBD, NomTablas
+from pynanzas.sql.diccionario import NomBD, NomTablas, BD_SQL
 from pynanzas.sql.esquemas import EsquemaMovs, EsquemaProds
 
 
 def actualizar_tabla(nom_tabla: NomTablas,
                      esquema: EsquemaProds | EsquemaMovs,
-                     nom_bd: NomBD = NomBD.BD_SQLITE,
+                     nom_bd: NomBD = BD_SQL,
                      cursor: Optional[sqlite3.Cursor] = None
                      ) -> None:
-    # Importaciones locales para evitar ciclos
+
     from pynanzas.sql.movs import crear_tabla_movs
     from pynanzas.sql.prods import crear_tabla_prods
 

@@ -6,7 +6,7 @@ from warnings import deprecated
 import pandas as pd
 
 from pynanzas.constants import BASE_PATH, PROD_ID
-from pynanzas.sql.diccionario import NomBD, NomTablas
+from pynanzas.sql.diccionario import NomBD, NomTablas, BD_SQL
 
 
 @deprecated('Se eliminará en el futuro')
@@ -118,7 +118,7 @@ def cargar_datos(
 
 def tabla_sql_a_df(
     nom_tabla: NomTablas,
-    nom_bd: NomBD = NomBD.BD_SQLITE
+    nom_bd: NomBD = BD_SQL
 ) -> pd.DataFrame:
     try:
         with sqlite3.connect(nom_bd) as conn:

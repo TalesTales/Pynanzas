@@ -4,7 +4,6 @@ Pynanzas: Un paquete para el análisis y seguimiento de portafolios de inversió
 
 from pynanzas.analisis import dist_riesgo
 from pynanzas.constants import (
-    BD_SQLITE,
     PROD_ID,
 )
 from pynanzas.data_loader import tabla_sql_a_df
@@ -36,7 +35,6 @@ __all__ = [
     "ProductoFinanciero",
     "PROD_ID",
     "dist_riesgo",
-    "BD_SQLITE",
     'crear_tabla_prods',
     'crear_tabla_movs',
     'tabla_sql_a_df',

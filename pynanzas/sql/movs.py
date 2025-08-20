@@ -2,25 +2,15 @@ from dataclasses import asdict
 import sqlite3
 
 from pynanzas.constants import PROD_ID
-from pynanzas.sql.diccionario import ColumDDL, NomBD, NomTablas
+from pynanzas.sql.diccionario import BD_SQL, ColumDDL, NomBD, NomTablas
 from pynanzas.sql.esquemas import EsquemaMovs
 
-EsquemaMovsDDL: EsquemaMovs =  EsquemaMovs(
-    id = ColumDDL.INT_PK_AUTO,
-    producto_id = ColumDDL.TXT_NOT_NULL,
-    fecha = ColumDDL.DATE_NOT_NULL,
-    tipo = ColumDDL.TXT_NOT_NULL,
-    valor  = ColumDDL.REAL_NOT_NULL,
-    unidades  = ColumDDL.REAL,
-    valor_unidades = ColumDDL.REAL,
-    fecha_agregada = ColumDDL.DATE_ACTUAL
-)
 
 def insertar_mov(
         movimiento: EsquemaMovs,
         nom_tabla_movs: NomTablas = NomTablas.MOVS,
         producto_id: str = PROD_ID,
-        nom_bd: NomBD = NomBD.BD_SQLITE
+        nom_bd: NomBD = BD_SQL
 ) -> None:
     from pynanzas.sql.sqlite import tabla_existe
 
@@ -43,11 +33,22 @@ def insertar_mov(
         cursor.execute(query, valores)
         conn.commit()  # Agregado: faltaba commit
 
+EsquemaMovsDDL: EsquemaMovs =  EsquemaMovs(
+    id = ColumDDL.INT_PK_AUTO,
+    producto_id = ColumDDL.TXT_NOT_NULL,
+    fecha = ColumDDL.DATE_NOT_NULL,
+    tipo = ColumDDL.TXT_NOT_NULL,
+    valor  = ColumDDL.REAL_NOT_NULL,
+    unidades  = ColumDDL.REAL,
+    valor_unidades = ColumDDL.REAL,
+    fecha_agregada = ColumDDL.DATE_ACTUAL
+)
+
 def crear_tabla_movs(esquema_movs: EsquemaMovs = EsquemaMovsDDL,
                      nom_tabla_movs: NomTablas = NomTablas.MOVS,
                      nom_tabla_prods: NomTablas = NomTablas.PRODS,
                      producto_id: str = PROD_ID,
-                     nom_bd: NomBD = NomBD.BD_SQLITE) -> None:
+                     nom_bd: NomBD = BD_SQL) -> None:
     from pynanzas.sql.prods import crear_tabla_prods
     from pynanzas.sql.sqlite import tabla_existe
 

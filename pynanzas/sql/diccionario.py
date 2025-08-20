@@ -1,35 +1,40 @@
 from enum import StrEnum
+import os
 
-from pynanzas.constants import BD_SQLITE, BD_TEST, TABLA_MOVS, TABLA_PRODS
+from pynanzas.constants import TABLA_MOVS, TABLA_PRODS, TEST
 
 
 class ColumDDL(StrEnum):
     """Enum para tipos de columna SQL comunes."""
-    INT_PK = "INTEGER PRIMARY KEY"
-    INT_PK_AUTO = "INTEGER PRIMARY KEY AUTOINCREMENT"
-    INT_DEFAULT = "INTEGER DEFAULT 0"
-    TXT_NOT_NULL = "TEXT NOT NULL"
-    TXT_UNIQUE = "TEXT NOT NULL UNIQUE"
-    TXT_PK = "TEXT NOT NULL PRIMARY KEY"
+    INT_PK = "INTEGER primary key"
+    INT_PK_AUTO = "INTEGER primary key AUTOINCREMENT"
+    INT_DEFAULT = "INTEGER default 0"
+    TXT_NOT_NULL = "TEXT not null"
+    TXT_UNIQUE = "TEXT not null UNIQUE"
+    TXT_PK = "TEXT not null primary key"
     REAL = "REAL"
-    REAL_NOT_NULL = "REAL NOT NULL"
-    REAL_DEFAULT_CERO = "REAL NOT NULL DEFAULT 0.0"
-    BOOL_FALSE = "BOOLEAN NOT NULL DEFAULT FALSE"
-    BOOL_TRUE = "BOOLEAN NOT NULL DEFAULT TRUE"
-    DATE = "DATE NOT NULL"
-    DATE_NOT_NULL = "DATE NOT NULL"
-    DATE_ACTUAL = "DATE DEFAULT CURRENT_TIMESTAMP"
+    REAL_NOT_NULL = "REAL not null"
+    REAL_DEFAULT_CERO = "REAL not null default 0.0"
+    BOOL_FALSE = "BOOLEAN not null default FALSE"
+    BOOL_TRUE = "BOOLEAN not null default TRUE"
+    DATE = "DATE not null"
+    DATE_NOT_NULL = "DATE not null"
+    DATE_ACTUAL = "DATE default CURRENT_TIMESTAMP"
     @staticmethod
     def txt_default(default: str) -> str:
-        """Genera un tipo TEXT NOT NULL con valor por defecto."""
-        return f"TEXT NOT NULL DEFAULT '{default}'"
+        """Genera un tipo TEXT not null con valor por defecto."""
+        return f"TEXT not null default '{default}'"
 
 
 class NomTablas(StrEnum):
     PRODS = TABLA_PRODS
     MOVS = TABLA_MOVS
 
-
 class NomBD(StrEnum):
-    BD_SQLITE = BD_SQLITE
-    BD_TEST = BD_TEST
+    BD_SQLITE = os.path.join("../data",'pynanzas_bd.sqlite')
+    BD_TEST = os.path.join("../data",'pynanzas_bd_test.sqlite')
+
+if not TEST:
+    BD_SQL: NomBD = NomBD.BD_SQLITE  # pyright: ignore[reportRedeclaration]
+else:
+    BD_SQL: NomBD = NomBD.BD_TEST
