@@ -5,8 +5,8 @@ from warnings import deprecated
 
 import pandas as pd
 
-from pynanzas.constants import BASE_PATH, PROD_ID
-from pynanzas.sql.diccionario import NomBD, NomTablas, BD_SQL
+from pynanzas.constants import DIR_BASE, PROD_ID
+from pynanzas.sql.diccionario import BD_SQL, NomBD, NomTablas
 
 
 @deprecated('Se eliminará en el futuro')
@@ -41,7 +41,7 @@ def cargar_datos(
         y "Productos". Si no se encuentra el Excel, busca archivos CSV individuales
         con el patrón "Inversiones_DATA_[NombreHoja].csv".
     """
-    data_path: Path = BASE_PATH / data_dir
+    data_path: Path = DIR_BASE / data_dir
     archivo_path: Path = data_path / nombre_archivo
     data: dict[str, pd.DataFrame] = {}
     try:
@@ -133,7 +133,7 @@ def tabla_sql_a_df(
               f"'{nom_tabla}': {e}")
         return pd.DataFrame()
 
-def init_once()-> None:
+def init_once(nom_bd: NomBD = BD_SQL)-> None:
     
     from pynanzas.diccionario import Liquidez, Plazo, Riesgo
     from pynanzas.limpiar_datos import prods_raw_a_df, trans_raw_to_df
@@ -161,7 +161,7 @@ def init_once()-> None:
                             df_prods.loc[i]['plataforma'],
                             df_prods.loc[i]['tipo_de_producto'],
                             df_prods.loc[i]['tipo_de_inversion'])
-        insertar_prod(prod)
+        insertar_prod(prod, nom_bd=nom_bd)
 
     for m in df_trans.index:
         mov = EsquemaMovs(
@@ -172,4 +172,4 @@ def init_once()-> None:
             df_trans.loc[m]['unidades'],
             df_trans.loc[m]['precio_de_la_unidad'],
         )
-        insertar_mov(mov)
+        insertar_mov(mov, nom_bd=nom_bd)

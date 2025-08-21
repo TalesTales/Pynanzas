@@ -1,7 +1,7 @@
 from enum import StrEnum
 import os
 
-from pynanzas.constants import TABLA_MOVS, TABLA_PRODS, TEST
+from pynanzas.constants import DIR_DATA, TABLA_MOVS, TABLA_PRODS, TEST
 
 
 class ColumDDL(StrEnum):
@@ -31,8 +31,8 @@ class NomTablas(StrEnum):
     MOVS = TABLA_MOVS
 
 class NomBD(StrEnum):
-    BD_SQLITE = os.path.join("../data",'pynanzas_bd.sqlite')
-    BD_TEST = os.path.join("../data",'pynanzas_bd_test.sqlite')
+    BD_SQLITE = os.path.join(DIR_DATA, 'pynanzas_bd.sqlite')
+    BD_TEST = os.path.join(DIR_DATA, 'pynanzas_bd_test.sqlite')
 
 if not TEST:
     BD_SQL: NomBD = NomBD.BD_SQLITE  # pyright: ignore[reportRedeclaration]
