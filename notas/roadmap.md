@@ -2,6 +2,8 @@
 
 ## En Desarrollo
 
+[*] Ingresar transacciones desde lo que hay ahora
+
 [] Eliminar completamente la dependencia de Excel y dejar sólo lectura de CSV.
 
 - [] Borrar la lectura de Excel de data_loader
@@ -9,8 +11,6 @@
 - [] Función para exportar los datos a CSV en la carpeta correcta (.data)
 
 [] No eliminar Diccionario.csv (buscar forma de generarlo desde py o desde sqlite)
-
-[*] Ingresar transacciones desde lo que hay ahora
 
 ## Hecho
 

@@ -1,3 +1,9 @@
+## 1.10.2 (2025-08-21)
+
+### Fix
+
+- **portafolio**: se corrigió un error en calcular intereses donde no se enconraba "COP" porque ahora las monedas se gestionan con Moneda.COP
+
 ## 1.10.1 (2025-08-21)
 
 ### Fix
