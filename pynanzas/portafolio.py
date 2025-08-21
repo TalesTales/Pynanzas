@@ -86,7 +86,7 @@ class Portafolio:
             [
                 producto.intereses
                 for producto in self.productos.values()
-                if producto.moneda == "COP"
+                if producto.moneda == Moneda.COP
             ]
         )
         intereses_validos = interes[~np.isnan(interes)]
