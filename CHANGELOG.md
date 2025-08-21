@@ -1,3 +1,9 @@
+## 1.10.1 (2025-08-21)
+
+### Fix
+
+- **sql**: se corrigió un error que ubicaba de manera equivocada el directorio base del main.
+
 ## 1.10.0 (2025-08-20)
 
 ### Feat
