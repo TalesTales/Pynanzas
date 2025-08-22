@@ -1,37 +1,40 @@
-import os
+from collections import namedtuple
 from pathlib import Path
 import sqlite3
-from warnings import deprecated
 
 import pandas as pd
 
-from pynanzas.constants import PROD_ID, DIR_DATA
+from pynanzas.constants import DIR_DATA, PROD_ID
 from pynanzas.sql.diccionario import BD_SQL, NomBD, NomTablas
-
-from collections import namedtuple
-from typing import NamedTuple
 
 
 def cargar_csv(
     dir_data: Path = DIR_DATA,
     nom_tablas: tuple[NomTablas, ...] = tuple(NomTablas),
 ) -> tuple:
-    nom_tablas_str: list[str] = [nom.value for nom in NomTablas]
+    nom_tablas_str: list[str] = [str(nom.value) for nom in nom_tablas]
     data = namedtuple("data", nom_tablas_str)
     try:
         df_list: list[pd.DataFrame] = []
         for nom_tabla in nom_tablas_str:
-            df_read: pd.DataFrame = pd.read_csv(
-                DIR_DATA / (nom_tabla + ".csv")
-            )
-            if not df_read.empty:
-                df_list.append(df_read)
+            if (dir_data / (nom_tabla + '.csv')).exists():
+                df_read: pd.DataFrame = pd.read_csv(
+                    dir_data / (nom_tabla + '.csv')
+                )
+                if not df_read.empty:
+                    df_list.append(df_read)
+                    print(
+                        "data_loader.cargar_datos(): Archivos leído exitosamente."
+                    )
+                else:
+                    print("cargar_datos: Archivo cargado, pero df vacíos.")
             else:
-                print("cargar_datos: Archivo cargado, pero df vacíos.")
-        print("data_loader.cargar_datos(): Archivos leído exitosamente.")
+                df_read = pd.DataFrame()
+                df_list.append(df_read)
+                print(f"data_loader.cargar_datos(): {nom_tabla}.csv no existe")
         data = data(*df_list)
     except FileNotFoundError:
-        print("data_loader.cargar_datos(): ERROR: No se encontró el CSV.")
+        print("data_loader.cargar_datos(): ERROR: No se encontró csv.")
         raise
     except Exception as e:
         print(f"data_loader.cargar_datos(): ERROR: {e}")
@@ -58,18 +61,16 @@ def tabla_sql_a_df(
         return pd.DataFrame()
 
 
-def init_once(nom_bd: NomBD = BD_SQL) -> None:
+def reset_sql_desde_csv(nom_bd: NomBD = BD_SQL) -> None:
     from pynanzas.diccionario import Liquidez, Plazo, Riesgo
-    from pynanzas.limpiar_datos import prods_raw_a_df, trans_raw_to_df
+    from pynanzas.limpiar_datos import prods_csv_a_df, trans_raw_to_df
     from pynanzas.sql.esquemas import EsquemaMovs, EsquemaProds
     from pynanzas.sql.movs import insertar_mov
     from pynanzas.sql.prods import insertar_prod
 
-    datos: dict[str, pd.DataFrame] = cargar_csv()
-    df_prods: pd.DataFrame = prods_raw_a_df(
-        datos["productos"], datos["diccionario"]
-    )
-    df_trans: pd.DataFrame = trans_raw_to_df(datos["transacciones"])
+    data: tuple[pd.DataFrame, ...] = cargar_csv()
+    df_prods: pd.DataFrame = prods_csv_a_df()
+    df_trans: pd.DataFrame = trans_raw_to_df()
     for i in df_prods.index:
         print(i)
         prod = EsquemaProds(
