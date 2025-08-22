@@ -2,15 +2,17 @@
 
 ## En Desarrollo
 
-[*] Ingresar transacciones desde lo que hay ahora
+- [ ] Ingresar transacciones desde lo que hay ahora
+- [ ] Insertar clase Movimiento
 
-[] Eliminar completamente la dependencia de Excel y dejar sólo lectura de CSV.
+- [ ] Desarrollar una función _eq_ dentro de la clase Movimiento
+  - [ ] Eliminar completamente la dependencia de Excel y dejar sólo lectura de CSV.
 
-- [] Borrar la lectura de Excel de data_loader
-- [] Dejar solamente lectura de CSV
-- [] Función para exportar los datos a CSV en la carpeta correcta (.data)
+- [ ] Borrar la lectura de Excel de data_loader
+- [ ] Dejar solamente lectura de CSV
+- [ ] Función para exportar los datos a CSV en la carpeta correcta (.data)
 
-[] No eliminar Diccionario.csv (buscar forma de generarlo desde py o desde sqlite)
+[ ] No eliminar Diccionario.csv (buscar forma de generarlo desde py o desde sqlite)
 
 ## Hecho
 
@@ -18,13 +20,13 @@
 - [ ] PORTAFOLIO: Poder filtrar todas las funciones por Plataforma (!), Riesgo, Plazo, etc.
 - [ ] PORTAFOLIO: Balancear debe aceptar valores negativos (retiros)
 - [ ] Agregar DocString a todo
-- [X] BUG: Cuando se crea la tabla productos las columnas que son enumeraciones se crean como texto
-- [X] BUG: en .portafolio_transacciones_a_productos
+- [x] BUG: Cuando se crea la tabla productos las columnas que son enumeraciones se crean como texto
+- [x] BUG: en .portafolio_transacciones_a_productos
 - [x] Empezar a usar SQLite
-    - [x] Empezar a usar enumeraciones
-    - [x] Subir los datos de los productos a la tabla
-- [X] Subir transacciones a TABLE movimientos
-- [X] Actualizas DDL de TABLE productos
+  - [x] Empezar a usar enumeraciones
+  - [x] Subir los datos de los productos a la tabla
+- [x] Subir transacciones a TABLE movimientos
+- [x] Actualizas DDL de TABLE productos
 - [x] crear tabla de productos
 - [x] Agregar: abierto, saldo, aportes, intereses, rentabilidad, ultima_tran, xirr a la TABLE productos
 - [x] Actualizar el esquema de Productos
@@ -43,11 +45,11 @@
 
 - BUG: Cuando se envía un NAN a balancear en Portafolio, se le asigna la completa totalidad del saldo
 - [ ] ProductoFinanciero o portafolio: encontrar la forma de simular un pd.Dataframe o un ProductoFinanciero despues
-  de "balancer" para que pueda ver la dist_riesgo antes y después, todo con filtros.
+      de "balancer" para que pueda ver la dist_riesgo antes y después, todo con filtros.
 - [ ] PORTAFOLIO: De pronto la función "balancear" no se llama asi? En cualquier caso, debe tener un varificador de "
-  inversión mínima", atada a una propiedad del ProductoFinanciero. Por ejemplo: en TYBA es de COP5000, pero en IBKR
-  cambia dependiendo del producto. Esto haría que cuando se ejecute el algoritmo, si la asignación es menor a la
-  inversión, se deba transferir esa parte a otra parte del portafolio.
+      inversión mínima", atada a una propiedad del ProductoFinanciero. Por ejemplo: en TYBA es de COP5000, pero en IBKR
+      cambia dependiendo del producto. Esto haría que cuando se ejecute el algoritmo, si la asignación es menor a la
+      inversión, se deba transferir esa parte a otra parte del portafolio.
 - [ ] PORTAFOLIO: Agregar una función para ver el retorno mensual.
 - [ ] PORTAFOLIO: Hacer el total de retorno en un df.
 - [ ] Ver la evolución histórica de mi portafolio desde enero de 2025
@@ -63,14 +65,14 @@
 - [ ] Poder ingresar productos en otras monedas y hacer seguimiento a la tasa de cambio
 - [ ] Poder imprimir una ficha técnica de mi portafolio real en PDF
 - [ ] Que le diga al programa cuánto quiero en cada categoría de riesgo y que calcule cuánto debo invertir para
-  rebalancear
+      rebalancear
 - [ ] Calcular la volatilidad de cada producto
 - [ ] Calcular la volatilidad de mi portafolio
 - [ ] Calcular mi exposición a ciertos tipos de riesgo (riesgo país, riesgo de mercado)
 - [ ] Calcular el riesgo total de mi portafolio
 - [ ] Calcular métricas avanzadas como el Ratio de Sharpe
 - [ ] Saber cuál es la intersección de mis activos en la vida real (ej. si un ETF que poseo ya invierte en una acción
-  que también tengo por separado)
+      que también tengo por separado)
 - [ ] Saber mi coeficiente de apalancamiento
 - [ ] Saber cuánto deben subir o bajar mis activos para perderlo todo
 
@@ -94,7 +96,7 @@
 - [ ] Añadir tests unitarios para todos los módulos, empezando por la funcionalidad principal
 - [ ] Implementar un sistema de gestión de configuración (ej. usando archivos `.env`)
 - [ ] Crear una interfaz de línea de comandos (CLI) para ejecutar análisis
-- [X] Implementar un almacenamiento en base de datos en lugar de archivos CSV/Excel
+- [x] Implementar un almacenamiento en base de datos en lugar de archivos CSV/Excel
 - [ ] Optimizar el rendimiento de los cálculos de XIRR para grandes volúmenes de datos
 - [ ] Crear contenedores de Docker para la aplicación
 - [ ] Configurar integración continua (CI) para tests automáticos

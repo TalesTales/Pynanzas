@@ -3,10 +3,11 @@ from pathlib import Path
 
 TEST = False
 
-TABLA_PRODS: str = 'productos'
-TABLA_MOVS: str = 'movimientos'
+TABLA_PRODS: str = "productos"
+TABLA_MOVS: str = "movimientos"
+TABLA_DICC: str = "diccionario"
 
-PROD_ID: str = 'producto_id'
+PROD_ID: str = "producto_id"
 
 try:
     dir_base: Path = Path(__file__).resolve().parent.parent

@@ -1,11 +1,18 @@
 from enum import StrEnum
 import os
 
-from pynanzas.constants import DIR_DATA, TABLA_MOVS, TABLA_PRODS, TEST
+from pynanzas.constants import (
+    DIR_DATA,
+    TABLA_MOVS,
+    TABLA_PRODS,
+    TEST,
+    TABLA_DICC,
+)
 
 
 class ColumDDL(StrEnum):
     """Enum para tipos de columna SQL comunes."""
+
     INT_PK = "INTEGER primary key"
     INT_PK_AUTO = "INTEGER primary key AUTOINCREMENT"
     INT_DEFAULT = "INTEGER default 0"
@@ -20,6 +27,7 @@ class ColumDDL(StrEnum):
     DATE = "DATE not null"
     DATE_NOT_NULL = "DATE not null"
     DATE_ACTUAL = "DATE default CURRENT_TIMESTAMP"
+
     @staticmethod
     def txt_default(default: str) -> str:
         """Genera un tipo TEXT not null con valor por defecto."""
@@ -29,10 +37,13 @@ class ColumDDL(StrEnum):
 class NomTablas(StrEnum):
     PRODS = TABLA_PRODS
     MOVS = TABLA_MOVS
+    DICC = TABLA_DICC
+
 
 class NomBD(StrEnum):
-    BD_SQLITE = os.path.join(DIR_DATA, 'pynanzas_bd.sqlite')
-    BD_TEST = os.path.join(DIR_DATA, 'pynanzas_bd_test.sqlite')
+    BD_SQLITE = os.path.join(DIR_DATA, "pynanzas_bd.sqlite")
+    BD_TEST = os.path.join(DIR_DATA, "pynanzas_bd_test.sqlite")
+
 
 if not TEST:
     BD_SQL: NomBD = NomBD.BD_SQLITE  # pyright: ignore[reportRedeclaration]
