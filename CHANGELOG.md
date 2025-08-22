@@ -1,3 +1,9 @@
+## 1.11.0 (2025-08-21)
+
+### Feat
+
+- **export**: nuevo módulo para exportar a archivos
+
 ## 1.10.2 (2025-08-21)
 
 ### Fix
