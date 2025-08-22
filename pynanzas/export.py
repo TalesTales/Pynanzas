@@ -8,10 +8,10 @@ from pynanzas.constants import DIR_DATA
 from pynanzas.sql.diccionario import BD_SQL, NomBD, NomTablas
 
 
-def exportar_sqlite_csv(nom_tabla: NomTablas,
-                        nom_bd: NomBD = BD_SQL,
-                        nom_csv = None,
-                        data_dir: Path = DIR_DATA):
+def exportar_sql_csv(nom_tabla: NomTablas,
+                     nom_bd: NomBD = BD_SQL,
+                     nom_csv = None,
+                     data_dir: Path = DIR_DATA):
     os.makedirs(data_dir, exist_ok=True)
 
     if not nom_csv:

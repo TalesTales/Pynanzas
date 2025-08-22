@@ -1,3 +1,9 @@
+## 1.12.0 (2025-08-22)
+
+### Feat
+
+- **data_loader**: Se eliminó la función cargar_datos() y se reemplazó por cargar_csv()
+
 ## 1.11.0 (2025-08-21)
 
 ### Feat
