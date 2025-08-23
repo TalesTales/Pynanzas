@@ -5,34 +5,6 @@ from pynanzas.constants import PROD_ID
 from pynanzas.sql.diccionario import BD_SQL, ColumDDL, NomBD, NomTablas
 from pynanzas.sql.esquemas import EsquemaMovs
 
-
-def insertar_mov(
-        movimiento: EsquemaMovs,
-        nom_tabla_movs: NomTablas = NomTablas.MOVS,
-        producto_id: str = PROD_ID,
-        nom_bd: NomBD = BD_SQL
-) -> None:
-    from pynanzas.sql.sqlite import tabla_existe
-
-    mov = asdict(movimiento)
-    
-    mov.pop('id', None)
-    mov.pop('fecha_agregada', None)
-    
-    columnas: str = ','.join(mov.keys())
-    placeholders: str = ','.join(['?'] * len(mov.keys()))
-    valores: tuple = tuple(mov.values())
-
-    with sqlite3.connect(nom_bd) as conn:
-        cursor: sqlite3.Cursor = conn.cursor()
-        if not tabla_existe(cursor, nom_tabla_movs):
-            crear_tabla_movs(nom_tabla_movs=nom_tabla_movs, nom_bd=nom_bd)
-        query: str = (f"INSERT INTO {nom_tabla_movs} "
-                      f"({columnas}) "
-                      f"VALUES ({placeholders})")
-        cursor.execute(query, valores)
-        conn.commit()  # Agregado: faltaba commit
-
 EsquemaMovsDDL: EsquemaMovs =  EsquemaMovs(
     id = ColumDDL.INT_PK_AUTO,
     producto_id = ColumDDL.TXT_NOT_NULL,
@@ -78,3 +50,30 @@ def crear_tabla_movs(esquema_movs: EsquemaMovs = EsquemaMovsDDL,
             conn.commit()
     except sqlite3.Error as e:
         print(f"sql.crear_tabla_movs: error sql {e}")
+
+def insertar_mov(
+        movimiento: EsquemaMovs,
+        nom_tabla_movs: NomTablas = NomTablas.MOVS,
+        producto_id: str = PROD_ID,
+        nom_bd: NomBD = BD_SQL
+) -> None:
+    from pynanzas.sql.sqlite import tabla_existe
+
+    mov = asdict(movimiento)
+
+    mov.pop('id', None)
+    mov.pop('fecha_agregada', None)
+
+    columnas: str = ','.join(mov.keys())
+    placeholders: str = ','.join(['?'] * len(mov.keys()))
+    valores: tuple = tuple(mov.values())
+
+    with sqlite3.connect(nom_bd) as conn:
+        cursor: sqlite3.Cursor = conn.cursor()
+        if not tabla_existe(cursor, nom_tabla_movs):
+            crear_tabla_movs(nom_tabla_movs=nom_tabla_movs, nom_bd=nom_bd)
+        query: str = (f"INSERT INTO {nom_tabla_movs} "
+                      f"({columnas}) "
+                      f"VALUES ({placeholders})")
+        cursor.execute(query, valores)
+        conn.commit()  # Agregado: faltaba commit
