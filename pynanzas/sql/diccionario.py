@@ -6,7 +6,6 @@ from pynanzas.constants import (
     TABLA_MOVS,
     TABLA_PRODS,
     TEST,
-    TABLA_DICC,
 )
 
 
@@ -37,8 +36,6 @@ class ColumDDL(StrEnum):
 class NomTablas(StrEnum):
     PRODS = TABLA_PRODS
     MOVS = TABLA_MOVS
-    DICC = TABLA_DICC
-
 
 class NomBD(StrEnum):
     BD_SQLITE = os.path.join(DIR_DATA, "pynanzas_bd.sqlite")
