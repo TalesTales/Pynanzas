@@ -26,6 +26,7 @@ EsquemaProdsDDL: EsquemaProds = EsquemaProds(
     xirr = ColumDDL.REAL_DEFAULT_CERO,
     fecha_actualizacion = ColumDDL.DATE_ACTUAL
 )
+
 def insertar_prod(producto: EsquemaProds,
         nom_tabla_prods: NomTablas = NomTablas.PRODS,
         nom_bd: NomBD = BD_SQL
