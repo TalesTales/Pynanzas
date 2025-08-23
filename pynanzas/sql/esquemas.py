@@ -39,8 +39,8 @@ class EsquemaMovs(EsquemaBase):
     valor: str | float | ColumDDL
     unidades: str | float | ColumDDL
     valor_unidades: str | float | ColumDDL
-    id: ColumDDL | None = None
-    fecha_agregada: ColumDDL | None = None
+    id: str | ColumDDL | None = None
+    fecha_agregada: str | ColumDDL | None = None
 
     def obtener_colums(self) -> dict[str, str]:
         return asdict(self)
@@ -66,7 +66,7 @@ class EsquemaProds(EsquemaBase):
     producto_id: str
     nombre: str
     ticket: str
-    simulado: ColumDDL | bool
+    simulado: ColumDDL | bool | str
     moneda: str
     riesgo: str | ColumDDL | Riesgo
     liquidez:  str | ColumDDL | Liquidez
@@ -76,13 +76,13 @@ class EsquemaProds(EsquemaBase):
     plataforma:  str
     tipo_producto:  str
     tipo_inversion: str
-    abierto:ColumDDL |  bool = True
-    asignacion: ColumDDL | float = 0
-    saldo: float | ColumDDL = 0
-    aportes: float | ColumDDL = 0
-    intereses: float | ColumDDL = 0
-    xirr: float | ColumDDL = 0
-    fecha_actualizacion: ColumDDL | None = None
+    abierto:ColumDDL | str |  bool = True
+    asignacion: ColumDDL |str| float = 0
+    saldo: float |str| ColumDDL = 0
+    aportes: float |str| ColumDDL = 0
+    intereses: float |str| ColumDDL = 0
+    xirr: float |str| ColumDDL = 0
+    fecha_actualizacion: str|ColumDDL | None = None
 
     def obtener_colums(self) -> dict[str, str]:
         return asdict(self)
