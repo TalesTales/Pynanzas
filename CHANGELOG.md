@@ -1,3 +1,18 @@
+## 1.13.0 (2025-08-23)
+
+### Feat
+
+- **sqlite**: se agregó la función _reset_sql_desde_csv
+- **limpiar_data**: Se organizaron las funciones para limpiar los csv y volverlos df funcionales
+- **cargar_data**: se cambió el nombre del módulo y se agregó la funcón cargar_csv_a_df y tabla_sql_a_df
+
+### Fix
+
+- **pynanzas**: Se cambió el nombre de Nom_BD a path_db para ser consistente entre el nombre y el contenido
+- **sql/esquemas**: se ajustaron los tipos de los esquemas para que puedieran integrarse con cargar_data y limpiar_data
+- **sql/diccionario**: se eliminó TABLA_DICC. Innecesaria
+- **data_loader**: cambiada función prods_raw_a_df por prods_csv_a_df
+
 ## 1.12.0 (2025-08-22)
 
 ### Feat
