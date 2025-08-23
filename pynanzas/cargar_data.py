@@ -4,7 +4,7 @@ import sqlite3
 import pandas as pd
 
 from pynanzas.constants import DIR_DATA, PROD_ID
-from pynanzas.sql.diccionario import BD_SQL, NomBD, NomTablas
+from pynanzas.sql.diccionario import PATH_DB, NomTablas, PathDB
 
 
 def cargar_csv_a_df(
@@ -34,7 +34,7 @@ def cargar_csv_a_df(
 
 
 def tabla_sql_a_df(
-    nom_tabla: NomTablas, nom_bd: NomBD = BD_SQL
+    nom_tabla: NomTablas, nom_bd: PathDB = PATH_DB
 ) -> pd.DataFrame:
     try:
         with sqlite3.connect(nom_bd) as conn:

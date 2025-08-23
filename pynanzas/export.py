@@ -5,12 +5,12 @@ import sqlite3
 import pandas as pd
 
 from pynanzas.constants import DIR_DATA
-from pynanzas.sql.diccionario import BD_SQL, NomBD, NomTablas
+from pynanzas.sql.diccionario import PATH_DB, NomTablas, PathDB
 
 
 def exportar_sql_csv(nom_tabla: NomTablas,
-                     nom_bd: NomBD = BD_SQL,
-                     nom_csv = None,
+                     path_db: PathDB = PATH_DB,
+                     nom_csv: str | None = None,
                      data_dir: Path = DIR_DATA):
     os.makedirs(data_dir, exist_ok=True)
 
@@ -20,7 +20,7 @@ def exportar_sql_csv(nom_tabla: NomTablas,
     csv_path = os.path.join(data_dir, nom_csv)
 
     try:
-        with sqlite3.connect(nom_bd) as con:
+        with sqlite3.connect(path_db) as con:
             df = pd.read_sql_query(f"SELECT * FROM {nom_tabla}",con)
             df.to_csv(csv_path, index=False, encoding='utf-8')
 

@@ -37,12 +37,12 @@ class NomTablas(StrEnum):
     PRODS = TABLA_PRODS
     MOVS = TABLA_MOVS
 
-class NomBD(StrEnum):
-    BD_SQLITE = os.path.join(DIR_DATA, "pynanzas_bd.sqlite")
-    BD_TEST = os.path.join(DIR_DATA, "pynanzas_bd_test.sqlite")
+class PathDB(StrEnum):
+    SQLITE = os.path.join(DIR_DATA, "pynanzas_bd.sqlite")
+    TEST = os.path.join(DIR_DATA,"pynanzas_bd_test.sqlite")
 
 
 if not TEST:
-    BD_SQL: NomBD = NomBD.BD_SQLITE  # pyright: ignore[reportRedeclaration]
+    PATH_DB: PathDB = PathDB.SQLITE  # pyright: ignore[reportRedeclaration]
 else:
-    BD_SQL: NomBD = NomBD.BD_TEST
+    PATH_DB: PathDB = PathDB.TEST

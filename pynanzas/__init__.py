@@ -3,10 +3,10 @@ Pynanzas: Un paquete para el análisis y seguimiento de portafolios de inversió
 """
 
 from pynanzas.analisis import dist_riesgo
+from pynanzas.cargar_data import cargar_csv_a_df
 from pynanzas.constants import (
     PROD_ID,
 )
-from pynanzas.data_loader import tabla_sql_a_df
 from pynanzas.diccionario import (
     Liquidez,
     Moneda,
@@ -21,8 +21,8 @@ from pynanzas.producto import ProductoFinanciero
 from pynanzas.sql import (
     EsquemaMovs,
     EsquemaProds,
-    NomBD,
     NomTablas,
+    PathDB,
     actualizar_tabla,
     crear_tabla_movs,
     crear_tabla_prods,
@@ -37,12 +37,12 @@ __all__ = [
     "dist_riesgo",
     'crear_tabla_prods',
     'crear_tabla_movs',
-    'tabla_sql_a_df',
+    'cargar_csv_a_df',
     'EsquemaMovs',
     'EsquemaProds',
     'insertar_prod',
     'NomTablas',
-    'NomBD',
+    'PathDB',
     'Riesgo',
     'Liquidez',
     'Plazo',

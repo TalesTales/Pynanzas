@@ -1,14 +1,17 @@
 import sqlite3
 from typing import Any, Optional
 
-from pynanzas.constants import PROD_ID
-from pynanzas.sql.diccionario import NomBD, NomTablas, BD_SQL
+import pandas as pd
+
+from pynanzas.constants import DIR_DATA, PROD_ID
+from pynanzas.diccionario import Liquidez, Plazo, Riesgo
+from pynanzas.sql.diccionario import PATH_DB, NomTablas, PathDB
 from pynanzas.sql.esquemas import EsquemaMovs, EsquemaProds
 
 
 def actualizar_tabla(nom_tabla: NomTablas,
                      esquema: EsquemaProds | EsquemaMovs,
-                     nom_bd: NomBD = BD_SQL,
+                     nom_bd: PathDB = PATH_DB,
                      cursor: Optional[sqlite3.Cursor] = None
                      ) -> None:
 
@@ -25,7 +28,7 @@ def actualizar_tabla(nom_tabla: NomTablas,
                 crear_tabla_prods(esquema, nom_tabla, nom_bd)
             elif isinstance(esquema, EsquemaMovs):
                 if not tabla_existe(cursor, NomTablas.PRODS):
-                    crear_tabla_prods(nom_bd=nom_bd)
+                    crear_tabla_prods(path_db=nom_bd)
                 crear_tabla_movs(esquema, nom_tabla, NomTablas.PRODS,
                                  PROD_ID, nom_bd)
             return

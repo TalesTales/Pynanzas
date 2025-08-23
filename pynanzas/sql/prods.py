@@ -1,7 +1,7 @@
 from dataclasses import asdict
 import sqlite3
 
-from pynanzas.sql.diccionario import BD_SQL, ColumDDL, NomBD, NomTablas
+from pynanzas.sql.diccionario import PATH_DB, ColumDDL, NomTablas, PathDB
 from pynanzas.sql.esquemas import EsquemaProds
 
 EsquemaProdsDDL: EsquemaProds = EsquemaProds(
@@ -28,9 +28,9 @@ EsquemaProdsDDL: EsquemaProds = EsquemaProds(
 )
 
 def insertar_prod(producto: EsquemaProds,
-        nom_tabla_prods: NomTablas = NomTablas.PRODS,
-        nom_bd: NomBD = BD_SQL
-) -> None:
+                  nom_tabla_prods: NomTablas = NomTablas.PRODS,
+                  path_db: PathDB = PATH_DB
+                  ) -> None:
     from pynanzas.sql.sqlite import tabla_existe
     prod = asdict(producto)
     prod.pop('fecha_actualizacion', None)
@@ -38,11 +38,11 @@ def insertar_prod(producto: EsquemaProds,
     placeholders: str = ','.join(['?'] * len(prod))
     valores = tuple(prod.values())
     try:
-        with sqlite3.connect(nom_bd) as conn:
+        with sqlite3.connect(path_db) as conn:
             cursor: sqlite3.Cursor = conn.cursor()
             if not tabla_existe(cursor, nom_tabla_prods):
                 crear_tabla_prods(nom_tabla_prods=nom_tabla_prods,
-                                  nom_bd=nom_bd)
+                                  path_db=path_db)
             query: str = (f"INSERT INTO {nom_tabla_prods} ({columnas}) VALUES "
                           f"({placeholders})")
             cursor.execute(query, valores)
@@ -54,7 +54,7 @@ def insertar_prod(producto: EsquemaProds,
 
 def crear_tabla_prods(esquema_prods: EsquemaProds = EsquemaProdsDDL,
                       nom_tabla_prods: NomTablas = NomTablas.PRODS,
-                      nom_bd: NomBD = BD_SQL) -> None:
+                      path_db: PathDB = PATH_DB) -> None:
     if esquema_prods is None or len(esquema_prods) == 0:
         esquema_prods = EsquemaProdsDDL
 
@@ -64,7 +64,7 @@ def crear_tabla_prods(esquema_prods: EsquemaProds = EsquemaProdsDDL,
     orden_ddl: str = ",\n".join(columnas_ddl)
 
     try:
-        with sqlite3.connect(nom_bd) as conn:
+        with sqlite3.connect(path_db) as conn:
             cursor: sqlite3.Cursor = conn.cursor()
             query: str = f"CREATE TABLE IF NOT EXISTS {nom_tabla_prods} "
             query += f"(\n{orden_ddl}\n);"
