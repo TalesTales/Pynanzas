@@ -33,5 +33,3 @@ def movs_csv_a_df(nom_tabla: NomTablas = NomTablas.MOVS,
     df_movs.drop_duplicates(inplace=True)
     df_movs.set_index('id', inplace=True, drop=True)
     return df_movs
-    return df_movs
-    return df_movs
