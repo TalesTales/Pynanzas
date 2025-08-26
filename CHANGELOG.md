@@ -1,3 +1,18 @@
+## 2.0.0 (2025-08-25)
+
+### Feat
+
+- **Se-agregó-Polars-a-Pynanzas**: Se empezará la migración a Polars
+
+### Fix
+
+- **sql/dicc**: se eliminó un type hint erróneo
+
+### Refactor
+
+- **misc**: cambios menores
+- **sql**: reorganizada la manera en la que se dividen las responsabilidades en los .py del submódulo sql
+
 ## 1.13.0 (2025-08-23)
 
 ### Feat
