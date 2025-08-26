@@ -32,6 +32,49 @@ class EsquemaBase(ABC):
         return True
 
 @dataclass
+class EsquemaProds(EsquemaBase):
+
+    producto_id: str
+    nombre: str
+    ticket: str
+    simulado: ColumDDL | bool | str
+    moneda: str
+    riesgo: str | ColumDDL | Riesgo
+    liquidez:  str | ColumDDL | Liquidez
+    plazo:  str | ColumDDL | Plazo
+    objetivo:  str
+    administrador:  str
+    plataforma:  str
+    tipo_producto:  str
+    tipo_inversion: str
+    abierto:ColumDDL | str |  bool = True
+    asignacion: ColumDDL |str| float = 0
+    saldo: float |str| ColumDDL = 0
+    aportes: float |str| ColumDDL = 0
+    intereses: float |str| ColumDDL = 0
+    xirr: float |str| ColumDDL = 0
+    fecha_actualizacion: str | ColumDDL | None = None
+
+    def obtener_colums(self) -> dict[str, str]:
+        return asdict(self)
+
+    def obtener_colums_oblig(self) -> list[str]:
+        return ['producto_id']
+
+    def __len__(self) -> int:
+        return len(asdict(self))
+
+    def keys(self) -> KeysView[str]:
+        return asdict(self).keys()
+
+    def items(self) -> ItemsView[str, Any]:
+        return asdict(self).items()
+
+    def values(self) -> ValuesView[Any]:
+        return asdict(self).values()
+
+
+@dataclass
 class EsquemaMovs(EsquemaBase):
     producto_id: str | ColumDDL
     fecha: str | ColumDDL
@@ -60,44 +103,3 @@ class EsquemaMovs(EsquemaBase):
     def values(self) -> ValuesView[Any]:
         return asdict(self).values()
 
-
-@dataclass
-class EsquemaProds(EsquemaBase):
-    producto_id: str
-    nombre: str
-    ticket: str
-    simulado: ColumDDL | bool | str
-    moneda: str
-    riesgo: str | ColumDDL | Riesgo
-    liquidez:  str | ColumDDL | Liquidez
-    plazo:  str | ColumDDL | Plazo
-    objetivo:  str
-    administrador:  str
-    plataforma:  str
-    tipo_producto:  str
-    tipo_inversion: str
-    abierto:ColumDDL | str |  bool = True
-    asignacion: ColumDDL |str| float = 0
-    saldo: float |str| ColumDDL = 0
-    aportes: float |str| ColumDDL = 0
-    intereses: float |str| ColumDDL = 0
-    xirr: float |str| ColumDDL = 0
-    fecha_actualizacion: str|ColumDDL | None = None
-
-    def obtener_colums(self) -> dict[str, str]:
-        return asdict(self)
-
-    def obtener_colums_oblig(self) -> list[str]:
-        return ['producto_id']
-
-    def __len__(self) -> int:
-        return len(asdict(self))
-
-    def keys(self) -> KeysView[str]:
-        return asdict(self).keys()
-
-    def items(self) -> ItemsView[str, Any]:
-        return asdict(self).items()
-
-    def values(self) -> ValuesView[Any]:
-        return asdict(self).values()
