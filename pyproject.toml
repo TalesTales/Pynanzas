@@ -57,6 +57,7 @@ openpyxl = "^3.1.5"
 overrides = "^7.7.0"
 notebook = "^7.4.5"
 polars = "^1.32.3"
+pyarrow = "^21.0.0"
 
 
 [tool.poetry.group.dev.dependencies]
