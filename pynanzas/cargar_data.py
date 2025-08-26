@@ -2,6 +2,7 @@ from pathlib import Path
 import sqlite3
 
 import pandas as pd
+import polars as pl
 
 from pynanzas.constants import DIR_DATA, PROD_ID
 from pynanzas.sql.diccionario import PATH_DB, NomTablas, PathDB
@@ -50,3 +51,18 @@ def tabla_sql_a_df(
             f"'{nom_tabla}': {e}"
         )
         return pd.DataFrame()
+
+def tabla_sql_a_df_pl(
+    nom_tabla: NomTablas, nom_bd: PathDB = PATH_DB
+) -> pl.DataFrame:
+    try:
+        with sqlite3.connect(nom_bd) as conn:
+            query = f"SELECT * FROM {nom_tabla}"
+            df = pl.read_database(query, conn)
+            return df
+    except sqlite3.Error as e:
+        print(
+            f"data_loader.tabla_sql_a_df: Error al leer la tabla "
+            f"'{nom_tabla}': {e}"
+        )
+        return pl.DataFrame()
