@@ -43,6 +43,6 @@ class PathDB(StrEnum):
 
 
 if not TEST:
-    PATH_DB: PathDB = PathDB.SQLITE  # pyright: ignore[reportRedeclaration]
+    PATH_DB: PathDB = PathDB.SQLITE
 else:
-    PATH_DB: PathDB = PathDB.TEST
+    PATH_DB = PathDB.TEST
