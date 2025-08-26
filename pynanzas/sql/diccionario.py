@@ -10,8 +10,6 @@ from pynanzas.constants import (
 
 
 class ColumDDL(StrEnum):
-    """Enum para tipos de columna SQL comunes."""
-
     INT_PK = "INTEGER primary key"
     INT_PK_AUTO = "INTEGER primary key AUTOINCREMENT"
     INT_DEFAULT = "INTEGER default 0"
