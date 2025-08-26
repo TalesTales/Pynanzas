@@ -1,3 +1,10 @@
+## 2.1.0 (2025-08-26)
+
+### Feat
+
+- **limpiar_data**: Se re-implementó prods_csv_a_df, movs_csv_a_df, prods_sql_a_df y usando LazyFrame y DataFrame desde polars
+- **cargar_data**: se empezó a usar scan_csv y read_database desde polars para cargar los datos
+
 ## 2.0.0 (2025-08-25)
 
 ### Feat
