@@ -1,9 +1,55 @@
-from dataclasses import asdict
 import sqlite3
 
 from pynanzas.constants import PROD_ID
 from pynanzas.sql.diccionario import PATH_DB, ColumDDL, NomTablas, PathDB
-from pynanzas.sql.esquemas import EsquemaMovs
+from pynanzas.sql.esquemas import EsquemaMovs, EsquemaProds
+
+EsquemaProdsDDL: EsquemaProds = EsquemaProds(
+    producto_id = ColumDDL.TXT_PK,
+    nombre = ColumDDL.TXT_UNIQUE,
+    ticket = ColumDDL.TXT_UNIQUE,
+    simulado = ColumDDL.BOOL_FALSE,
+    moneda = ColumDDL.txt_default('cop'),
+    riesgo = ColumDDL.INT_DEFAULT,
+    liquidez = ColumDDL.INT_DEFAULT,
+    plazo = ColumDDL.INT_DEFAULT,
+    asignacion = ColumDDL.REAL_DEFAULT_CERO,
+    objetivo = ColumDDL.TXT_NOT_NULL,
+    administrador = ColumDDL.TXT_NOT_NULL,
+    plataforma = ColumDDL.TXT_NOT_NULL,
+    tipo_producto = ColumDDL.TXT_NOT_NULL,
+    tipo_inversion = ColumDDL.TXT_NOT_NULL,
+    abierto = ColumDDL.BOOL_TRUE,
+    saldo = ColumDDL.REAL_DEFAULT_CERO,
+    aportes = ColumDDL.REAL_DEFAULT_CERO,
+    intereses = ColumDDL.REAL_DEFAULT_CERO,
+    xirr = ColumDDL.REAL_DEFAULT_CERO,
+    fecha_actualizacion = ColumDDL.DATE_ACTUAL
+)
+
+def crear_tabla_prods(esquema_prods: EsquemaProds = EsquemaProdsDDL,
+                      nom_tabla_prods: NomTablas = NomTablas.PRODS,
+                      path_db: PathDB = PATH_DB) -> None:
+    if esquema_prods is None or len(esquema_prods) == 0:
+        esquema_prods = EsquemaProdsDDL
+
+    columnas_ddl: list[str] = []
+    for k, v in esquema_prods.items():
+        columnas_ddl.append(f"{k} {v}")
+    orden_ddl: str = ",\n".join(columnas_ddl)
+
+    try:
+        with sqlite3.connect(path_db) as conn:
+            cursor: sqlite3.Cursor = conn.cursor()
+            query: str = f"CREATE TABLE IF NOT EXISTS {nom_tabla_prods} "
+            query += f"(\n{orden_ddl}\n);"
+            print(f'crear_tabla_prod:\n{query}')  # TODO: logging
+            cursor.execute(query)
+            conn.commit()
+    except sqlite3.Error as e:
+        print(f"sql.crear_tabla_prods: error sql {e}")
+
+
 
 EsquemaMovsDDL: EsquemaMovs =  EsquemaMovs(
     id = ColumDDL.INT_PK_AUTO,
@@ -21,7 +67,6 @@ def crear_tabla_movs(esquema_movs: EsquemaMovs = EsquemaMovsDDL,
                      nom_tabla_prods: NomTablas = NomTablas.PRODS,
                      producto_id: str = PROD_ID,
                      path_db: PathDB = PATH_DB) -> None:
-    from pynanzas.sql.prods import crear_tabla_prods
     from pynanzas.sql.sqlite import tabla_existe
 
     if nom_tabla_movs == "":
@@ -50,30 +95,3 @@ def crear_tabla_movs(esquema_movs: EsquemaMovs = EsquemaMovsDDL,
             conn.commit()
     except sqlite3.Error as e:
         print(f"sql.crear_tabla_movs: error sql {e}")
-
-def insertar_mov(
-        movimiento: EsquemaMovs,
-        nom_tabla_movs: NomTablas = NomTablas.MOVS,
-        producto_id: str = PROD_ID,
-        path_db: PathDB = PATH_DB,
-) -> None:
-    from pynanzas.sql.sqlite import tabla_existe
-
-    mov = asdict(movimiento)
-
-    mov.pop('id', None)
-    mov.pop('fecha_agregada', None)
-
-    columnas: str = ','.join(mov.keys())
-    placeholders: str = ','.join(['?'] * len(mov.keys()))
-    valores: tuple = tuple(mov.values())
-
-    with sqlite3.connect(path_db) as conn:
-        cursor: sqlite3.Cursor = conn.cursor()
-        if not tabla_existe(cursor, nom_tabla_movs):
-            crear_tabla_movs(nom_tabla_movs=nom_tabla_movs, path_db=path_db)
-        query: str = (f"INSERT INTO {nom_tabla_movs} "
-                      f"({columnas}) "
-                      f"VALUES ({placeholders})")
-        cursor.execute(query, valores)
-        conn.commit()  # Agregado: faltaba commit
