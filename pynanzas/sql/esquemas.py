@@ -84,6 +84,7 @@ class EsquemaMovs(EsquemaBase):
     valor_unidades: str | float | ColumDDL
     id: str | ColumDDL | None = None
     fecha_agregada: str | ColumDDL | None = None
+    saldo_hist: str | ColumDDL | None = None
 
     def obtener_colums(self) -> dict[str, str]:
         return asdict(self)
