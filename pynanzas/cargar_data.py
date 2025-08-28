@@ -1,10 +1,9 @@
 from pathlib import Path
-import sqlite3
 
 import polars as pl
 
 from pynanzas.constants import DIR_DATA
-from pynanzas.sql.diccionario import PATH_DB, NomTablas, PathDB
+from pynanzas.sql.diccionario import URI, NomTablas
 
 
 def cargar_csv_a_df(
@@ -22,15 +21,6 @@ def cargar_csv_a_df(
         raise
 
 def cargar_sql_a_df(nom_tabla: NomTablas,
-                    nom_bd: PathDB = PATH_DB) -> pl.DataFrame:
-    try:
-        with sqlite3.connect(nom_bd) as conn:
-            query = f"SELECT * FROM {nom_tabla}"
-            df = pl.read_database(query, conn)
-            return df
-    except sqlite3.Error as e:
-        print(
-            f"data_loader.tabla_sql_a_df: Error al leer la tabla "
-            f"'{nom_tabla}': {e}"
-        )
-        raise
+                    uri: str = URI) -> pl.LazyFrame:
+    return pl.read_database_uri(f"SELECT * FROM {nom_tabla}",uri,
+                                engine='adbc').lazy()
