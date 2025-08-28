@@ -2,6 +2,10 @@
 
 ## En Desarrollo
 
+- [ ] BUG: se crean dos atributos mov_hist y movs_hist en Producto.
+- [ ] BUG: -filter(9 no está filtrando crrectamente)
+    - Si reconoce el string "" pero no el valor
+
 - [ ] Ingresar transacciones desde lo que hay ahora
 - [ ] Insertar clase Movimiento
 

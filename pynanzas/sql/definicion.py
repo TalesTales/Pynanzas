@@ -59,7 +59,8 @@ EsquemaMovsDDL: EsquemaMovs =  EsquemaMovs(
     valor  = ColumDDL.REAL_NOT_NULL,
     unidades  = ColumDDL.REAL,
     valor_unidades = ColumDDL.REAL,
-    fecha_agregada = ColumDDL.DATE_ACTUAL
+    fecha_agregada = ColumDDL.DATE_ACTUAL,
+    saldo_hist = ColumDDL.REAL_DEFAULT_CERO,
 )
 
 def crear_tabla_movs(esquema_movs: EsquemaMovs = EsquemaMovsDDL,
@@ -92,6 +93,84 @@ def crear_tabla_movs(esquema_movs: EsquemaMovs = EsquemaMovsDDL,
                           f"(\n{orden_ddl}\n);")
             print(query)  # TODO: logging
             cursor.execute(query)
+
+            trigger_insert = f"""
+                    CREATE TRIGGER IF NOT EXISTS trigger_saldo_hist_insert
+                    AFTER INSERT ON {nom_tabla_movs}
+                    FOR EACH ROW
+                    BEGIN
+                        -- Calcular saldo para el registro recién insertado
+                        UPDATE {nom_tabla_movs} 
+                        SET saldo_hist = ROUND((
+                            SELECT SUM(m2.valor)
+                            FROM {nom_tabla_movs} m2
+                            WHERE m2.producto_id = NEW.producto_id
+                            AND (m2.fecha < NEW.fecha 
+                                 OR (m2.fecha = NEW.fecha AND m2.id <= NEW.id))
+                        ), 2)
+                        WHERE id = NEW.id;
+
+                        -- Recalcular saldos para movimientos posteriores del mismo producto
+                        UPDATE {nom_tabla_movs} 
+                        SET saldo_hist = ROUND((
+                            SELECT SUM(m3.valor)
+                            FROM {nom_tabla_movs} m3
+                            WHERE m3.producto_id = {nom_tabla_movs}.producto_id
+                            AND (m3.fecha < {nom_tabla_movs}.fecha 
+                                 OR (m3.fecha = {nom_tabla_movs}.fecha AND m3.id <= {nom_tabla_movs}.id))
+                        ), 2)
+                        WHERE producto_id = NEW.producto_id 
+                        AND (fecha > NEW.fecha 
+                             OR (fecha = NEW.fecha AND id > NEW.id));
+                    END;
+                    """
+
+            trigger_update = f"""
+                    CREATE TRIGGER IF NOT EXISTS trigger_saldo_hist_update
+                    AFTER UPDATE OF valor ON {nom_tabla_movs}
+                    FOR EACH ROW
+                    BEGIN
+                        -- Recalcular saldos desde la fecha del registro modificado en adelante
+                        UPDATE {nom_tabla_movs} 
+                        SET saldo_hist = ROUND((
+                            SELECT SUM(m2.valor)
+                            FROM {nom_tabla_movs} m2
+                            WHERE m2.producto_id = {nom_tabla_movs}.producto_id
+                            AND (m2.fecha < {nom_tabla_movs}.fecha 
+                                 OR (m2.fecha = {nom_tabla_movs}.fecha AND m2.id <= {nom_tabla_movs}.id))
+                        ), 2)
+                        WHERE producto_id = NEW.producto_id 
+                        AND (fecha >= NEW.fecha);
+                    END;
+                    """
+
+            trigger_delete = f"""
+                    CREATE TRIGGER IF NOT EXISTS trigger_saldo_hist_delete
+                    AFTER DELETE ON {nom_tabla_movs}
+                    FOR EACH ROW
+                    BEGIN
+                        -- Recalcular saldos para movimientos posteriores del mismo producto
+                        UPDATE {nom_tabla_movs} 
+                        SET saldo_hist = ROUND((
+                            SELECT SUM(m2.valor)
+                            FROM {nom_tabla_movs} m2
+                            WHERE m2.producto_id = {nom_tabla_movs}.producto_id
+                            AND (m2.fecha < {nom_tabla_movs}.fecha 
+                                 OR (m2.fecha = {nom_tabla_movs}.fecha AND m2.id <= {nom_tabla_movs}.id))
+                        ), 2)
+                        WHERE producto_id = OLD.producto_id 
+                        AND (fecha >= OLD.fecha);
+                    END;
+                    """
+            cursor.execute(trigger_insert)
+            print("✓ Trigger INSERT creado")
+
+            cursor.execute(trigger_update)
+            print("✓ Trigger UPDATE creado")
+
+            cursor.execute(trigger_delete)
+            print("✓ Trigger DELETE creado")
+
             conn.commit()
     except sqlite3.Error as e:
         print(f"sql.crear_tabla_movs: error sql {e}")

@@ -1,7 +1,3 @@
-"""
-Pynanzas: Un paquete para el análisis y seguimiento de portafolios de inversión.
-"""
-
 from pynanzas.analisis import dist_riesgo
 from pynanzas.cargar_data import cargar_csv_a_df
 from pynanzas.constants import PROD_ID
@@ -25,6 +21,7 @@ from pynanzas.sql import (
     insertar_mov,
     insertar_prod,
 )
+from pynanzas.sql.diccionario import PATH_DB
 
 __all__ = [
     "Portafolio",
@@ -45,5 +42,7 @@ __all__ = [
     'MovsIntereses',
     'actualizar_tabla',
     'insertar_mov',
-    'Moneda'
+    'Moneda',
+    'PATH_DB'
 ]
+

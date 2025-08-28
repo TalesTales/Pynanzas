@@ -1,3 +1,14 @@
+## 2.1.1 (2025-08-28)
+
+### Fix
+
+- **sql/esquemas**: Se agregagó "saldo_hist" al esquema de Mov
+- **sql**: todo el pipeline de cargar -> limpiar data ahora devuelve sólo pl.LazyFrames
+
+### Refactor
+
+- **sql/diccionario**: Se agregó la constante URI para poder usar las funciones de polars que hacen uso de una URI
+
 ## 2.1.0 (2025-08-26)
 
 ### Feat

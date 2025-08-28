@@ -1,6 +1,6 @@
 [project]
 name = "pynanzas"
-version = "2.1.0"
+version = "2.1.1"
 description = "Análisis financiero personal con Python"
 authors = [{ name = "TalesTales" }]
 
@@ -58,6 +58,7 @@ overrides = "^7.7.0"
 notebook = "^7.4.5"
 polars = "^1.32.3"
 pyarrow = "^21.0.0"
+connectorx = "^0.4.4"
 
 
 [tool.poetry.group.dev.dependencies]
