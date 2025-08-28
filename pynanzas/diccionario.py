@@ -2,13 +2,11 @@ from enum import IntEnum, StrEnum
 
 
 class MovsIntereses(StrEnum):
-    """Enum para tipos de movimientos de intereses."""
     INTERESES = "intereses"
     DIVIDENDOS = "dividendos"
     RENDIMIENTOS = "rendimientos"
 
 class MovsAportes(StrEnum):
-    """Enum para tipos de movimientos que son aportes."""
     TRANSFERENCIA = "transferencia"
     COMPRA = "compra"
     VENTA = "venta"
@@ -16,12 +14,10 @@ class MovsAportes(StrEnum):
     APERTURA = "apertura"
 
 class MovsNoAportes(StrEnum):
-    """Enum para tipos de movimientos que NO son aportes."""
     SALDO_INICIAL = "saldo_inicial"
     COMISIONES = "comisiones"
     COMISION = "comisión"
     IMPUESTO = "impuesto"
-    # Movimientos de intereses
     INTERESES = "intereses"
     DIVIDENDOS = "dividendos"
     RENDIMIENTOS = "rendimientos"
