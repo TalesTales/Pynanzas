@@ -40,7 +40,5 @@ class PathDB(StrEnum):
     TEST = os.path.join(DIR_DATA,"pynanzas_bd_test.sqlite")
 
 
-if not TEST:
-    PATH_DB: PathDB = PathDB.SQLITE
-else:
-    PATH_DB = PathDB.TEST
+PATH_DB: PathDB = PathDB.TEST if TEST else PathDB.SQLITE
+URI: str = f"sqlite:///{PATH_DB}"
