@@ -1,19 +1,21 @@
-import sqlite3
 
-import pandas as pd
+import polars as pl
 
-from pynanzas.sql.diccionario import PATH_DB, NomTablas, PathDB
+from pynanzas.sql.diccionario import URI, NomTablas
 
 
-def movs_filtrados_prod(producto_id,
-                        path_db: PathDB = PATH_DB,
-                        nom_tabla_movs: NomTablas = NomTablas.MOVS) -> (
-        pd.DataFrame):
-    try:
-        with sqlite3.connect(path_db) as con:
-            query = (f"SELECT * FROM {nom_tabla_movs} "
-                     f"WHERE producto_id = '{producto_id}'")
-            return pd.read_sql_query(query, con)
-    except sqlite3.Error as e:
-        print(f"Portafolio._movs.filtrados.prod() Error: -> {e}")
-        return pd.DataFrame()
+def movs_filtrados_prod(producto_id: str,
+                        nom_tabla_movs: NomTablas = NomTablas.MOVS,
+                        uri: str = URI) -> (
+        pl.LazyFrame):
+    query = (f"SELECT * "
+             f"FROM '{nom_tabla_movs}'"
+             f"WHERE producto_id = ?")
+    return pl.read_database_uri(query,
+                                uri,
+                                engine='adbc',
+                                execute_options={"parameters": [producto_id]}
+                                ).lazy()
+if __name__ == "__main__":
+    print(movs_filtrados_prod("FonNu").collect())
+    a = movs_filtrados_prod("FonNu")
