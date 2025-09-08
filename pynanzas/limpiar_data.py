@@ -4,10 +4,10 @@ import polars as pl
 
 from pynanzas.cargar_data import cargar_csv_a_df, cargar_sql_a_df
 from pynanzas.constants import DIR_DATA
-from pynanzas.sql.diccionario import PATH_DB, NomTablas, PathDB, URI
+from pynanzas.sql.diccionario import URI, NomTablas
 
 
-def prods_csv_a_df(nom_tabla: NomTablas = NomTablas.PRODS,
+def prods_csv_a_lf(nom_tabla: NomTablas = NomTablas.PRODS,
                    dir_data: Path = DIR_DATA) -> pl.LazyFrame:
     return (cargar_csv_a_df(nom_tabla,dir_data)
                                   .with_columns(
@@ -20,14 +20,14 @@ def prods_csv_a_df(nom_tabla: NomTablas = NomTablas.PRODS,
                                   )
 
 
-def movs_csv_a_df(nom_tabla: NomTablas = NomTablas.MOVS,
+def movs_csv_a_lf(nom_tabla: NomTablas = NomTablas.MOVS,
                   dir_data: Path = DIR_DATA) -> pl.LazyFrame:
     return (cargar_csv_a_df(nom_tabla, dir_data)
                    .with_columns((pl.col("fecha").str.to_datetime()),
                                  (pl.col("fecha_agregada").str.to_datetime())
                                  ))
 
-def prods_sql_a_df(nom_tabla: NomTablas = NomTablas.PRODS,
+def prods_sql_a_lf(nom_tabla: NomTablas = NomTablas.PRODS,
                    uri: str = URI) -> pl.LazyFrame:
     return (cargar_sql_a_df(nom_tabla,uri)
                                   .with_columns(
@@ -39,7 +39,7 @@ def prods_sql_a_df(nom_tabla: NomTablas = NomTablas.PRODS,
                                          "abierto": pl.Boolean})
                                   )
 
-def movs_sql_a_df(nom_tabla: NomTablas = NomTablas.MOVS,
+def movs_sql_a_lf(nom_tabla: NomTablas = NomTablas.MOVS,
                   uri: str = URI) -> pl.LazyFrame:
     return (cargar_sql_a_df(nom_tabla, uri)
                    .with_columns((pl.col("fecha").str.to_datetime()),
