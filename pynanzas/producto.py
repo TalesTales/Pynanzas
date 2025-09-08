@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from functools import cached_property
 
 import numpy as np
 from overrides import override
@@ -13,6 +14,7 @@ from pynanzas.diccionario import (
     Plazo,
     Riesgo,
 )
+from pynanzas.limpiar_data import movs_sql_a_lf
 
 
 @dataclass
@@ -32,18 +34,12 @@ class ProductoFinanciero:
     tipo_inversion: str
     abierto: bool = True
     asignacion: float = 0
-    saldo: float = field(init = False, default = 0)
-    aportes: float  = field(init = False, default = 0)
-    intereses: float = field(init = False, default = 0)
     xirr: float | None = field(init = False, default = None)
 
     saldo_inicial: float  = field(init = False, default = 0)
-    rent_acum: float | None = field(init = False, default = None)
-
-    movs_hist: pl.LazyFrame  = field(init = False)
 
     def __post_init__(self) -> None:
-        pass
+        self.abierto = False if self.saldo <= 0.0 else True
 
     def __hash__(self):
         return hash(self.producto_id)
@@ -52,6 +48,11 @@ class ProductoFinanciero:
         if not isinstance(other, ProductoFinanciero):
             return False
         return self.producto_id == other.producto_id
+
+    @override
+    def __repr__(self) -> str:  # TODO: Mejorar representación
+        return (f"<pynanzas.producto.ProductoFinanciero: {self.producto_id} "
+                f"en {hex(id(self))}>")
 
     @override
     def __str__(self) -> str:
@@ -78,59 +79,36 @@ class ProductoFinanciero:
         )
         return string
 
-    @override
-    def __repr__(self) -> str:  # TODO: Mejorar representación
-        return (f"<pynanzas.producto.ProductoFinanciero: {self.producto_id} "
-                f"en {hex(id(self))}>")
-
-    def procesar_movs(self, df_movs: pl.LazyFrame) -> None:
-        self.movs_hist = (df_movs.filter(pl.col(PROD_ID)==self.producto_id))
+    @cached_property
+    def movs_hist(self)-> pl.LazyFrame:
+        return movs_sql_a_lf().filter(pl.col(PROD_ID) == self.producto_id)
         self._calcular_metricas_basicas()
         # self._calcular_xirr_hist()
 
-    def _calcular_metricas_basicas(self) -> None:
-         self.aportes = (self.movs_hist.filter(
-             pl.col("tipo").is_in([m.value for m in MovsAportes]))  # pyright: ignore[reportOptionalMemberAccess]
-                         .select(pl.col("valor").sum())
-                         .collect().item())
-         self.intereses = (self.movs_hist.filter(
-             pl.col("tipo").is_in([m.value for m in MovsIntereses]))
-                         .select(pl.col("valor").sum())
-                         .collect().item())
+    @cached_property
+    def aportes(self) -> float:
+        return (self.movs_hist.filter(
+        pl.col("tipo").is_in([m.value for m in MovsAportes]))
+                    .select(pl.col("valor").sum().round(2))
+                    .collect().item())
 
-         self.saldo = (self.movs_hist.select(pl.col("saldo_hist"))
-                       .last().collect().item())
+    @cached_property
+    def intereses (self) -> float:
+        return (self.movs_hist
+                .filter(pl.col("tipo").is_in([m.value for m in MovsIntereses]))
+                .select(pl.col("valor").sum()).collect().item())
 
-         self.abierto = False if self.saldo <= 0.0 else True
+    @cached_property
+    def saldo(self) -> float:
+        return (self.movs_hist.select(pl.col("saldo_hist"))
+                .last().collect().item())
 
-         self.rent_acum = (float(self.saldo) - float(self.aportes))
+    @cached_property
+    def rent_acum (self) -> float:
+        return float(self.saldo) - float(self.aportes)
 
     #
     # def _calcular_xirr_hist(self) -> None:
-    #     """Calcula la XIRR (Tasa Interna de Retorno Extendida) progresiva para cada transacción.
-    #
-    #     Calcula la XIRR para cada punto en el tiempo del historial de transacciones,
-    #     considerando los flujos de caja (aportes) y el valor del saldo en cada fecha.
-    #     Esto permite obtener una serie temporal de la rentabilidad del producto.
-    #
-    #     La XIRR se calcula utilizando la biblioteca pyxirr, que implementa el algoritmo
-    #     de Newton-Raphson para encontrar la tasa que hace que el valor presente neto
-    #     de los flujos de caja sea cero.
-    #
-    #     Args:
-    #         None: Utiliza el historial_transacciones del objeto.
-    #
-    #     Returns:
-    #         None: Actualiza los siguientes atributos del objeto:
-    #             - historial_transacciones: Añade la columna "xirr_historica"
-    #             - xirr: Establece el valor final de XIRR (último valor válido)
-    #
-    #     Note:
-    #         - Los aportes (MOVIMIENTOS_APORTES) se consideran como flujos de caja negativos.
-    #         - El saldo en cada fecha se considera como flujo de caja positivo.
-    #         - Se filtran valores inválidos de XIRR (NaN, infinitos, o fuera del rango [-10, 10]).
-    #         - Si no hay flujos de caja o el cálculo falla, se asigna NaN.
-    #     """
     #     if self.movs_hist.empty:
     #         self.movs_hist["xirr_historica"] = np.nan
     #         self.xirr = np.nan
