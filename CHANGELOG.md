@@ -1,3 +1,10 @@
+## 2.1.2 (2025-09-07)
+
+### Refactor
+
+- **ProductoFinanciero**: Se ajustaron las funciones básicas para usar polars
+- **movs_filtrador_prod**: Se re escribió para usar polars
+
 ## 2.1.1 (2025-08-28)
 
 ### Fix
