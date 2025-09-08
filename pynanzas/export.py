@@ -5,11 +5,11 @@ import sqlite3
 import pandas as pd
 
 from pynanzas.constants import DIR_DATA
-from pynanzas.sql.diccionario import PATH_DB, NomTablas, PathDB
+from pynanzas.sql.diccionario import PATH_SQLITE, NomTablas, PathDB
 
 
 def exportar_sql_csv(nom_tabla: NomTablas,
-                     path_db: PathDB = PATH_DB,
+                     path_db: PathDB = PATH_SQLITE,
                      nom_csv: str | None = None,
                      data_dir: Path = DIR_DATA):
     os.makedirs(data_dir, exist_ok=True)

@@ -21,7 +21,7 @@ from pynanzas.sql import (
     insertar_mov,
     insertar_prod,
 )
-from pynanzas.sql.diccionario import PATH_DB
+from pynanzas.sql.diccionario import PATH_SQLITE
 
 __all__ = [
     "Portafolio",
@@ -43,6 +43,6 @@ __all__ = [
     'actualizar_tabla',
     'insertar_mov',
     'Moneda',
-    'PATH_DB'
+    'PATH_SQLITE'
 ]
 

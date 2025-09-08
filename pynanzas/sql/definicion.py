@@ -1,7 +1,12 @@
 import sqlite3
 
 from pynanzas.constants import PROD_ID
-from pynanzas.sql.diccionario import PATH_DB, ColumDDL, NomTablas, PathDB
+from pynanzas.sql.diccionario import (
+    PATH_SQLITE,
+    ColumDDL,
+    NomTablas,
+    PathDB,
+)
 from pynanzas.sql.esquemas import EsquemaMovs, EsquemaProds
 
 EsquemaProdsDDL: EsquemaProds = EsquemaProds(
@@ -27,9 +32,9 @@ EsquemaProdsDDL: EsquemaProds = EsquemaProds(
     fecha_actualizacion = ColumDDL.DATE_ACTUAL
 )
 
-def crear_tabla_prods(esquema_prods: EsquemaProds = EsquemaProdsDDL,
-                      nom_tabla_prods: NomTablas = NomTablas.PRODS,
-                      path_db: PathDB = PATH_DB) -> None:
+def crear_tabla_sqlite_prods(esquema_prods: EsquemaProds = EsquemaProdsDDL,
+                             nom_tabla_prods: NomTablas = NomTablas.PRODS,
+                             path_db: PathDB = PATH_SQLITE) -> None:
     if esquema_prods is None or len(esquema_prods) == 0:
         esquema_prods = EsquemaProdsDDL
 
@@ -49,8 +54,6 @@ def crear_tabla_prods(esquema_prods: EsquemaProds = EsquemaProdsDDL,
     except sqlite3.Error as e:
         print(f"sql.crear_tabla_prods: error sql {e}")
 
-
-
 EsquemaMovsDDL: EsquemaMovs =  EsquemaMovs(
     id = ColumDDL.INT_PK_AUTO,
     producto_id = ColumDDL.TXT_NOT_NULL,
@@ -63,11 +66,11 @@ EsquemaMovsDDL: EsquemaMovs =  EsquemaMovs(
     saldo_hist = ColumDDL.REAL_DEFAULT_CERO,
 )
 
-def crear_tabla_movs(esquema_movs: EsquemaMovs = EsquemaMovsDDL,
-                     nom_tabla_movs: NomTablas = NomTablas.MOVS,
-                     nom_tabla_prods: NomTablas = NomTablas.PRODS,
-                     producto_id: str = PROD_ID,
-                     path_db: PathDB = PATH_DB) -> None:
+def crear_tabla_sqlite_movs(esquema_movs: EsquemaMovs = EsquemaMovsDDL,
+                            nom_tabla_movs: NomTablas = NomTablas.MOVS,
+                            nom_tabla_prods: NomTablas = NomTablas.PRODS,
+                            producto_id: str = PROD_ID,
+                            path_db: PathDB = PATH_SQLITE) -> None:
     from pynanzas.sql.sqlite import tabla_existe
 
     if nom_tabla_movs == "":
@@ -87,8 +90,8 @@ def crear_tabla_movs(esquema_movs: EsquemaMovs = EsquemaMovsDDL,
         with sqlite3.connect(path_db) as conn:
             cursor: sqlite3.Cursor = conn.cursor()
             if not tabla_existe(cursor, nom_tabla_prods):
-                crear_tabla_prods(nom_tabla_prods=nom_tabla_prods,
-                                  path_db=path_db)
+                crear_tabla_sqlite_prods(nom_tabla_prods=nom_tabla_prods,
+                                         path_db=path_db)
             query: str = (f"CREATE TABLE IF NOT EXISTS {nom_tabla_movs} "
                           f"(\n{orden_ddl}\n);")
             print(query)  # TODO: logging

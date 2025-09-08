@@ -37,8 +37,9 @@ class NomTablas(StrEnum):
 
 class PathDB(StrEnum):
     SQLITE = os.path.join(DIR_DATA, "pynanzas_bd.sqlite")
+    DUCK_DB = os.path.join(DIR_DATA, "pynanzas.ddb")
     TEST = os.path.join(DIR_DATA,"pynanzas_bd_test.sqlite")
 
 
-PATH_DB: PathDB = PathDB.TEST if TEST else PathDB.SQLITE
-URI: str = f"sqlite:///{PATH_DB}"
+PATH_SQLITE: PathDB = PathDB.TEST if TEST else PathDB.SQLITE
+URI: str = f"sqlite:///{PATH_SQLITE}"
