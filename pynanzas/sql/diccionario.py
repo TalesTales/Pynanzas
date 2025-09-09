@@ -1,12 +1,7 @@
-from enum import StrEnum
 import os
+from enum import StrEnum
 
-from pynanzas.constants import (
-    DIR_DATA,
-    TABLA_MOVS,
-    TABLA_PRODS,
-    TEST,
-)
+from pynanzas.constants import DIR_DATA
 
 
 class ColumDDL(StrEnum):
@@ -32,14 +27,20 @@ class ColumDDL(StrEnum):
 
 
 class NomTablas(StrEnum):
-    PRODS = TABLA_PRODS
-    MOVS = TABLA_MOVS
+    PRODS = "productos"
+    MOVS = "movimientos"
+
+class NombreBD(StrEnum):
+    SQLITE = "pynanzas.sqlite"
+    DDB = "pynanzas.db"
 
 class PathDB(StrEnum):
-    SQLITE = os.path.join(DIR_DATA, "pynanzas_bd.sqlite")
-    DUCK_DB = os.path.join(DIR_DATA, "pynanzas.ddb")
-    TEST = os.path.join(DIR_DATA,"pynanzas_bd_test.sqlite")
+    SQLITE = os.path.join(DIR_DATA, NombreBD.SQLITE)
+    DDB = os.path.join(DIR_DATA, NombreBD.DDB)
 
 
-PATH_SQLITE: PathDB = PathDB.TEST if TEST else PathDB.SQLITE
-URI: str = f"sqlite:///{PATH_SQLITE}"
+PATH_SQLITE: PathDB = PathDB.SQLITE
+PATH_DDB: PathDB = PathDB.DDB
+
+URI_SQLITE: str = f"sqlite:///{PATH_SQLITE}"
+URI_DDB: str = f"duckdb:///{PATH_DDB}"
