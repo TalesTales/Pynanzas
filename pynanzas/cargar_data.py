@@ -1,9 +1,10 @@
 from pathlib import Path
 
+import duckdb
 import polars as pl
 
 from pynanzas.constants import DIR_DATA
-from pynanzas.sql.diccionario import URI, NomTablas
+from pynanzas.sql.diccionario import PATH_DDB, NomTablas, PathDB
 
 
 def cargar_csv_a_df(
@@ -20,7 +21,10 @@ def cargar_csv_a_df(
         print(f"data_loader.cargar_datos(): ERROR: {e}")
         raise
 
-def cargar_sql_a_df(nom_tabla: NomTablas,
-                    uri: str = URI) -> pl.LazyFrame:
-    return pl.read_database_uri(f"SELECT * FROM {nom_tabla}",uri,
-                                engine='adbc').lazy()
+def cargar_ddb_a_lf(nom_tabla: NomTablas,
+                    path_db: PathDB = PATH_DDB) -> pl.LazyFrame:
+    with duckdb.connect(path_db) as con:
+        return con.execute(f"""SELECT * FROM {nom_tabla};""").pl().lazy()
+
+if __name__ == "__main__":
+    print(cargar_ddb_a_lf(NomTablas.PRODS).collect())
