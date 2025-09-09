@@ -1,12 +1,12 @@
 
 import polars as pl
 
-from pynanzas.sql.diccionario import URI, NomTablas
+from pynanzas.sql.diccionario import NomTablas, URI_SQLITE
 
 
 def movs_filtrados_prod(producto_id: str,
                         nom_tabla_movs: NomTablas = NomTablas.MOVS,
-                        uri: str = URI) -> (
+                        uri: str = URI_SQLITE) -> (
         pl.LazyFrame):
     query = (f"SELECT * "
              f"FROM '{nom_tabla_movs}'"
