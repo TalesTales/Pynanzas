@@ -1,11 +1,9 @@
 import os
 from pathlib import Path
 
-TEST = False
+from dotenv import load_dotenv
 
-TABLA_PRODS: str = "productos"
-TABLA_MOVS: str = "movimientos"
-TABLA_DICC: str = "diccionario"
+TEST = False
 
 PROD_ID: str = "producto_id"
 
@@ -24,3 +22,6 @@ if not (dir_base / "pynanzas").exists():
 
 DIR_BASE: Path = dir_base
 DIR_DATA: Path = DIR_BASE / "data"
+
+load_dotenv()
+MD_TOKEN: str | None = os.getenv("MD_TOKEN")
