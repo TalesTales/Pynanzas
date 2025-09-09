@@ -1,7 +1,10 @@
 import sqlite3
 
+import duckdb
+
 from pynanzas.constants import PROD_ID
 from pynanzas.sql.diccionario import (
+    PATH_DDB,
     PATH_SQLITE,
     ColumDDL,
     NomTablas,
@@ -32,11 +35,10 @@ EsquemaProdsDDL: EsquemaProds = EsquemaProds(
     fecha_actualizacion = ColumDDL.DATE_ACTUAL
 )
 
-def crear_tabla_sqlite_prods(esquema_prods: EsquemaProds = EsquemaProdsDDL,
-                             nom_tabla_prods: NomTablas = NomTablas.PRODS,
-                             path_db: PathDB = PATH_SQLITE) -> None:
-    if esquema_prods is None or len(esquema_prods) == 0:
-        esquema_prods = EsquemaProdsDDL
+def _crear_tabla_sqlite_prods(esquema_prods: EsquemaProds = EsquemaProdsDDL,
+                              nom_tabla_prods: NomTablas = NomTablas.PRODS,
+                              path_db: PathDB = PATH_SQLITE) -> None:
+    esquema_prods = EsquemaProdsDDL if len(esquema_prods) == 0 else esquema_prods
 
     columnas_ddl: list[str] = []
     for k, v in esquema_prods.items():
@@ -54,7 +56,26 @@ def crear_tabla_sqlite_prods(esquema_prods: EsquemaProds = EsquemaProdsDDL,
     except sqlite3.Error as e:
         print(f"sql.crear_tabla_prods: error sql {e}")
 
-EsquemaMovsDDL: EsquemaMovs =  EsquemaMovs(
+def _crear_tabla_ddb_prods(esquema_prods: EsquemaProds = EsquemaProdsDDL,
+                           nom_tabla_prods: NomTablas = NomTablas.PRODS,
+                           path_db: PathDB = PATH_DDB) -> None:
+    esquema_prods = EsquemaProdsDDL if len(esquema_prods) == 0 else esquema_prods
+
+    columnas_ddl: list[str] = []
+    for k, v in esquema_prods.items():
+        columnas_ddl.append(f"{k} {v}")
+    orden_ddl: str = ",\n".join(columnas_ddl)
+
+    try:
+        with duckdb.connect(path_db) as con:
+            query: str = f"CREATE TABLE IF NOT EXISTS {nom_tabla_prods} "
+            query += f"(\n{orden_ddl}\n);"
+            print(f'crear_tabla_prod:\n{query}')  # TODO: logging
+            con.execute(query)
+    except Exception as e:
+        print(f"sql._crear_tabla_ddb_prods: error duckdb {e}")
+
+EsquemaMovsDDL_SQLITE: EsquemaMovs =  EsquemaMovs(
     id = ColumDDL.INT_PK_AUTO,
     producto_id = ColumDDL.TXT_NOT_NULL,
     fecha = ColumDDL.DATE_NOT_NULL,
@@ -66,11 +87,11 @@ EsquemaMovsDDL: EsquemaMovs =  EsquemaMovs(
     saldo_hist = ColumDDL.REAL_DEFAULT_CERO,
 )
 
-def crear_tabla_sqlite_movs(esquema_movs: EsquemaMovs = EsquemaMovsDDL,
-                            nom_tabla_movs: NomTablas = NomTablas.MOVS,
-                            nom_tabla_prods: NomTablas = NomTablas.PRODS,
-                            producto_id: str = PROD_ID,
-                            path_db: PathDB = PATH_SQLITE) -> None:
+def _crear_tabla_sqlite_movs(esquema_movs: EsquemaMovs = EsquemaMovsDDL_SQLITE,
+                             nom_tabla_movs: NomTablas = NomTablas.MOVS,
+                             nom_tabla_prods: NomTablas = NomTablas.PRODS,
+                             producto_id: str = PROD_ID,
+                             path_db: PathDB = PATH_SQLITE) -> None:
     from pynanzas.sql.sqlite import tabla_existe
 
     if nom_tabla_movs == "":
@@ -78,7 +99,7 @@ def crear_tabla_sqlite_movs(esquema_movs: EsquemaMovs = EsquemaMovsDDL,
     if nom_tabla_prods == "":
         raise ValueError("crear_tabla_movs: nom_tabla_prods vacio")
     if esquema_movs is None or len(esquema_movs) == 0:
-        esquema_movs = EsquemaMovsDDL
+        esquema_movs = EsquemaMovsDDL_SQLITE
 
     columnas_ddl: list[str] = []
     for k, v in esquema_movs.items():
@@ -90,8 +111,8 @@ def crear_tabla_sqlite_movs(esquema_movs: EsquemaMovs = EsquemaMovsDDL,
         with sqlite3.connect(path_db) as conn:
             cursor: sqlite3.Cursor = conn.cursor()
             if not tabla_existe(cursor, nom_tabla_prods):
-                crear_tabla_sqlite_prods(nom_tabla_prods=nom_tabla_prods,
-                                         path_db=path_db)
+                _crear_tabla_sqlite_prods(nom_tabla_prods=nom_tabla_prods,
+                                          path_db=path_db)
             query: str = (f"CREATE TABLE IF NOT EXISTS {nom_tabla_movs} "
                           f"(\n{orden_ddl}\n);")
             print(query)  # TODO: logging
@@ -177,3 +198,50 @@ def crear_tabla_sqlite_movs(esquema_movs: EsquemaMovs = EsquemaMovsDDL,
             conn.commit()
     except sqlite3.Error as e:
         print(f"sql.crear_tabla_movs: error sql {e}")
+
+EsquemaMovsDDL_DDB: EsquemaMovs =  EsquemaMovs(
+    id = ColumDDL.INT_PK,
+    producto_id = ColumDDL.TXT_NOT_NULL,
+    fecha = ColumDDL.DATE_NOT_NULL,
+    tipo = ColumDDL.TXT_NOT_NULL,
+    valor  = ColumDDL.REAL_NOT_NULL,
+    unidades  = ColumDDL.REAL,
+    valor_unidades = ColumDDL.REAL,
+    fecha_agregada = ColumDDL.DATE_ACTUAL,
+    saldo_hist = ColumDDL.REAL_DEFAULT_CERO,
+)
+
+def _crear_tabla_ddb_movs(esquema_movs: EsquemaMovs = EsquemaMovsDDL_DDB,
+                             nom_tabla_movs: NomTablas = NomTablas.MOVS,
+                             nom_tabla_prods: NomTablas = NomTablas.PRODS,
+                             producto_id: str = PROD_ID,
+                             path_db: PathDB = PATH_DDB) -> None:
+
+    if nom_tabla_movs == "":
+        raise ValueError("crear_tabla_movs: nom_tabla_movs vacio")
+    if nom_tabla_prods == "":
+        raise ValueError("crear_tabla_movs: nom_tabla_prods vacio")
+    if esquema_movs is None or len(esquema_movs) == 0:
+        esquema_movs = EsquemaMovsDDL_DDB
+
+    columnas_ddl: list[str] = []
+    for k, v in esquema_movs.items():
+        columnas_ddl.append(f"{k} {v}")
+    orden_ddl = (',\n'.join(columnas_ddl))
+    orden_ddl += (f",\nFOREIGN KEY ({producto_id}) REFERENCES"
+                  f" {nom_tabla_prods} ({producto_id})")
+    try:
+        with duckdb.connect(path_db) as con:
+            query: str = (f"CREATE TABLE IF NOT EXISTS {nom_tabla_movs} "
+                          f"(\n{orden_ddl}\n);")
+            print(query)  # TODO: logging
+            con.execute(query)
+    except Exception as e:
+        print(f"sql._crear_tabla_ddb_movs: error duckdb {e}")
+
+def _init_ddb() -> None:
+    _crear_tabla_ddb_prods()
+    _crear_tabla_ddb_movs()
+
+if __name__ == "__main__":
+    _init_ddb()
