@@ -1,3 +1,17 @@
+## 3.0.0 (2025-09-09)
+
+### Feat
+
+- **manipulación**: se agregó función copiar de SQL a DuckDB
+- **definicion**: se agregaron funciones de DDL a DuckDB
+- **export**: se agregó la opción de usar export a md
+- **constantns**: Se agregó MD_TOKEN para usar md:
+- **cargar_data**: Se cambió la función de cargar Data de SQLite a DuckDB
+
+### Refactor
+
+- **limpiar_data**: se actualizó el uso de la función cargar_data
+
 ## 2.1.2 (2025-09-07)
 
 ### Refactor
