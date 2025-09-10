@@ -80,9 +80,9 @@ class EsquemaMovs(EsquemaBase):
     fecha: str | ColumDDL
     tipo: str | ColumDDL
     valor: str | float | ColumDDL
-    unidades: str | float | ColumDDL
-    valor_unidades: str | float | ColumDDL
-    id: str | ColumDDL | None = None
+    unidades: str | float | ColumDDL |None =  None
+    valor_unidades: str | float | ColumDDL | None = None
+    id: str | ColumDDL | int | None = None
     fecha_agregada: str | ColumDDL | None = None
     saldo_hist: str | ColumDDL | None = None
 

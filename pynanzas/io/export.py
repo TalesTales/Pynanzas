@@ -8,7 +8,6 @@ from pynanzas.constants import DIR_BACKUP, MD_TOKEN
 from pynanzas.sql.diccionario import (
     NOM_BD,
     PATH_DDB,
-    NombreBD,
     NomTablas,
     PathDB,
 )
@@ -51,7 +50,6 @@ def _exportar_ddb_parquet(path_db: PathDB = PATH_DDB,
         return None
 
 def exportar_remoto(md_con: duckdb.DuckDBPyConnection | None = None,
-                    nombre_db: NombreBD = NombreBD.DDB,
                     path_db: PathDB = PATH_DDB,
                     md_token: str = MD_TOKEN) -> None:
     fecha = datetime.now().strftime("%y%m%d_%H%M%S")

@@ -92,3 +92,23 @@ def _cargar_tabla_ddb_a_lf(nom_tabla: NomTablas,
     else:
         with duckdb.connect(path_db) as con:
             return con.execute(f"""SELECT * FROM {nom_tabla};""").pl().lazy()
+
+def _cargar_tabla_ddb_a_relation(nom_tabla: NomTablas,
+                                 path_db: PathDB = PATH_DDB,
+                                 local_con: duckdb.DuckDBPyConnection | None = None,
+                                 *,
+                                 md: bool = False) -> duckdb.DuckDBPyRelation:
+    global MD_GLOBAL
+    print(f"md= {md}, MD_GLOBAL= {MD_GLOBAL}, ddb= {os.path.exists(path_db)}")
+    if md or MD_GLOBAL or not os.path.exists(path_db):
+        print("sincronizando")
+        _synch_ddb_local_md(path_db)
+        MD_GLOBAL = False
+        print(f"md= {md}, y MD_GLOBAL= {MD_GLOBAL}")
+    else:
+        print("local")
+    if local_con:
+        return local_con.sql(f"""SELECT * FROM {nom_tabla};""")
+    else:
+        with duckdb.connect(path_db) as con:
+            return con.sql(f"""SELECT * FROM {nom_tabla};""")

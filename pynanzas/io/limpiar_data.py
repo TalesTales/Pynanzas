@@ -2,7 +2,9 @@
 import duckdb
 import polars as pl
 
-from pynanzas.io.cargar_data import _cargar_tabla_ddb_a_lf
+from pynanzas.io.cargar_data import (
+    _cargar_tabla_ddb_a_lf,
+)
 from pynanzas.sql.diccionario import PATH_DDB, NomTablas, PathDB
 
 

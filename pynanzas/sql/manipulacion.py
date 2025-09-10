@@ -6,11 +6,16 @@ from typing import Any, Optional
 import duckdb
 
 from pynanzas.constants import DIR_DATA, PROD_ID
+from pynanzas.io.cargar_data import (
+    _cargar_tabla_ddb_a_lf,
+    _cargar_tabla_ddb_a_relation,
+)
 from pynanzas.sql.definicion import (
     _crear_tabla_sqlite_movs,
     _crear_tabla_sqlite_prods,
 )
 from pynanzas.sql.diccionario import (
+    PATH_DDB,
     PATH_SQLITE,
     NombreBD,
     NomTablas,
@@ -45,7 +50,7 @@ def _sql_insertar_prod(producto: EsquemaProds,
         print(f"sql.insertar_prod: error sql {e}")
 
 
-def _sql_insertar_mov(
+def _insertar_mov_sqlite(
         movimiento: EsquemaMovs,
         nom_tabla_movs: NomTablas = NomTablas.MOVS,
         path_db: PathDB = PATH_SQLITE,
@@ -69,7 +74,47 @@ def _sql_insertar_mov(
                       f"({columnas}) "
                       f"VALUES ({placeholders})")
         cursor.execute(query, valores)
-        conn.commit()  # Agregado: faltaba commit
+        conn.commit()
+
+def _insertar_mov_ddb(
+        movimiento: EsquemaMovs | dict[str, Any],
+        nom_tabla_movs: NomTablas = NomTablas.MOVS,
+        path_db: PathDB = PATH_DDB,
+        local_con: duckdb.DuckDBPyConnection | None = None
+) -> None:
+
+    mov = asdict(movimiento) if isinstance(movimiento, EsquemaMovs) else movimiento
+    
+    # mov.pop('id', None)
+    mov.pop('fecha_agregada', None)
+
+    columnas: str = ','.join(mov.keys())
+    placeholders: str = ','.join(['?'] * len(mov.keys()))
+    valores: tuple = tuple(mov.values())
+
+    query: str = (f"INSERT INTO {nom_tabla_movs} "
+                  f"({columnas}) "
+                  f"VALUES ({placeholders});")
+    print(query)
+    try:
+        if local_con is None:
+            with duckdb.connect(path_db) as local_con:
+                local_con.execute(query, valores)
+                print(_cargar_tabla_ddb_a_relation(nom_tabla_movs, path_db,
+                                             local_con).order("id "
+                                                              "desc").limit(3))
+        else:
+            local_con.execute(query, valores)
+            print(
+                _cargar_tabla_ddb_a_relation(
+                    nom_tabla_movs, path_db, local_con
+                )
+                .order("id desc")
+                .limit(3)
+            )
+    except Exception as e:
+        print(f"sql.insertar_mov_ddb: error sql {e}")
+
 
 
 def _sql_actualizar_tabla(nom_tabla: NomTablas,
@@ -134,4 +179,11 @@ def _copy_sqlite_ddb(nom_sqllite: NombreBD = NombreBD.SQLITE,
             print(e)
 
 if __name__ == '__main__':
-    _copy_sqlite_ddb()
+    con = duckdb.connect(PATH_DDB)
+    a = (_cargar_tabla_ddb_a_lf(NomTablas.MOVS, local_con = con))
+    print(_cargar_tabla_ddb_a_lf(NomTablas.MOVS, local_con = con).collect().tail(2))
+    mov = EsquemaMovs(
+        "AltLiq","2025-08-18","retiro",-258196.56,id=145,
+    )
+    _insertar_mov_ddb(mov, local_con = con)
+    con.close()
