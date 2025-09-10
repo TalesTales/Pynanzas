@@ -31,9 +31,11 @@ class NomTablas(StrEnum):
     PRODS = "productos"
     MOVS = "movimientos"
 
+NOM_BD = f"pynanzas{VERSION_DB}"
+
 class NombreBD(StrEnum):
-    SQLITE = f"pynanzas{VERSION_DB}.sqlite"
-    DDB = f"pynanzas{VERSION_DB}.db"
+    SQLITE = f"{NOM_BD}.sqlite"
+    DDB = f"{NOM_BD}.db"
 
 class PathDB(StrEnum):
     SQLITE = os.path.join(DIR_DATA, NombreBD.SQLITE)
@@ -44,3 +46,4 @@ PATH_DDB: PathDB = PathDB.DDB
 
 URI_SQLITE: str = f"sqlite:///{PATH_SQLITE}"
 URI_DDB: str = f"duckdb:///{PATH_DDB}"
+

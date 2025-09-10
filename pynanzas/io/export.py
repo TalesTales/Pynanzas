@@ -5,7 +5,13 @@ from pathlib import Path
 import duckdb
 
 from pynanzas.constants import DIR_BACKUP, MD_TOKEN
-from pynanzas.sql.diccionario import PATH_DDB, NomTablas, PathDB
+from pynanzas.sql.diccionario import (
+    NOM_BD,
+    PATH_DDB,
+    NombreBD,
+    NomTablas,
+    PathDB,
+)
 
 
 def _exportar_tabla_parquet(nom_tabla: NomTablas,
@@ -45,12 +51,15 @@ def _exportar_ddb_parquet(path_db: PathDB = PATH_DDB,
         return None
 
 def exportar_remoto(md_con: duckdb.DuckDBPyConnection | None = None,
+                    nombre_db: NombreBD = NombreBD.DDB,
                     path_db: PathDB = PATH_DDB,
                     md_token: str = MD_TOKEN) -> None:
     fecha = datetime.now().strftime("%y%m%d_%H%M%S")
     query = (
         f"""ATTACH '{path_db}' AS ddb_local;\n"""
-        f"""CREATE OR REPLACE DATABASE pynanzas_{fecha} FROM ddb_local;\n"""
+        f"""CREATE OR REPLACE DATABASE {NOM_BD}_{fecha} FROM 
+        ddb_local;\n""" #TODO: Ajustar mejor el acoplamiento de VERSION_DB (
+        # Tal vez cambiar NombreBD.DDB para que no contenga
     )
     print(query)
     if md_con is None:
