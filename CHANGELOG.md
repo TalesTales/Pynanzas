@@ -1,3 +1,9 @@
+## 3.3.0 (2025-09-10)
+
+### Feat
+
+- **sql.manipulacion**: Se agregó insertar movimiento DDB
+
 ## 3.2.2 (2025-09-10)
 
 ### Fix
