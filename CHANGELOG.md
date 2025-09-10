@@ -1,3 +1,9 @@
+## 3.2.0 (2025-09-10)
+
+### Feat
+
+- **export**: se agregó la función de exportar ddb a parquet
+
 ## 3.1.1 (2025-09-10)
 
 ### Fix
