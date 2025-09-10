@@ -85,7 +85,7 @@ def _insertar_mov_ddb(
 
     mov = asdict(movimiento) if isinstance(movimiento, EsquemaMovs) else movimiento
     
-    # mov.pop('id', None)
+    mov.pop('id', None)
     mov.pop('fecha_agregada', None)
 
     columnas: str = ','.join(mov.keys())
@@ -183,7 +183,7 @@ if __name__ == '__main__':
     a = (_cargar_tabla_ddb_a_lf(NomTablas.MOVS, local_con = con))
     print(_cargar_tabla_ddb_a_lf(NomTablas.MOVS, local_con = con).collect().tail(2))
     mov = EsquemaMovs(
-        "AltLiq","2025-08-18","retiro",-258196.56,id=145,
+        "DeuCorp","2025-08-18","retiro",-224906.94,
     )
     _insertar_mov_ddb(mov, local_con = con)
     con.close()
