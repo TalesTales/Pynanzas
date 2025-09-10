@@ -2,16 +2,14 @@
 
 ## En Desarrollo
 
-- [ ] BUG: se crean dos atributos mov_hist y movs_hist en Producto.
-- [ ] BUG: -filter( no está filtrando crrectamente)
-    - Si reconoce el string "" pero no el valor
+- [*] Actualizar la función Insertar_movimiento para usar correctamente ddb
 
 - [ ] Ingresar transacciones desde lo que hay ahora
 - [ ] Insertar clase Movimiento
 
 - [ ] Desarrollar una función _eq_ dentro de la clase Movimiento
 
-[ ] No eliminar Diccionario.csv (buscar forma de generarlo desde py o desde sqlite)
+- [ ] No eliminar Diccionario.csv (buscar forma de generarlo desde py o desde sqlite)
 
 ## Hecho
 
@@ -19,6 +17,9 @@
 - [ ] PORTAFOLIO: Poder filtrar todas las funciones por Plataforma (!), Riesgo, Plazo, etc.
 - [ ] PORTAFOLIO: Balancear debe aceptar valores negativos (retiros)
 - [ ] Agregar DocString a todo
+- [x] BUG: se crean dos atributos mov_hist y movs_hist en Producto.
+- [x] BUG: -filter( no está filtrando crrectamente)
+    - Si reconoce el string "" pero no el valor
 - [x] Borrar la lectura de Excel de data_loader
 - [x] Dejar solamente lectura de CSV
 - [x] Función para exportar los datos a CSV en la carpeta correcta (.data)
