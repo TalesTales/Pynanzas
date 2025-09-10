@@ -1,3 +1,9 @@
+## 3.2.1 (2025-09-10)
+
+### Fix
+
+- **version**: se ajustó la VERSION_DDB para que sólo use el primer número de la versión
+
 ## 3.2.0 (2025-09-10)
 
 ### Feat
