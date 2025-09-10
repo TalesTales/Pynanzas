@@ -43,14 +43,22 @@ def _exportar_db_parquet(nom_tabla: NomTablas,
             return None
     return None
 
-def guardar_md():
-    print(MD_TOKEN)
-    with duckdb.connect(f"md:?motherduck_token={MD_TOKEN}") as con:
-        fecha = datetime.now().strftime("%y%m%d_%H%M%S")
-        q = (f"""ATTACH '{PATH_DDB}' AS ddb;\n"""
-             f"""CREATE OR REPLACE DATABASE pynanzas_{fecha} FROM ddb;\n""")
-        print(q)
-        con.sql(q)
+def guardar_md(md_con: duckdb.DuckDBPyConnection | None = None,
+               path_db: PathDB = PATH_DDB,
+               md_token: str = MD_TOKEN) -> None:
+    fecha = datetime.now().strftime("%y%m%d_%H%M%S")
+    q = (
+        f"""ATTACH '{path_db}' AS ddb;\n"""
+        f"""CREATE OR REPLACE DATABASE pynanzas_{fecha} FROM ddb;\n"""
+    )
+    print(q)
+    if md_con is None:
+        with duckdb.connect(f"md:?motherduck_token={md_token}") as md_con:
+            md_con.sql(q)
+        return
+    else:
+        md_con.sql(q)
+        return
 
 if __name__ == '__main__':
     guardar_md()

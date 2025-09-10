@@ -14,7 +14,8 @@ from pynanzas.diccionario import (
     Plazo,
     Riesgo,
 )
-from pynanzas.limpiar_data import movs_sql_a_lf
+from pynanzas.limpiar_data import _tabla_ddb_lf
+from pynanzas.sql.diccionario import NomTablas
 
 
 @dataclass
@@ -80,27 +81,32 @@ class ProductoFinanciero:
         return string
 
     @cached_property
-    def movs_hist(self)-> pl.LazyFrame:
-        return movs_sql_a_lf().filter(pl.col(PROD_ID) == self.producto_id)
+    def movs_hist(self)-> pl.DataFrame:
+        return self._movs_hist.collect()
+
+    @cached_property
+    def _movs_hist(self)-> pl.LazyFrame:
+        return _tabla_ddb_lf(NomTablas.MOVS).filter(pl.col(PROD_ID) ==
+                                                    self.producto_id)
         self._calcular_metricas_basicas()
         # self._calcular_xirr_hist()
 
     @cached_property
     def aportes(self) -> float:
-        return (self.movs_hist.filter(
+        return (self._movs_hist.filter(
         pl.col("tipo").is_in([m.value for m in MovsAportes]))
                     .select(pl.col("valor").sum().round(2))
                     .collect().item())
 
     @cached_property
     def intereses (self) -> float:
-        return (self.movs_hist
+        return (self._movs_hist
                 .filter(pl.col("tipo").is_in([m.value for m in MovsIntereses]))
                 .select(pl.col("valor").sum()).collect().item())
 
     @cached_property
     def saldo(self) -> float:
-        return (self.movs_hist.select(pl.col("saldo_hist"))
+        return (self._movs_hist.select(pl.col("saldo_hist"))
                 .last().collect().item())
 
     @cached_property

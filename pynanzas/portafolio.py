@@ -191,12 +191,12 @@ class Portafolio:
                 continue
 
             if (
-                producto.movs_hist.empty
-                or "xirr_historica" not in producto.movs_hist.columns
+                producto._movs_hist.empty
+                or "xirr_historica" not in producto._movs_hist.columns
             ):
                 continue
 
-            producto_xirr = producto.movs_hist[
+            producto_xirr = producto._movs_hist[
                 ["fecha", "xirr_historica"]
             ].copy()
             producto_xirr = producto_xirr[
@@ -238,12 +238,12 @@ class Portafolio:
                 continue
 
             if (
-                producto.movs_hist.empty
-                or "saldo_historico" not in producto.movs_hist.columns
+                producto._movs_hist.empty
+                or "saldo_historico" not in producto._movs_hist.columns
             ):
                 continue
 
-            producto_saldo = producto.movs_hist[
+            producto_saldo = producto._movs_hist[
                 ["fecha", "saldo_historico"]
             ].copy()
             producto_saldo = producto_saldo[

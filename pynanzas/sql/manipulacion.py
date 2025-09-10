@@ -10,7 +10,12 @@ from pynanzas.sql.definicion import (
     _crear_tabla_sqlite_movs,
     _crear_tabla_sqlite_prods,
 )
-from pynanzas.sql.diccionario import PATH_SQLITE, NombreBD, NomTablas, PathDB
+from pynanzas.sql.diccionario import (
+    PATH_SQLITE,
+    NombreBD,
+    NomTablas,
+    PathDB,
+)
 from pynanzas.sql.esquemas import EsquemaMovs, EsquemaProds
 from pynanzas.sql.sqlite import tabla_existe
 
