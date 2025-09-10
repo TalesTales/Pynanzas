@@ -1,3 +1,9 @@
+## 3.1.1 (2025-09-10)
+
+### Fix
+
+- **_cargar_data**: Se corrigió la lógica del flujo de control de cargar data
+
 ## 3.1.0 (2025-09-09)
 
 ### Feat
