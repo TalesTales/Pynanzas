@@ -1,3 +1,9 @@
+## 3.2.2 (2025-09-10)
+
+### Fix
+
+- **export**: Se ajustó el nombre de la BD en MD:
+
 ## 3.2.1 (2025-09-10)
 
 ### Fix
