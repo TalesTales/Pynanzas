@@ -5,7 +5,10 @@ import duckdb
 import polars as pl
 
 from pynanzas.constants import DIR_DATA, MD_GLOBAL, MD_TOKEN
-from pynanzas.io.export import _exportar_tabla_parquet, exportar_remoto
+from pynanzas.io.export import (
+    _exportar_ddb_parquet,
+    exportar_remoto,
+)
 from pynanzas.sql.diccionario import PATH_DDB, NomTablas, PathDB
 
 
@@ -52,9 +55,7 @@ def _synch_ddb_local_md(path_db: PathDB = PATH_DDB,
                                     .item().timestamp())
                 if float(tiempo_md) > float(tiempo_local):
                     print("Descargando md y actualizando local")
-                    _exportar_tabla_parquet(NomTablas.PRODS) #TODO:
-                    # Desacoplar porque se usa la enum de manera dura
-                    _exportar_tabla_parquet(NomTablas.MOVS)
+                    _exportar_ddb_parquet()
                     con.sql(
                             f"""ATTACH '{path_db}' AS ddb_local;\n"""
                             f"""CREATE OR REPLACE DATABASE ddb_local """

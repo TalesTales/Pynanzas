@@ -22,6 +22,7 @@ if not (dir_base / "pynanzas").exists():
 
 DIR_BASE: Path = dir_base
 DIR_DATA: Path = DIR_BASE / "data"
+DIR_BACKUP: Path = DIR_DATA / "backup"
 
 load_dotenv()
 MD_TOKEN: str = os.getenv("MD_TOKEN", "")

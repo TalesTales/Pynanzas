@@ -1,7 +1,8 @@
-import os
 from enum import StrEnum
+import os
 
 from pynanzas.constants import DIR_DATA
+from pynanzas.version import VERSION_DB
 
 
 class ColumDDL(StrEnum):
@@ -31,13 +32,12 @@ class NomTablas(StrEnum):
     MOVS = "movimientos"
 
 class NombreBD(StrEnum):
-    SQLITE = "pynanzas.sqlite"
-    DDB = "pynanzas.db"
+    SQLITE = f"pynanzas{VERSION_DB}.sqlite"
+    DDB = f"pynanzas{VERSION_DB}.db"
 
 class PathDB(StrEnum):
     SQLITE = os.path.join(DIR_DATA, NombreBD.SQLITE)
     DDB = os.path.join(DIR_DATA, NombreBD.DDB)
-
 
 PATH_SQLITE: PathDB = PathDB.SQLITE
 PATH_DDB: PathDB = PathDB.DDB

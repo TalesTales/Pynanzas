@@ -4,24 +4,40 @@ from pathlib import Path
 
 import duckdb
 
-from pynanzas.constants import DIR_DATA, MD_TOKEN
+from pynanzas.constants import DIR_BACKUP, MD_TOKEN
 from pynanzas.sql.diccionario import PATH_DDB, NomTablas, PathDB
 
 
 def _exportar_tabla_parquet(nom_tabla: NomTablas,
                             path_db: PathDB = PATH_DDB,
-                            data_dir: Path = DIR_DATA) -> None:
+                            dir_backup: Path = DIR_BACKUP) -> None:
 
     fecha: str = datetime.now().strftime("%y%m%d_%H%M%S")
-    data_bu: Path = data_dir / "backup" / fecha
+    dir_data_fecha: Path = dir_backup / fecha
     nom_parquet = f"{nom_tabla}_{fecha}.parquet"
-    os.makedirs(data_bu, exist_ok=True)
-    parquet_path = os.path.join(data_bu, nom_parquet)
+    os.makedirs(dir_data_fecha, exist_ok=True)
+    parquet_path = os.path.join(dir_data_fecha, nom_parquet)
     try:
         with duckdb.connect(path_db) as con:
             data = con.sql(f"COPY {nom_tabla} TO '{parquet_path}' ("
                            f"FORMAT parquet);")
         print(parquet_path)
+        return None
+
+    except Exception as e:
+        print(f"❌ Error: {e}")
+        return None
+
+def _exportar_ddb_parquet(path_db: PathDB = PATH_DDB,
+                          dir_backup: Path = DIR_BACKUP) -> None:
+
+    fecha: str = datetime.now().strftime("%y%m%d_%H%M%S")
+    dir_data_fecha: Path = dir_backup / fecha
+    os.makedirs(dir_data_fecha, exist_ok=True)
+    try:
+        with duckdb.connect(path_db) as con:
+            con.sql(f"EXPORT DATABASE '{dir_data_fecha}' (FORMAT parquet);")
+        print(dir_data_fecha)
         return None
 
     except Exception as e:
@@ -46,4 +62,5 @@ def exportar_remoto(md_con: duckdb.DuckDBPyConnection | None = None,
         return
 
 if __name__ == '__main__':
-    pass
+    _exportar_ddb_parquet()
+    exportar_remoto()
