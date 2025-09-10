@@ -1,7 +1,6 @@
 from dataclasses import dataclass, field
 from functools import cached_property
 
-import numpy as np
 from overrides import override
 import polars as pl
 
@@ -14,7 +13,7 @@ from pynanzas.diccionario import (
     Plazo,
     Riesgo,
 )
-from pynanzas.limpiar_data import _tabla_ddb_lf
+from pynanzas.io.limpiar_data import _tabla_lf
 from pynanzas.sql.diccionario import NomTablas
 
 
@@ -63,14 +62,14 @@ class ProductoFinanciero:
         if self.abierto:
             xirr_display = (
                 f"{self.xirr:.2%}"
-                if (self.xirr is not None and not np.isnan(self.xirr))
+                if (self.xirr is not None)
                 else "N/A"
             )
             string += f"\nSaldo: COP ${self.saldo:,.2f}"  # TODO: Modificar moneda
             string += f" | XIRR: {xirr_display}"
             string += (
                 f" | Asignación: {self.asignacion:.2%}"
-                if (self.asignacion is not np.isnan(self.asignacion))
+                if (self.asignacion is not None)
                 else "N/A"
             )
         string +=(f"\nPlataforma: {self.plataforma}, Tipo: {self.tipo_producto}, "
@@ -86,8 +85,8 @@ class ProductoFinanciero:
 
     @cached_property
     def _movs_hist(self)-> pl.LazyFrame:
-        return _tabla_ddb_lf(NomTablas.MOVS).filter(pl.col(PROD_ID) ==
-                                                    self.producto_id)
+        return _tabla_lf(NomTablas.MOVS).filter(pl.col(PROD_ID) ==
+                                                self.producto_id)
         self._calcular_metricas_basicas()
         # self._calcular_xirr_hist()
 

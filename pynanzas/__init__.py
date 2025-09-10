@@ -1,6 +1,6 @@
-from pynanzas.export import guardar_md
+from pynanzas.io.export import exportar_remoto
 
 __all__ = [
-    "guardar_md",
+    "exportar_remoto",
 ]
 

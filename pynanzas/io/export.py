@@ -13,14 +13,14 @@ def _exportar_tabla_parquet(nom_tabla: NomTablas,
                             data_dir: Path = DIR_DATA) -> None:
 
     fecha: str = datetime.now().strftime("%y%m%d_%H%M%S")
-    data_bu: Path = data_dir / "backup"
+    data_bu: Path = data_dir / "backup" / fecha
     nom_parquet = f"{nom_tabla}_{fecha}.parquet"
-
     os.makedirs(data_bu, exist_ok=True)
     parquet_path = os.path.join(data_bu, nom_parquet)
     try:
         with duckdb.connect(path_db) as con:
-            con.sql(f"COPY {nom_tabla} TO '{nom_tabla}.parquet' (FORMAT parquet);")
+            data = con.sql(f"COPY {nom_tabla} TO '{parquet_path}' ("
+                           f"FORMAT parquet);")
         print(parquet_path)
         return None
 
@@ -33,7 +33,6 @@ def exportar_remoto(md_con: duckdb.DuckDBPyConnection | None = None,
                     md_token: str = MD_TOKEN) -> None:
     fecha = datetime.now().strftime("%y%m%d_%H%M%S")
     query = (
-        f"""DETACH ddb_local"""
         f"""ATTACH '{path_db}' AS ddb_local;\n"""
         f"""CREATE OR REPLACE DATABASE pynanzas_{fecha} FROM ddb_local;\n"""
     )
@@ -47,4 +46,4 @@ def exportar_remoto(md_con: duckdb.DuckDBPyConnection | None = None,
         return
 
 if __name__ == '__main__':
-    exportar_remoto()
+    pass

@@ -1,28 +1,16 @@
+import os.path
 from pathlib import Path
 
 import duckdb
 import polars as pl
 
 from pynanzas.constants import DIR_DATA, MD_GLOBAL, MD_TOKEN
-from pynanzas.export import exportar_remoto
+from pynanzas.io.export import _exportar_tabla_parquet, exportar_remoto
 from pynanzas.sql.diccionario import PATH_DDB, NomTablas, PathDB
 
 
-def _cargar_csv_a_lf(
-    nom_tabla: NomTablas,
-    dir_data: Path = DIR_DATA
-) -> pl.LazyFrame:
-    try:
-        df_read = pl.scan_csv(dir_data/(nom_tabla + '.csv'))
-        return df_read
-    except FileNotFoundError:
-        print("_cargar_csv_a_lf(): ERROR: No se encontró csv.")
-        raise
-    except Exception as e:
-        print(f"_cargar_csv_a_lf(): ERROR: {e}")
-        raise
-
-def _cargar_parquet_a_lf(
+def _cargar_parquet_a_lf(#TODO: de pronto usar esto como último recurso para
+        # cargar datos?
     nom_tabla: NomTablas,
     dir_data: Path = DIR_DATA
 ) -> pl.LazyFrame:
@@ -36,10 +24,12 @@ def _cargar_parquet_a_lf(
         print(f"_cargar_parquet_a_lf(): ERROR: {e}")
         raise
 
+def _cargar_parquet_a_ddb():
+    raise NotImplementedError
+
 
 def _synch_ddb_local_md(path_db: PathDB = PATH_DDB,
                         md_token: str  = MD_TOKEN)->None:
-    tiempo_local = Path(path_db).stat().st_mtime
 
     md_q: str = ("SELECT name, created_ts "
                  "FROM md_information_schema.databases "
@@ -48,31 +38,48 @@ def _synch_ddb_local_md(path_db: PathDB = PATH_DDB,
 
     try:
         with duckdb.connect(f"md:?motherduck_token={md_token}") as con:
-            df = con.execute(md_q).pl()
-            nombre_bd_md = df.tail(1).select(pl.col("name")).item()
-            tiempo_md = df.tail(1).select(pl.col("created_ts")).item().timestamp()
-            if float(tiempo_md) > float(tiempo_local):
-                con.sql(f"""DETACH ddb_local;"""
-                        """ATTACH '{path_db}' AS ddb_local;\n"""
-                        f"""CREATE OR REPLACE DATABASE ddb_local FROM
-                {nombre_bd_md};\n""")
-                print("ddb_md")
+            if not os.path.exists(path_db):
+                print("Descargando md y creando local")
+                df = con.sql(md_q)
+                nombre_bd_md = df.pl().tail(1).select(pl.col("name")).item()
+                con.sql(f"""ATTACH '{path_db}' as ddb_local;"""
+                        f"""COPY FROM DATABASE {nombre_bd_md} to ddb_local;""")
             else:
-                exportar_remoto(con, path_db)
-                print("ddb_local")
+                tiempo_local = Path(path_db).stat().st_mtime
+                df = con.sql(md_q)
+                nombre_bd_md = df.pl().tail(1).select(pl.col("name")).item()
+                tiempo_md = (df.pl().tail(1).select(pl.col("created_ts"))
+                                    .item().timestamp())
+                if float(tiempo_md) > float(tiempo_local):
+                    print("Descargando md y actualizando local")
+                    _exportar_tabla_parquet(NomTablas.PRODS) #TODO:
+                    # Desacoplar porque se usa la enum de manera dura
+                    _exportar_tabla_parquet(NomTablas.MOVS)
+                    con.sql(
+                            f"""ATTACH '{path_db}' AS ddb_local;\n"""
+                            f"""CREATE OR REPLACE DATABASE ddb_local """
+                            f"""FROM {nombre_bd_md};\n"""
+                            f"""DETACH ddb_local;""")
+                    print("ddb_md")
+                else:
+                    if os.path.exists(path_db):
+                        print("Subiendo md")
+                        exportar_remoto(con, path_db)
+                        print("ddb_local")
+                    else:
+                        print("ddb_local no existe")
         return None
     except Exception as e:
-        print(f"descargar_md(): ERROR: {e}")
-        print("ddb_local")
+        print(f"exportar_remoto(): ERROR: {e}")
 
-def _cargar_ddb_a_lf(nom_tabla: NomTablas,
-                     path_db: PathDB = PATH_DDB,
-                     local_con: duckdb.DuckDBPyConnection | None = None,
-                     *,
-                     md: bool = False) -> pl.LazyFrame:
+def _cargar_tabla_ddb_a_lf(nom_tabla: NomTablas,
+                           path_db: PathDB = PATH_DDB,
+                           local_con: duckdb.DuckDBPyConnection | None = None,
+                           *,
+                           md: bool = False) -> pl.LazyFrame:
     global MD_GLOBAL
-    print(f"md= {md}, y MD_GLOBAL= {MD_GLOBAL}")
-    if md or MD_GLOBAL:
+    print(f"md= {md}, MD_GLOBAL= {MD_GLOBAL}, ddb= {os.path.exists(path_db)}")
+    if md or MD_GLOBAL or not os.path.exists(path_db):
         print("sincronizando")
         _synch_ddb_local_md(path_db)
         MD_GLOBAL = False
@@ -84,6 +91,3 @@ def _cargar_ddb_a_lf(nom_tabla: NomTablas,
     else:
         with duckdb.connect(path_db) as con:
             return con.execute(f"""SELECT * FROM {nom_tabla};""").pl().lazy()
-
-if __name__ == "__main__":
-    print(MD_GLOBAL,_cargar_ddb_a_lf(NomTablas.PRODS).collect())

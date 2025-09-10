@@ -25,4 +25,4 @@ DIR_DATA: Path = DIR_BASE / "data"
 
 load_dotenv()
 MD_TOKEN: str = os.getenv("MD_TOKEN", "")
-MD_GLOBAL: bool = True
+MD_GLOBAL: bool = False
