@@ -1,3 +1,9 @@
+## 3.3.1 (2025-09-10)
+
+### Fix
+
+- **insert_mov_ddb**: Se agregó una secuencia en duckdb que elimina la necesidad de enviar id por python
+
 ## 3.3.0 (2025-09-10)
 
 ### Feat
