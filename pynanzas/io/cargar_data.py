@@ -4,7 +4,7 @@ import duckdb
 import polars as pl
 
 from pynanzas.constants import DIR_DATA, MD_GLOBAL, MD_TOKEN
-from pynanzas.export import guardar_md
+from pynanzas.export import exportar_remoto
 from pynanzas.sql.diccionario import PATH_DDB, NomTablas, PathDB
 
 
@@ -58,7 +58,7 @@ def _synch_ddb_local_md(path_db: PathDB = PATH_DDB,
                 {nombre_bd_md};\n""")
                 print("ddb_md")
             else:
-                guardar_md(con, path_db)
+                exportar_remoto(con, path_db)
                 print("ddb_local")
         return None
     except Exception as e:
