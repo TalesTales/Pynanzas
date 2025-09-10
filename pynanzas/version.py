@@ -15,5 +15,5 @@ __version__ = _read_from_toml()
 
 _ver = Version(__version__)
 __version_num__ = _ver.major * 10000 + _ver.minor * 100 + _ver.micro
-VERSION_DB = _ver.major * 10 + _ver.minor * 1
+VERSION_DB = _ver.major * 1
 
