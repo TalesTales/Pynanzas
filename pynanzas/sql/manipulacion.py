@@ -7,7 +7,6 @@ import duckdb
 
 from pynanzas.constants import DIR_DATA, PROD_ID
 from pynanzas.io.cargar_data import (
-    _cargar_tabla_ddb_a_lf,
     _cargar_tabla_ddb_a_relation,
 )
 from pynanzas.sql.definicion import (
@@ -180,10 +179,8 @@ def _copy_sqlite_ddb(nom_sqllite: NombreBD = NombreBD.SQLITE,
 
 if __name__ == '__main__':
     con = duckdb.connect(PATH_DDB)
-    a = (_cargar_tabla_ddb_a_lf(NomTablas.MOVS, local_con = con))
-    print(_cargar_tabla_ddb_a_lf(NomTablas.MOVS, local_con = con).collect().tail(2))
     mov = EsquemaMovs(
-        "DeuCorp","2025-08-18","retiro",-224906.94,
+        "DeuCorp","2025-08-18","intereses",526,
     )
     _insertar_mov_ddb(mov, local_con = con)
     con.close()

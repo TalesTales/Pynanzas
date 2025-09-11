@@ -43,10 +43,14 @@ def _synch_ddb_local_md(path_db: PathDB = PATH_DDB,
         with duckdb.connect(f"md:?motherduck_token={md_token}") as con:
             if not os.path.exists(path_db):
                 print("Descargando md y creando local")
+                print(md_q)
                 df = con.sql(md_q)
                 nombre_bd_md = df.pl().tail(1).select(pl.col("name")).item()
-                con.sql(f"""ATTACH '{path_db}' as ddb_local;"""
-                        f"""COPY FROM DATABASE {nombre_bd_md} to ddb_local;""")
+                query = (f"""ATTACH '{path_db}' as ddb_local; """
+                         f"""COPY FROM DATABASE {nombre_bd_md} to ddb_local; """
+                         f"""CHECKPOINT ddb_local;""")
+                print(query)
+                con.sql(query)
             else:
                 tiempo_local = Path(path_db).stat().st_mtime
                 df = con.sql(md_q)
@@ -112,3 +116,6 @@ def _cargar_tabla_ddb_a_relation(nom_tabla: NomTablas,
     else:
         with duckdb.connect(path_db) as con:
             return con.sql(f"""SELECT * FROM {nom_tabla};""")
+
+if __name__ == '__main__':
+    _cargar_tabla_ddb_a_lf(NomTablas.MOVS)
