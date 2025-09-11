@@ -2,12 +2,7 @@
 
 ## En Desarrollo
 
-- [*] Ingresar transacciones desde lo que hay ahora
-- [ ] Insertar clase Movimiento
-
-- [ ] Desarrollar una función _eq_ dentro de la clase Movimiento
-
-- [ ] No eliminar Diccionario.csv (buscar forma de generarlo desde py o desde sqlite)
+- [ ] PRODUCTO: terminar de pasar todas las funciones a polars. (Por ahora seguir manejando todo en memoria)
 
 ## Hecho
 
@@ -15,6 +10,10 @@
 - [ ] PORTAFOLIO: Poder filtrar todas las funciones por Plataforma (!), Riesgo, Plazo, etc.
 - [ ] PORTAFOLIO: Balancear debe aceptar valores negativos (retiros)
 - [ ] Agregar DocString a todo
+- [ ] Insertar clase Movimiento
+- [ ] Desarrollar una función _eq_ dentro de la clase Movimiento
+- [ ] No eliminar Diccionario.csv (buscar forma de generarlo desde py o desde sqlite)
+- [x] Ingresar transacciones desde lo que hay ahora
 - [x] Actualizar la función Insertar_movimiento para usar correctamente ddb
 - [x] BUG: se crean dos atributos mov_hist y movs_hist en Producto.
 - [x] BUG: -filter( no está filtrando crrectamente)
