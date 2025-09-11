@@ -2,9 +2,7 @@
 
 ## En Desarrollo
 
-- [*] Actualizar la función Insertar_movimiento para usar correctamente ddb
-
-- [ ] Ingresar transacciones desde lo que hay ahora
+- [*] Ingresar transacciones desde lo que hay ahora
 - [ ] Insertar clase Movimiento
 
 - [ ] Desarrollar una función _eq_ dentro de la clase Movimiento
@@ -17,6 +15,7 @@
 - [ ] PORTAFOLIO: Poder filtrar todas las funciones por Plataforma (!), Riesgo, Plazo, etc.
 - [ ] PORTAFOLIO: Balancear debe aceptar valores negativos (retiros)
 - [ ] Agregar DocString a todo
+- [x] Actualizar la función Insertar_movimiento para usar correctamente ddb
 - [x] BUG: se crean dos atributos mov_hist y movs_hist en Producto.
 - [x] BUG: -filter( no está filtrando crrectamente)
     - Si reconoce el string "" pero no el valor
