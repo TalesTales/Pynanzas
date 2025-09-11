@@ -76,41 +76,44 @@ def _insertar_mov_sqlite(
         conn.commit()
 
 def _insertar_mov_ddb(
-        movimiento: EsquemaMovs | dict[str, Any],
+        movimientos: list[EsquemaMovs],
         nom_tabla_movs: NomTablas = NomTablas.MOVS,
         path_db: PathDB = PATH_DDB,
         local_con: duckdb.DuckDBPyConnection | None = None
 ) -> None:
-
-    mov = asdict(movimiento) if isinstance(movimiento, EsquemaMovs) else movimiento
-    
-    mov.pop('id', None)
-    mov.pop('fecha_agregada', None)
-
-    columnas: str = ','.join(mov.keys())
-    placeholders: str = ','.join(['?'] * len(mov.keys()))
-    valores: tuple = tuple(mov.values())
-
-    query: str = (f"INSERT INTO {nom_tabla_movs} "
-                  f"({columnas}) "
-                  f"VALUES ({placeholders});")
-    print(query)
+    print("Insertar movimientos\n")
+    print("====")
     try:
         if local_con is None:
             with duckdb.connect(path_db) as local_con:
-                local_con.execute(query, valores)
+                inicio_transaccion: str = "BEGIN TRANSACTION;\n"
+                local_con.execute(inicio_transaccion)
+                print(inicio_transaccion)
+                for mov in movimientos:
+                    m = asdict(mov)
+                    m.pop('id', None)
+                    m.pop('fecha_agregada', None)
+                    columnas: str = ','.join(m.keys())
+                    placeholders: str = ','.join(['?'] * len(m.keys()))
+                    valores: tuple = tuple(m.values())
+
+                    query = (f"INSERT INTO {nom_tabla_movs}\n"
+                              f"({columnas}) VALUES ({placeholders});\n")
+                    print(query)
+                    print(valores)
+                    local_con.execute(query, valores)
+                commit = input('commit? s/n: ')
+                if commit == 's':
+                    local_con.execute("COMMIT;")
+                    print('commit;')
+                else:
+                    local_con.execute("ROLLBACK;")
+                    print('rollback;')
                 print(_cargar_tabla_ddb_a_relation(nom_tabla_movs, path_db,
-                                             local_con).order("id "
-                                                              "desc").limit(3))
+                                             local_con).select("producto_id","fecha","tipo","valor","id").order("id "
+                                                              "desc").limit(len(movimientos)+3))
         else:
-            local_con.execute(query, valores)
-            print(
-                _cargar_tabla_ddb_a_relation(
-                    nom_tabla_movs, path_db, local_con
-                )
-                .order("id desc")
-                .limit(3)
-            )
+            print("No conn passed")
     except Exception as e:
         print(f"sql.insertar_mov_ddb: error sql {e}")
 
@@ -177,10 +180,32 @@ def _copy_sqlite_ddb(nom_sqllite: NombreBD = NombreBD.SQLITE,
         except Exception as e:
             print(e)
 
+def fabricar_movs()-> list[EsquemaMovs]:
+    insertar: bool = True
+    movs: list[EsquemaMovs] = []
+    while insertar:
+        producto_id: str = input("producto_id: ")
+        fecha: str = input("fecha: ")
+        tipo: str = input("tipo: ")
+        valor: float = float(input("valor: "))
+        crear_mov: str = f"insertar: {producto_id}, {fecha}, {tipo}, {valor}? s/n: "
+        append = input(crear_mov)
+        if append == "s":
+            mov: EsquemaMovs = EsquemaMovs(producto_id, fecha, tipo, valor)
+            movs.append(mov)
+            print(movs)
+        else:
+            pass
+
+        insertar_otro: str = input("Insertar otro movimiento? s/n: ")
+        if insertar_otro == "s":
+            pass
+        else:
+            insertar = False
+        print("========")
+        print("\n")
+
+    return movs
+
 if __name__ == '__main__':
-    con = duckdb.connect(PATH_DDB)
-    mov = EsquemaMovs(
-        "DeuCorp","2025-08-18","intereses",526,
-    )
-    _insertar_mov_ddb(mov, local_con = con)
-    con.close()
+    _insertar_mov_ddb(fabricar_movs())
