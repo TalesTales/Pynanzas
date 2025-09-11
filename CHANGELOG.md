@@ -1,3 +1,9 @@
+## 3.3.2 (2025-09-11)
+
+### Fix
+
+- **sql**: se ajustaron las funciones nuevas de ddb
+
 ## 3.3.1 (2025-09-10)
 
 ### Fix
