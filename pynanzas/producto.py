@@ -34,13 +34,8 @@ class ProductoFinanciero:
     plataforma: str
     tipo_producto: str
     tipo_inversion: str
-    abierto: bool = True
     asignacion: float = 0
-
     saldo_inicial: float  = field(init = False, default = 0)
-
-    def __post_init__(self) -> None:
-        self.abierto = False is self.saldo < 0
 
     def __hash__(self):
         return hash(self.producto_id)
@@ -110,21 +105,26 @@ class ProductoFinanciero:
                 .sum().collect().item())
 
     @cached_property
+    def abierto(self) -> bool:
+        if self.saldo <= 0 or None:
+            return False
+        else:
+            return True
+
+    @cached_property
     def rent_acum (self) -> float:
         return float(self.saldo) - float(self.aportes)
 
     @cached_property
-    def xirr(self, movs_hist = None) -> float | None:
-        if movs_hist is None:
-            movs_hist = self._movs_hist
-        df_flujos: pl.LazyFrame = (movs_hist
+    def xirr(self) -> float | None:
+        df_flujos: pl.LazyFrame = (self._movs_hist
                 .filter(pl.col("tipo").is_in([m.value for m in MovsAportes])))
 
         fechas: list = (df_flujos.select(pl.col("fecha"))
                              .collect().to_series().to_list())
         valores: list[float] = (df_flujos.select(-pl.col("valor"))
                           .collect().to_series().to_list()) # Cambiar signo
-        saldo: float = movs_hist.select(pl.col("valor")).sum().collect().item()
+        saldo: float = self._movs_hist.select(pl.col("valor")).sum().collect().item()
         fechas.append(fechas[-1])
         valores.append(saldo)
         try:
@@ -167,7 +167,7 @@ def fabrica_prod(i):
                 ticket, -- TODO: revisar columna TickeR/TickeT
                 simulado,
                 moneda,
-                enum_code(riesgo) AS riesgo, -- 👈 lo pasa a número
+                enum_code(riesgo) AS riesgo,
                 enum_code(liquidez) AS liquidez,
                 enum_code(plazo) AS plazo,
                 objetivo,
@@ -178,7 +178,3 @@ def fabrica_prod(i):
             FROM productos
         """).fetchall()
         return ProductoFinanciero(*prods[i])
-
-if __name__ == "__main__":
-    p = fabrica_prod(0)
-    print(p.xirr*100)
