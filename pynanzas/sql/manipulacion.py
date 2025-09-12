@@ -1,4 +1,5 @@
 from dataclasses import asdict
+from datetime import datetime
 from pathlib import Path
 import sqlite3
 from typing import Any, Optional
@@ -9,6 +10,7 @@ from pynanzas.constants import DIR_DATA, PROD_ID
 from pynanzas.io.cargar_data import (
     _cargar_tabla_ddb_a_relation,
 )
+from pynanzas.producto import ProductoFinanciero
 from pynanzas.sql.definicion import (
     _crear_tabla_sqlite_movs,
     _crear_tabla_sqlite_prods,
@@ -206,6 +208,45 @@ def fabricar_movs()-> list[EsquemaMovs]:
         print("\n")
 
     return movs
+
+def update_prod_ddb(prod: ProductoFinanciero,
+                    ask_commit: bool= True):
+    query: str = ("""UPDATE productos
+                  SET abierto = ?,
+                      aportes = ?,
+                      intereses = ?,
+                      saldo = ?,
+                      xirr = ?,
+                      fecha_actualizacion = ?
+                  WHERE producto_id = ?
+                  """)
+    valores: tuple = (prod.abierto,
+                     prod.aportes,
+                     prod.intereses,
+                     prod.saldo,
+                     prod.xirr,
+                     datetime.now(),
+                     prod.producto_id)
+    if ask_commit:
+        print(query, valores)
+        commit = input("Confirmar UPDATE? s/n: ") if ask_commit else "s"
+        if commit == "s":
+            try:
+                with duckdb.connect(PATH_DDB) as con:
+                    con.execute(query, valores)
+                    print(con.sql(f"""SELECT * FROM productos WHERE producto_id 
+                    = '{prod.producto_id}'"""))
+            except:
+                raise
+        else:
+            print("Operation cancelled")
+            return
+    else:
+        try:
+            with duckdb.connect(PATH_DDB) as con:
+                con.execute(query, valores)
+        except Exception as e:
+            raise e
 
 if __name__ == '__main__':
     _insertar_mov_ddb(fabricar_movs())
