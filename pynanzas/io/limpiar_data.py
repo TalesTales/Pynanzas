@@ -1,4 +1,6 @@
 
+from functools import lru_cache
+
 import duckdb
 import polars as pl
 
@@ -8,6 +10,7 @@ from pynanzas.io.cargar_data import (
 from pynanzas.sql.diccionario import PATH_DDB, NomTablas, PathDB
 
 
+@lru_cache
 def _tabla_lf(nom_tabla: NomTablas,
               path_db: PathDB = PATH_DDB,
               local_con: duckdb.DuckDBPyConnection | None = None,
