@@ -1,3 +1,14 @@
+## 3.5.0 (2025-09-12)
+
+### Feat
+
+- **sql.manipulacion**: Se implementó función update_prod_ddb
+
+### Fix
+
+- **limpiar_data**: ahora _tabla_lf es un lru
+- **Producto**: Se corrigió el estado de abierto
+
 ## 3.4.1 (2025-09-11)
 
 ### Fix
