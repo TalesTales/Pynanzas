@@ -1,3 +1,9 @@
+## 3.4.1 (2025-09-11)
+
+### Fix
+
+- **ProductoFinanciero**: xirr ahora funciona con Polars
+
 ## 3.4.0 (2025-09-11)
 
 ### Feat
