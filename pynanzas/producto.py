@@ -1,8 +1,10 @@
 from dataclasses import dataclass, field
 from functools import cached_property
 
+import duckdb
 from overrides import override
 import polars as pl
+import pyxirr
 
 from pynanzas.constants import PROD_ID
 from pynanzas.diccionario import (
@@ -14,7 +16,7 @@ from pynanzas.diccionario import (
     Riesgo,
 )
 from pynanzas.io.limpiar_data import _tabla_lf
-from pynanzas.sql.diccionario import NomTablas
+from pynanzas.sql.diccionario import PATH_DDB, NomTablas
 
 
 @dataclass
@@ -34,12 +36,11 @@ class ProductoFinanciero:
     tipo_inversion: str
     abierto: bool = True
     asignacion: float = 0
-    xirr: float | None = field(init = False, default = None)
 
     saldo_inicial: float  = field(init = False, default = 0)
 
     def __post_init__(self) -> None:
-        self.abierto = False if self.saldo <= 0.0 else True
+        self.abierto = False is self.saldo < 0
 
     def __hash__(self):
         return hash(self.producto_id)
@@ -105,68 +106,34 @@ class ProductoFinanciero:
 
     @cached_property
     def saldo(self) -> float:
-        return (self._movs_hist.select(pl.col("saldo_hist"))
-                .last().collect().item())
+        return (self._movs_hist.select(pl.col("valor"))
+                .sum().collect().item())
 
     @cached_property
     def rent_acum (self) -> float:
         return float(self.saldo) - float(self.aportes)
 
-    #
-    # def _calcular_xirr_hist(self) -> None:
-    #     if self.movs_hist.empty:
-    #         self.movs_hist["xirr_historica"] = np.nan
-    #         self.xirr = np.nan
-    #         return
-    #
-    #     xirr_historica: list[float] = []
-    #
-    #     for i in range(len(self.movs_hist)):
-    #         historial_hasta_fecha: pd.DataFrame = self.movs_hist.iloc[
-    #             : i + 1
-    #         ].copy()
-    #         df_flujos: pd.DataFrame = historial_hasta_fecha[
-    #             historial_hasta_fecha["tipo"].isin(MOVS_APORTES)
-    #         ].copy()
-    #         if df_flujos.empty:
-    #             xirr_historica.append(np.nan)
-    #             continue
-    #
-    #         fechas = df_flujos["fecha"].tolist()
-    #
-    #         valores = (-df_flujos["valor"]).tolist()  # Cambiar signo
-    #
-    #         fecha_corte = self.movs_hist.iloc[i]["fecha"]
-    #         valor_final = self.movs_hist.iloc[i]["saldo_historico"]
-    #
-    #         fechas.append(fecha_corte)
-    #         valores.append(valor_final)
-    #
-    #         xirr_actual: float = np.nan
-    #
-    #         try:
-    #             resultado: float | None = pyxirr.xirr(fechas, valores)
-    #             if (
-    #                     resultado is not None
-    #                     and not np.isinf(resultado)
-    #                     and not np.isnan(resultado)
-    #                     and -10 < resultado < 10
-    #             ):
-    #                 xirr_actual = resultado
-    #         except Exception as e:
-    #             print(f"Error: {e} en {self.producto_id} al calcular xirr")
-    #             print(fechas, valores)
-    #             pass
-    #
-    #         xirr_historica.append(xirr_actual)
-    #
-    #     self.movs_hist["xirr_historica"] = xirr_historica
-    #
-    #     xirr_validas: list[float] = [
-    #         x for x in xirr_historica if not np.isnan(x)
-    #     ]
-    #     self.xirr = xirr_validas[-1] if xirr_validas else np.nan
-    #
+    @cached_property
+    def xirr(self, movs_hist = None) -> float | None:
+        if movs_hist is None:
+            movs_hist = self._movs_hist
+        df_flujos: pl.LazyFrame = (movs_hist
+                .filter(pl.col("tipo").is_in([m.value for m in MovsAportes])))
+
+        fechas: list = (df_flujos.select(pl.col("fecha"))
+                             .collect().to_series().to_list())
+        valores: list[float] = (df_flujos.select(-pl.col("valor"))
+                          .collect().to_series().to_list()) # Cambiar signo
+        saldo: float = movs_hist.select(pl.col("valor")).sum().collect().item()
+        fechas.append(fechas[-1])
+        valores.append(saldo)
+        try:
+            return pyxirr.xirr(fechas, valores)
+        except Exception as e:
+            print(f"Error: {e} en {self.producto_id} al calcular xirr")
+            print(fechas, valores)
+            pass
+
     # def xirr_hist(self) -> pd.DataFrame:
     #     """Retorna el historial de XIRR progresiva como un DataFrame.
     #
@@ -190,3 +157,28 @@ class ProductoFinanciero:
     #         return pd.DataFrame()
     #     else:
     #         return pd.DataFrame(self.movs_hist["xirr_historica"])
+
+def fabrica_prod(i):
+    with duckdb.connect(PATH_DDB) as con:
+        prods = con.sql("""
+            SELECT
+                producto_id,
+                nombre,
+                ticket, -- TODO: revisar columna TickeR/TickeT
+                simulado,
+                moneda,
+                enum_code(riesgo) AS riesgo, -- 👈 lo pasa a número
+                enum_code(liquidez) AS liquidez,
+                enum_code(plazo) AS plazo,
+                objetivo,
+                administrador,
+                plataforma,
+                tipo_producto,
+                tipo_inversion
+            FROM productos
+        """).fetchall()
+        return ProductoFinanciero(*prods[i])
+
+if __name__ == "__main__":
+    p = fabrica_prod(0)
+    print(p.xirr*100)
