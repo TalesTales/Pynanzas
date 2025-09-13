@@ -94,15 +94,6 @@ def _cargar_tabla_ddb_a_relation(nom_tabla: NomTabl,
                                  local_con: duckdb.DuckDBPyConnection | None = None,
                                  *,
                                  md: bool = False) -> duckdb.DuckDBPyRelation:
-    global MD_GLOBAL
-    print(f"md= {md}, MD_GLOBAL= {MD_GLOBAL}, ddb= {os.path.exists(path_db)}")
-    if md or MD_GLOBAL or not os.path.exists(path_db):
-        print("sincronizando")
-        _synch_ddb_local_md(path_db)
-        MD_GLOBAL = False
-        print(f"md= {md}, y MD_GLOBAL= {MD_GLOBAL}")
-    else:
-        print("local")
     if local_con:
         return local_con.sql(f"""SELECT * FROM {nom_tabla};""")
     else:
@@ -110,4 +101,4 @@ def _cargar_tabla_ddb_a_relation(nom_tabla: NomTabl,
             return con.sql(f"""SELECT * FROM {nom_tabla};""")
 
 if __name__ == '__main__':
-    _cargar_tabla_ddb_a_lf(NomTablas.MOVS)
+    pass
