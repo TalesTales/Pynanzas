@@ -57,6 +57,7 @@ duckdb = "^1.3.2"
 dotenv = "^0.9.9"
 notebook = "^7.4.5"
 pytz = "^2025.2"
+numpy = "^2.3.3"
 
 
 [tool.poetry.group.dev.dependencies]
