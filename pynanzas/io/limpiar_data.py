@@ -4,15 +4,15 @@ from functools import lru_cache
 import duckdb
 import polars as pl
 
+from pynanzas.duck.dicc import NomTabl, PATH_DDB, PathBD
 from pynanzas.io.cargar_data import (
     _cargar_tabla_ddb_a_lf,
 )
-from pynanzas.sql.diccionario import PATH_DDB, NomTablas, PathDB
 
 
 @lru_cache
-def _tabla_lf(nom_tabla: NomTablas,
-              path_db: PathDB = PATH_DDB,
+def _tabla_lf(nom_tabla: NomTabl,
+              path_db: PathBD = PATH_DDB,
               local_con: duckdb.DuckDBPyConnection | None = None,
               *,
               md: bool = False) -> pl.LazyFrame:

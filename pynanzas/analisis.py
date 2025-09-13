@@ -1,10 +1,7 @@
 
 from typing import Optional
 
-from numpy import empty
-import pandas as pd
-
-from pynanzas.producto import ProductoFinanciero
+from pynanzas.modelos.producto import ProductoFinanciero
 
 
 def dist_riesgo(productos: dict[str, ProductoFinanciero],

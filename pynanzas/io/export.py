@@ -4,17 +4,18 @@ from pathlib import Path
 
 import duckdb
 
-from pynanzas.constants import DIR_BACKUP, MD_TOKEN
-from pynanzas.sql.diccionario import (
+from pynanzas.cons import DIR_BACKUP
+from pynanzas.duck.con import MD_TOKEN
+from pynanzas.duck.dicc import (
     NOM_BD,
     PATH_DDB,
-    NomTablas,
-    PathDB,
+    NomTabl,
+    PathBD,
 )
 
 
-def _exportar_tabla_parquet(nom_tabla: NomTablas,
-                            path_db: PathDB = PATH_DDB,
+def _exportar_tabla_parquet(nom_tabla: NomTabl,
+                            path_db: PathBD = PATH_DDB,
                             dir_backup: Path = DIR_BACKUP) -> None:
 
     fecha: str = datetime.now().strftime("%y%m%d_%H%M%S")
@@ -49,9 +50,9 @@ def _exportar_ddb_parquet(path_db: PathDB = PATH_DDB,
         print(f"❌ Error: {e}")
         return None
 
-def exportar_remoto(md_con: duckdb.DuckDBPyConnection | None = None,
-                    path_db: PathDB = PATH_DDB,
-                    md_token: str = MD_TOKEN) -> None:
+def _exportar_remoto(md_con: duckdb.DuckDBPyConnection | None = None,
+                     path_db: PathBD = PATH_DDB,
+                     md_token: str = MD_TOKEN) -> None:
     fecha = datetime.now().strftime("%y%m%d_%H%M%S")
     query = (
         f"""ATTACH '{path_db}' AS ddb_local;\n"""
@@ -70,4 +71,4 @@ def exportar_remoto(md_con: duckdb.DuckDBPyConnection | None = None,
 
 if __name__ == '__main__':
     _exportar_ddb_parquet()
-    exportar_remoto()
+    _exportar_remoto()
