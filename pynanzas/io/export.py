@@ -34,21 +34,26 @@ def _exportar_tabla_parquet(nom_tabla: NomTabl,
         print(f"❌ Error: {e}")
         return None
 
-def _exportar_ddb_parquet(path_db: PathDB = PATH_DDB,
-                          dir_backup: Path = DIR_BACKUP) -> None:
+def _exportar_ddb_parquet(path_db: PathBD = PATH_DDB,
+                          dir_backup: Path = DIR_BACKUP,
+                          local_con: duckdb.DuckDBPyConnection | None = None) \
+        -> None:
 
     fecha: str = datetime.now().strftime("%y%m%d_%H%M%S")
     dir_data_fecha: Path = dir_backup / fecha
     os.makedirs(dir_data_fecha, exist_ok=True)
+    con_interna = duckdb.connect(path_db) if local_con is None else local_con
     try:
-        with duckdb.connect(path_db) as con:
-            con.sql(f"EXPORT DATABASE '{dir_data_fecha}' (FORMAT parquet);")
-        print(dir_data_fecha)
+        con_interna.sql(f"EXPORT DATABASE '{dir_data_fecha}' (FORMAT "
+                        f"parquet);")
+        print(f"Exportado a: {dir_data_fecha}")
         return None
-
     except Exception as e:
         print(f"❌ Error: {e}")
-        return None
+        raise
+    finally:
+        if local_con is None:
+            con_interna.close()
 
 def _exportar_remoto(md_con: duckdb.DuckDBPyConnection | None = None,
                      path_db: PathBD = PATH_DDB,
