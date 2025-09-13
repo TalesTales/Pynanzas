@@ -1,3 +1,9 @@
+## 3.7.1 (2025-09-13)
+
+### Fix
+
+- **export**: Se corrigió un error en el export a md que impedía subir el archivo correctamente
+
 ## 3.7.0 (2025-09-13)
 
 ### Feat
