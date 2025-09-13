@@ -82,7 +82,7 @@ def _exportar_remoto(md_con: duckdb.DuckDBPyConnection | None = None,
     fecha = datetime.now().strftime("%y%m%d_%H%M%S")
     query = (
         f"""ATTACH '{path_db}' AS ddb_local;\n"""
-        f"""CREATE OR REPLACE DATABASE {NOM_BD}_{fecha} FROM 
+        f"""CREATE DATABASE {NOM_BD}_{fecha} FROM
         ddb_local;\n""" #TODO: Ajustar mejor el acoplamiento de VERSION_DB (
         # Tal vez cambiar NombreBD.DDB para que no contenga
     )
@@ -96,5 +96,5 @@ def _exportar_remoto(md_con: duckdb.DuckDBPyConnection | None = None,
         return
 
 if __name__ == '__main__':
-    _exportar_ddb_parquet()
+
     _exportar_remoto()
