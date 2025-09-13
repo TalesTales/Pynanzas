@@ -1,3 +1,23 @@
+## 3.6.0 (2025-09-13)
+
+### Feat
+
+- **duck.manipulacion**: se implementaron funciones de manipulacion como insertar movimiento, fabricar movimientos y actualizar producto
+- **duck.definicion**: Se implementaron funciones para crear la base de datos desde cero y reconstruirla desde un backup de parquet
+- **duck.con**: Se implementaron desde IAG duckdb.connect(99 locales y remotas con context manager
+- **cargar_data**: Se agregó cargar ddb desde parquet como último recurso
+
+### Fix
+
+- **cargar_data**: se corrigió un código redundante que pedía confirmación de sincronización cuando no era necesario
+- **export**: se agregó la lógica de local_conn en export
+
+### Refactor
+
+- **duck.esquemas**: se organizaron los esquemas de la base de datos
+- **pynanzas**: organizada la librería conforme a una lógica acorde a la realidad de la misma
+- **sqlite**: eliminada toda la lógica de sqlite
+
 ## 3.5.0 (2025-09-12)
 
 ### Feat
