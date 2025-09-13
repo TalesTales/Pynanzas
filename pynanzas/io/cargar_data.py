@@ -8,23 +8,20 @@ from pynanzas.duck.con import MD_GLOBAL, MD_TOKEN
 from pynanzas.duck.dicc import PATH_DDB, NomTabl, PathBD
 from pynanzas.io.export import _exportar_ddb_parquet, _exportar_remoto
 
-def _cargar_parquet_a_lf(#TODO: de pronto usar esto como último recurso para
-        # cargar datos?
-    nom_tabla: NomTablas,
-    dir_data: Path = DIR_DATA
-) -> pl.LazyFrame:
-    try:
-        df_read = pl.scan_parquet(dir_data/(nom_tabla + '.parquet'))
-        return df_read
-    except FileNotFoundError:
-        print("_cargar_parquet_a_lf(): ERROR: No se encontró parquet.")
-        raise
-    except Exception as e:
-        print(f"_cargar_parquet_a_lf(): ERROR: {e}")
-        raise
-
-def _cargar_parquet_a_ddb():
-    raise NotImplementedError
+# def _cargar_parquet_a_lf(#TODO: de pronto usar esto como último recurso para
+#         # cargar datos?
+#     nom_tabla: NomTablas,
+#     dir_data: Path = DIR_DATA
+# ) -> pl.LazyFrame:
+#     try:
+#         df_read = pl.scan_parquet(dir_data/(nom_tabla + '.parquet'))
+#         return df_read
+#     except FileNotFoundError:
+#         print("_cargar_parquet_a_lf(): ERROR: No se encontró parquet.")
+#         raise
+#     except Exception as e:
+#         print(f"_cargar_parquet_a_lf(): ERROR: {e}")
+#         raise
 
 def _synch_ddb_local_md(path_bd: PathBD = PATH_DDB,
                         md_token: str  = MD_TOKEN)->None:
