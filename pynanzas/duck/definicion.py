@@ -6,7 +6,7 @@ import duckdb
 from pynanzas.cons import DIR_BACKUP
 from pynanzas.duck.dicc import MOV_ID, PATH_DDB, PROD_ID, NomTabl, PathBD
 from pynanzas.duck.esquemas import EsquemaMovs, EsquemaProds
-from pynanzas.io.export import _exportar_ddb_parquet
+from pynanzas.io.export import _exportar_ddb_parquet, _exportar_ddb_csv
 
 
 class DDLDDB(StrEnum):
@@ -167,6 +167,7 @@ def _reconstruir_ddb_parquet(esquema_prods: EsquemaProds = ProdsDDL_DDB,
         con_interna.execute(q_insert_movs)
         print(con_interna.sql(f"FROM {nom_tabla_movs}").pl())
         _exportar_ddb_parquet()
+        _exportar_ddb_csv()
     except Exception as e:
         print(f"sql._crear_tabla_ddb_movs: error duckdb {e}")
         raise
