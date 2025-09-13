@@ -2,7 +2,9 @@
 
 ## En Desarrollo
 
-- [ ] PRODUCTO: terminar de pasar todas las funciones a polars. (Por ahora seguir manejando todo en memoria)
+- [*] PRODUCTO: terminar de pasar todas las funciones a polars. (Por ahora seguir manejando todo en memoria)
+    - Ya están todas las funciones escalares. Falta ahora desarrollar las históricas (Saldo y xirr) (mantener en pl(9.
+      Después vemos cómo pasarlas a ddb))
 
 ## Hecho
 
@@ -13,6 +15,7 @@
 - [ ] Insertar clase Movimiento
 - [ ] Desarrollar una función _eq_ dentro de la clase Movimiento
 - [ ] No eliminar Diccionario.csv (buscar forma de generarlo desde py o desde sqlite)
+- [ ] Update o guardar los saldos hist y las xirr hist en ddb
 - [x] Ingresar transacciones desde lo que hay ahora
 - [x] Actualizar la función Insertar_movimiento para usar correctamente ddb
 - [x] BUG: se crean dos atributos mov_hist y movs_hist en Producto.
