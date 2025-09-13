@@ -1,3 +1,9 @@
+## 3.7.0 (2025-09-13)
+
+### Feat
+
+- **export**: agregada la opción de exportar csv
+
 ## 3.6.0 (2025-09-13)
 
 ### Feat
