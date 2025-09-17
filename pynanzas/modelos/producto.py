@@ -45,7 +45,7 @@ class ProductoFinanciero:
         return self.producto_id == other.producto_id
 
     @override
-    def __repr__(self) -> str:  # TODO: Mejorar representación
+    def __repr__(self) -> str:
         return (f"<pynanzas.producto.ProductoFinanciero: {self.producto_id} "
                 f"en {hex(id(self))}>")
 
@@ -76,14 +76,14 @@ class ProductoFinanciero:
 
     @cached_property
     def movs_hist(self)-> pl.DataFrame:
-        return self._movs_hist.collect()
+        return self._movs_hist.collect().with_columns(self.xirr_hist)
 
     @cached_property
     def _movs_hist(self)-> pl.LazyFrame:
-        return _tabla_lf(NomTabl.MOVS).filter(pl.col(PROD_ID) ==
-                                                self.producto_id)
-        self._calcular_metricas_basicas()
-        # self._calcular_xirr_hist()
+        return (_tabla_lf(NomTabl.MOVS)
+                .filter(pl.col(PROD_ID) == self.producto_id)
+                .sort("fecha")
+                .with_columns((pl.col("valor").cum_sum()).alias("saldo_hist")))
 
     @cached_property
     def aportes(self) -> float:
@@ -104,6 +104,12 @@ class ProductoFinanciero:
                 .sum().collect().item())
 
     @cached_property
+    def saldo_hist(self) -> pl.DataFrame:
+        return (self._movs_hist
+                .select(pl.col('fecha'), pl.col('saldo_hist'))
+                .collect())
+
+    @cached_property
     def abierto(self) -> bool:
         if self.saldo <= 0 or None:
             return False
@@ -122,7 +128,7 @@ class ProductoFinanciero:
         fechas: list = (df_flujos.select(pl.col("fecha"))
                              .collect().to_series().to_list())
         valores: list[float] = (df_flujos.select(-pl.col("valor"))
-                          .collect().to_series().to_list()) # Cambiar signo
+                          .collect().to_series().to_list())
         saldo: float = self._movs_hist.select(pl.col("valor")).sum().collect().item()
         fechas.append(fechas[-1])
         valores.append(saldo)
@@ -133,29 +139,40 @@ class ProductoFinanciero:
             print(fechas, valores)
             pass
 
-    # def xirr_hist(self) -> pd.DataFrame:
-    #     """Retorna el historial de XIRR progresiva como un DataFrame.
-    #
-    #     Extrae la columna "xirr_historica" del historial de transacciones y la devuelve
-    #     como un DataFrame independiente. Esto facilita el análisis y visualización de
-    #     la evolución de la rentabilidad del producto a lo largo del tiempo.
-    #
-    #     Returns:
-    #         pd.DataFrame: DataFrame con la columna "xirr_historica" del historial de
-    #             transacciones. Si el historial está vacío o no contiene la columna
-    #             "xirr_historica", devuelve un DataFrame vacío.
-    #
-    #     Note:
-    #         Este método es útil para acceder a los datos de XIRR histórica sin necesidad
-    #         de manipular directamente el historial completo de transacciones.
-    #     """
-    #     if (
-    #             self.movs_hist.empty
-    #             or "xirr_historica" not in self.movs_hist.columns
-    #     ):
-    #         return pd.DataFrame()
-    #     else:
-    #         return pd.DataFrame(self.movs_hist["xirr_historica"])
+    @cached_property
+    def xirr_hist(self) -> pl.Series:
+        movs_hist = self._movs_hist.collect()
+        valores: list[float] = []
+        xirr_hist: list[float|None] = []
+        fechas_xirr = []
+        valores_xirr = []
+        for mov in movs_hist.rows(named=True):
+            valores.append(mov["valor"])
+            saldo = sum(valores)
+            if mov['tipo'] in [m.value for m in MovsAportes]:
+                try:
+                    fechas_xirr.append(mov["fecha"])
+                    valores_xirr.append(mov["valor"] * -1)
+                    
+                    fechas_xirr.append(mov["fecha"])
+                    valores_xirr.append(saldo)
+                    xirr_hist.append(pyxirr.xirr(fechas_xirr, valores_xirr))
+                    fechas_xirr.pop(-1)
+                    valores_xirr.pop(-1)
+                except Exception as e:
+                    print(f"Error: {e} en {self.producto_id} al calcular xirr")
+            else:
+                if len(xirr_hist) > 0:
+                    xirr_hist.append(xirr_hist[-1])
+                else:
+                    xirr_hist.append(None)
+        return pl.Series(xirr_hist).rename("xirr_hist")
+
+    def _reset_cache(self) -> None:
+        for attr in list(self.__dict__):
+            if isinstance(getattr(type(self), attr, None), cached_property):
+                self.__dict__.pop(attr, None)
+
 
 def fabrica_prod(i,
                  nom_tabl_prods: NomTabl = NomTabl.PRODS,
