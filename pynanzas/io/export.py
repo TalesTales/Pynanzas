@@ -9,12 +9,12 @@ from pynanzas.duck.con import MD_TOKEN
 from pynanzas.duck.dicc import (
     NOM_BD,
     PATH_DDB,
-    NomTabl,
+    NomTabla,
     PathBD,
 )
 
 
-def _exportar_tabla_parquet(nom_tabla: NomTabl,
+def _exportar_tabla_parquet(nom_tabla: NomTabla,
                             path_db: PathBD = PATH_DDB,
                             dir_backup: Path = DIR_BACKUP) -> None:
 

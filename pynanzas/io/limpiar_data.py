@@ -4,14 +4,14 @@ from functools import lru_cache
 import duckdb
 import polars as pl
 
-from pynanzas.duck.dicc import NomTabl, PATH_DDB, PathBD
+from pynanzas.duck.dicc import PATH_DDB, NomTabla, PathBD
 from pynanzas.io.cargar_data import (
     _cargar_tabla_ddb_a_lf,
 )
 
 
 @lru_cache
-def _tabla_lf(nom_tabla: NomTabl,
+def _tabla_lf(nom_tabla: NomTabla,
               path_db: PathBD = PATH_DDB,
               local_con: duckdb.DuckDBPyConnection | None = None,
               *,

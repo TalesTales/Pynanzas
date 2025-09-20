@@ -8,7 +8,7 @@ NOM_BD = f"pynanzas{VERSION_DB}"
 PROD_ID: str = "producto_id"
 MOV_ID: str = "mov_id"
 
-class NomTabl(StrEnum):
+class NomTabla(StrEnum):
     PRODS = "prods"
     MOVS = "movs"
 

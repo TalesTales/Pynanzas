@@ -5,7 +5,7 @@ import duckdb
 import polars as pl
 
 from pynanzas.duck.con import MD_GLOBAL, MD_TOKEN
-from pynanzas.duck.dicc import PATH_DDB, NomTabl, PathBD
+from pynanzas.duck.dicc import PATH_DDB, NomTabla, PathBD
 from pynanzas.io.export import _exportar_ddb_parquet, _exportar_remoto
 
 # def _cargar_parquet_a_lf(#TODO: de pronto usar esto como último recurso para
@@ -69,7 +69,7 @@ def _synch_ddb_local_md(path_bd: PathBD = PATH_DDB,
     except Exception as e:
         print(f"exportar_remoto(): ERROR: {e}")
 
-def _cargar_tabla_ddb_a_lf(nom_tabla: NomTabl,
+def _cargar_tabla_ddb_a_lf(nom_tabla: NomTabla,
                            path_bd: PathBD = PATH_DDB,
                            local_con: duckdb.DuckDBPyConnection | None = None,
                            *,
@@ -89,7 +89,7 @@ def _cargar_tabla_ddb_a_lf(nom_tabla: NomTabl,
         with duckdb.connect(path_bd) as con:
             return con.execute(f"""SELECT * FROM {nom_tabla};""").pl().lazy()
 
-def _cargar_tabla_ddb_a_relation(nom_tabla: NomTabl,
+def _cargar_tabla_ddb_a_relation(nom_tabla: NomTabla,
                                  path_db: PathBD = PATH_DDB,
                                  local_con: duckdb.DuckDBPyConnection | None = None,
                                  *,

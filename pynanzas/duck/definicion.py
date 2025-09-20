@@ -4,9 +4,9 @@ from pathlib import Path
 import duckdb
 
 from pynanzas.cons import DIR_BACKUP
-from pynanzas.duck.dicc import MOV_ID, PATH_DDB, PROD_ID, NomTabl, PathBD
+from pynanzas.duck.dicc import MOV_ID, PATH_DDB, PROD_ID, NomTabla, PathBD
 from pynanzas.duck.esquemas import EsquemaMovs, EsquemaProds
-from pynanzas.io.export import _exportar_ddb_parquet, _exportar_ddb_csv
+from pynanzas.io.export import _exportar_ddb_csv, _exportar_ddb_parquet
 
 
 class DDLDDB(StrEnum):
@@ -50,7 +50,7 @@ ProdsDDL_DDB = EsquemaProds(
     fecha_actualizacion = DDLDDB.DATETIME_ACTUAL
 )
 def _crear_tabl_prods_ddb(esquema_prods: EsquemaProds = ProdsDDL_DDB,
-                          nom_tabla_prods: NomTabl = NomTabl.PRODS,
+                          nom_tabla_prods: NomTabla = NomTabla.PRODS,
                           path_bd: PathBD = PATH_DDB,
                           local_con: duckdb.DuckDBPyConnection | None = None) \
         -> None:
@@ -88,8 +88,8 @@ MovsDDL_DDB: EsquemaMovs =  EsquemaMovs(
 )
 
 def _crear_tabla_ddb_movs(esquema_movs: EsquemaMovs = MovsDDL_DDB,
-                          nom_tabla_movs: NomTabl = NomTabl.MOVS,
-                          nom_tabla_prods: NomTabl = NomTabl.PRODS,
+                          nom_tabla_movs: NomTabla = NomTabla.MOVS,
+                          nom_tabla_prods: NomTabla = NomTabla.PRODS,
                           prod_id: str = PROD_ID,
                           mov_id: str = MOV_ID,
                           path_bd: PathBD = PATH_DDB,
@@ -123,14 +123,14 @@ def _crear_tabla_ddb_movs(esquema_movs: EsquemaMovs = MovsDDL_DDB,
             con_interna.close()
 
 def _reconstruir_ddb_parquet(esquema_prods: EsquemaProds = ProdsDDL_DDB,
-                            esquema_movs: EsquemaMovs = MovsDDL_DDB,
-                            nom_tabla_movs: NomTabl = NomTabl.MOVS,
-                            nom_tabla_prods: NomTabl = NomTabl.PRODS,
-                            prod_id: str = PROD_ID,
-                            mov_id: str = MOV_ID,
-                            path_bd: PathBD = PATH_DDB,
-                            path_parquet: Path | None = None,
-                            local_con: duckdb.DuckDBPyConnection | None
+                             esquema_movs: EsquemaMovs = MovsDDL_DDB,
+                             nom_tabla_movs: NomTabla = NomTabla.MOVS,
+                             nom_tabla_prods: NomTabla = NomTabla.PRODS,
+                             prod_id: str = PROD_ID,
+                             mov_id: str = MOV_ID,
+                             path_bd: PathBD = PATH_DDB,
+                             path_parquet: Path | None = None,
+                             local_con: duckdb.DuckDBPyConnection | None
                             = None):
 
     col_prods = list(esquema_prods.keys())
