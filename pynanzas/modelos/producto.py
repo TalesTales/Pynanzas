@@ -14,7 +14,7 @@ from pynanzas.dicc import (
     Plazo,
     Riesgo,
 )
-from pynanzas.duck.dicc import PATH_DDB, PROD_ID, NomTabl, PathBD
+from pynanzas.duck.dicc import PATH_DDB, PROD_ID, NomTabla, PathBD
 from pynanzas.io.limpiar_data import _tabla_lf
 
 
@@ -34,7 +34,11 @@ class ProductoFinanciero:
     tipo_producto: str
     tipo_inversion: str
     asignacion: float = 0
+    saldo: float = field(init=False)
     saldo_inicial: float  = field(init = False, default = 0)
+
+    def __post_init__(self):
+        self.saldo = self._saldo()
 
     def __hash__(self):
         return hash(self.producto_id)
@@ -80,7 +84,7 @@ class ProductoFinanciero:
 
     @cached_property
     def _movs_hist(self)-> pl.LazyFrame:
-        return (_tabla_lf(NomTabl.MOVS)
+        return (_tabla_lf(NomTabla.MOVS)
                 .filter(pl.col(PROD_ID) == self.producto_id)
                 .sort("fecha")
                 .with_columns((pl.col("valor").cum_sum()).alias("saldo_hist")))
@@ -98,8 +102,7 @@ class ProductoFinanciero:
                 .filter(pl.col("tipo").is_in([m.value for m in MovsIntereses]))
                 .select(pl.col("valor").sum()).collect().item())
 
-    @cached_property
-    def saldo(self) -> float:
+    def _saldo(self) -> float:
         return (self._movs_hist.select(pl.col("valor"))
                 .sum().collect().item())
 
@@ -175,7 +178,7 @@ class ProductoFinanciero:
 
 
 def fabrica_prod(i,
-                 nom_tabl_prods: NomTabl = NomTabl.PRODS,
+                 nom_tabla_prods: NomTabla = NomTabla.PRODS,
                  path_bd: PathBD = PATH_DDB):
     with duckdb.connect(path_bd) as con:
         prods = con.sql(f"""
@@ -193,6 +196,6 @@ def fabrica_prod(i,
                 plataforma,
                 tipo_producto,
                 tipo_inversion
-            FROM {nom_tabl_prods}
+            FROM {nom_tabla_prods}
         """).fetchall()
         return ProductoFinanciero(*prods[i])
