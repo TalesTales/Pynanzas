@@ -86,27 +86,51 @@ class Portafolio:
 
         return prods_lz
 
-    def xirr_historicas(self):
-        registros = []
-        for p in self.prods.values():
-            for fecha, xirr in p.xirr_hist:
-                registros.append(
-                    {
-                        "fecha": fecha,
-                        "producto_id": p.producto_id,
-                        "xirr": xirr,
-                    }
-                )
+    def total(self,
+              *,
+              riesgo: list[Riesgo] | None = None,
+              plazo: list[Plazo] | None = None,
+              liquidez: list[Liquidez] | None = None,
+              simulado: bool | None = None
+              ) -> float:
+        prods = self._filtro(riesgo, plazo, liquidez, simulado)
+        return prods.select(pl.col("saldo")).sum().collect().item()
 
-        df = pl.DataFrame(registros)
+    def intereses(self,
+              *,
+              riesgo: list[Riesgo] | None = None,
+              plazo: list[Plazo] | None = None,
+              liquidez: list[Liquidez] | None = None,
+              simulado: bool | None = None
+              ) -> float:
+        prods = self._filtro(riesgo, plazo, liquidez, simulado)
+        return prods.select(pl.col("intereses")).sum().collect().item()
 
-        df = df.pivot(
-            values="xirr", on="fecha", columns="producto_id"
-        ).sort("fecha")
+    def pesos(self,
+              *,
+              riesgo: list[Riesgo] | None = None,
+              plazo: list[Plazo] | None = None,
+              liquidez: list[Liquidez] | None = None,
+              simulado: bool | None = None
+              ) -> pl.DataFrame:
+        prods = self._filtro(riesgo, plazo, liquidez, simulado)
+        total = self.total(riesgo = riesgo, plazo = plazo, liquidez = liquidez,
+                           simulado = simulado)
+        return (prods.with_columns(((pl.col("saldo").cast(Decimal) / total)).alias(
+            "peso"))
+                .select(pl.col(PROD_ID), pl.col("peso"))
+                .collect())
 
-        df = df.select(pl.all().forward_fill())
-
-        return df
+    def xirr(self,
+              *,
+              riesgo: list[Riesgo] | None = None,
+              plazo: list[Plazo] | None = None,
+              liquidez: list[Liquidez] | None = None,
+              simulado: bool | None = None
+              ) -> pl.DataFrame:
+        prods = self._filtro(riesgo, plazo, liquidez, simulado)
+        return (prods.select(pl.col("saldo"), pl.col("xirr"))
+                .collect())
 
     #     # Extraer la xirr desde Producto Financierto
     #     # Apendizarla en un df que sea fecha y add column producto id
