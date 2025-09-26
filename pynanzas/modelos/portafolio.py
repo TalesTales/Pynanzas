@@ -1,17 +1,18 @@
 
-from functools import cached_property
+
+from decimal import Decimal
 
 import duckdb
 import polars as pl
 
 from pynanzas.dicc import Liquidez, Plazo, Riesgo
-from pynanzas.duck.dicc import PATH_DDB, NomTabla, PathBD
+from pynanzas.duck.dicc import PATH_DDB, PROD_ID, NomTabla, PathBD
 from pynanzas.modelos.producto import ProductoFinanciero
 
 
 def _crear_portafolio(nom_tabla_prods: NomTabla = NomTabla.PRODS,
                       path_bd: PathBD = PATH_DDB
-                      ):
+                      ) -> dict[str, ProductoFinanciero]:
     with duckdb.connect(path_bd) as con:
         prods = con.sql(f"""
             SELECT
@@ -32,13 +33,12 @@ def _crear_portafolio(nom_tabla_prods: NomTabla = NomTabla.PRODS,
         """).fetchall()
     return {str(prod[0]) : ProductoFinanciero(*prod) for prod in prods}
 
-
 class Portafolio:
     def __init__(self) -> None:
         self.prods: dict[str,ProductoFinanciero] = _crear_portafolio()
         for producto_id, prod in self.prods.items():
             setattr(self, producto_id, prod)
-        self.prods_pl = pl.DataFrame(prod for prod in self.prods.values())
+        self.prods_lz = pl.LazyFrame(prod for prod in self.prods.values())
 
     def __getitem__(self, key: str) -> ProductoFinanciero:
         return self.prods[key]
