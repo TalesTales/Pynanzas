@@ -60,40 +60,31 @@ class Portafolio:
             f"${self.total:,.2f}"
         )  # TODO: asegurar que total se calcule cop
 
-    @cached_property
-    def total(self) -> float:
-        return sum(prod.saldo for prod in self.prods.values())
-
-    @cached_property
-    def intereses(self) -> float:
-        return sum(prod.intereses for prod in self.prods.values())
-
-    def pesos(self, *,
-              riesgo: Riesgo | None = None,
-              plazo: Plazo | None = None,
-              liquidez: Liquidez | None = None,
-              simulado: bool | None = None) -> pl.DataFrame:
-        df = self.prods_pl
+    def _filtro(
+        self,
+        riesgo: list[Riesgo] | None = None,
+        plazo: list[Plazo] | None = None,
+        liquidez: list[Liquidez] | None = None,
+        simulado: bool | None = None,
+    ) -> pl.LazyFrame:
+        prods_lz = self.prods_lz
 
         if riesgo is not None:
-            df = df.filter(pl.col("riesgo") == riesgo.value)
+            valores_riesgo = [r.value for r in riesgo]
+            prods_lz = prods_lz.filter(pl.col("riesgo").is_in(valores_riesgo))
+
         if plazo is not None:
-            df = df.filter(pl.col("plazo") == plazo.value)
+            valores_plazo = [p.value for p in plazo]
+            prods_lz = prods_lz.filter(pl.col("plazo").is_in(valores_plazo))
+
         if liquidez is not None:
-            df = df.filter(pl.col("liquidez") == liquidez.value)
+            valores_liquidez = [l.value for l in liquidez]
+            prods_lz = prods_lz.filter(pl.col("liquidez").is_in(valores_liquidez))
+
         if simulado is not None:
-            df = df.filter(pl.col("simulado") == simulado)
+            prods_lz = prods_lz.filter(pl.col("simulado") == simulado)
 
-        total = df.select(pl.col("saldo").sum()).item()
-
-        prod_filtrados = set(df.select("producto_id").to_series().to_list())
-
-        return pl.DataFrame([
-            {"Prod": p.producto_id,
-             "Peso": int(p.saldo) / int(total),
-             "Saldo": int(p.saldo)}
-            for p in self.prods.values()
-            if p.producto_id in prod_filtrados])
+        return prods_lz
 
     def xirr_historicas(self):
         registros = []
