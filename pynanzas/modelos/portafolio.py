@@ -214,4 +214,8 @@ class Portafolio:
 
 if __name__ == '__main__':
     port = Portafolio()
-    print(port.xirr(simulado=False))
+    print(port.xirr(abierto=None))
+    print(port.xirr_hist(abierto=None))
+    print(port.saldos(abierto=None))
+    print(port.saldo_hist(abierto=None))
+    print(port.pesos(abierto=None))

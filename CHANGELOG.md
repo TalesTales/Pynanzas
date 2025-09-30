@@ -1,3 +1,13 @@
+## 3.9.0 (2025-09-30)
+
+### Feat
+
+- **manipulacion**: Se agregó la función actualizar_prods
+- **manipulación**: Cuando se inserta un movimiento a DuckDB se actualiza el producto correspondiente
+- **portafolio**: Se agregó el método saldo_hist a la clase
+- **portafolio**: Se agregó la función saldos
+- **portafolio**: Se agregó el parámetro 'abierto' al método _filtro
+
 ## 3.8.0 (2025-09-29)
 
 ### Feat
