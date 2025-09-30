@@ -2,18 +2,19 @@
 
 ## En Desarrollo
 
-- [ ] PORTAFOLIO: reescribir la clase
+- [ ] Cada vez que se inserta un movimiento en duckdb se debe actualizar todo el duckdb.
 
 ## Hecho
 
 - [ ] PRODUCTOS: Agregar holdings
-- [ ] PORTAFOLIO: Poder filtrar todas las funciones por Plataforma (!), Riesgo, Plazo, etc.
+- [x] PORTAFOLIO: Poder filtrar todas las funciones por Plataforma (!), Riesgo, Plazo, etc.
 - [ ] PORTAFOLIO: Balancear debe aceptar valores negativos (retiros)
 - [ ] Agregar DocString a todo
 - [ ] Insertar clase Movimiento
 - [ ] Desarrollar una función _eq_ dentro de la clase Movimiento
 - [ ] No eliminar Diccionario.csv (buscar forma de generarlo desde py o desde sqlite)
 - [ ] Update o guardar los saldos hist y las xirr hist en ddb
+- [x] PORTAFOLIO: reescribir la clase
 - [*] PRODUCTO: terminar de pasar todas las funciones a polars. (Por ahora seguir manejando todo en memoria)
     - Ya están todas las funciones escalares. Falta ahora desarrollar las históricas (Saldo y xirr) (mantener en pl(9.
       Después vemos cómo pasarlas a ddb))
