@@ -80,7 +80,8 @@ class ProductoFinanciero:
 
     @cached_property
     def movs_hist(self)-> pl.DataFrame:
-        return self._movs_hist.collect().with_columns(self.xirr_hist)
+        return self._movs_hist.collect().with_columns(self.xirr_hist.select(
+            pl.col("xirr_hist")))
 
     @cached_property
     def _movs_hist(self)-> pl.LazyFrame:
@@ -143,7 +144,7 @@ class ProductoFinanciero:
             pass
 
     @cached_property
-    def xirr_hist(self) -> pl.Series:
+    def xirr_hist(self) -> pl.DataFrame:
         movs_hist = self._movs_hist.collect()
         valores: list[float] = []
         xirr_hist: list[float|None] = []
@@ -169,7 +170,10 @@ class ProductoFinanciero:
                     xirr_hist.append(xirr_hist[-1])
                 else:
                     xirr_hist.append(None)
-        return pl.Series(xirr_hist).rename("xirr_hist")
+        fechas = self._movs_hist.select(pl.col("fecha")).collect().to_series().to_list()
+        return pl.DataFrame([fechas,xirr_hist]).rename({"column_0":"fecha",
+                                                        "column_1":"xirr_hist"}
+                                                       )
 
     def _reset_cache(self) -> None:
         for attr in list(self.__dict__):
