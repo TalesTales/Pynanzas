@@ -169,6 +169,28 @@ class Portafolio:
         xirr_hist = pl.concat(lista_xirr, how='align')
         return xirr_hist
 
+    def saldos(
+        self,
+        *,
+        abierto: bool | None  = True,
+        riesgo: list[Riesgo] | None = None,
+        plazo: list[Plazo] | None = None,
+        liquidez: list[Liquidez] | None = None,
+        simulado: bool | None = False,
+    ) -> pl.DataFrame:
+        prods = set(
+            self._filtro(abierto, riesgo, plazo, liquidez, simulado)
+            .select(pl.col(PROD_ID))
+            .collect()
+            .to_series()
+            .to_list()
+        )
+
+        return pl.DataFrame(
+            {PROD_ID: p.producto_id, "saldo": p.saldo}
+            for p in self.prods.values()
+            if p.producto_id in prods
+        )
 
     #     # Extraer la xirr desde Producto Financierto
     #     # Apendizarla en un df que sea fecha y add column producto id
