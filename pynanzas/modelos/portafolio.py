@@ -286,5 +286,4 @@ class Portafolio:
 
 if __name__ == '__main__':
     port = Portafolio()
-    print(port)
-    print(port.pesos(riesgo = Riesgo.Bajo, simulado=False))
+    print(port.xirr(simulado=False))

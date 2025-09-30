@@ -203,3 +203,7 @@ def fabrica_prod(i,
             FROM {nom_tabla_prods}
         """).fetchall()
         return ProductoFinanciero(*prods[i])
+
+if __name__ == '__main__':
+    a = fabrica_prod(0)
+    print(a.movs_hist)

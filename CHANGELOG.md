@@ -1,3 +1,23 @@
+## 3.8.0 (2025-09-29)
+
+### Feat
+
+- **portafolio**: se agregó xirr_hist
+- **portafolio**: agregadas funciones básicas al portafolio
+- **portafolio**: nuevo método para filtrar productos
+- **Portafolio**: Actualizadas funciones correspondientes a la actualización de ProductoFinanciero
+- **producto**: Se agregó Saldo Histórico y XIRR histórica a la clase ProductoFinanciero
+
+### Fix
+
+- **producto**: xirr devuelve un DataFrame y no una serie
+- **producto**: todos los filtros se pasaron a simulado = False
+- **pynanzas**: Se cambió el nombre NomTabl por NomTablas
+
+### Refactor
+
+- **portafolio**: producs_pl ahora es un LazyFrame
+
 ## 3.7.1 (2025-09-13)
 
 ### Fix
