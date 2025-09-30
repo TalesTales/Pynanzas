@@ -91,7 +91,7 @@ class Portafolio:
               riesgo: list[Riesgo] | None = None,
               plazo: list[Plazo] | None = None,
               liquidez: list[Liquidez] | None = None,
-              simulado: bool | None = None
+              simulado: bool | None = False
               ) -> float:
         prods = self._filtro(riesgo, plazo, liquidez, simulado)
         return prods.select(pl.col("saldo")).sum().collect().item()
@@ -101,7 +101,7 @@ class Portafolio:
               riesgo: list[Riesgo] | None = None,
               plazo: list[Plazo] | None = None,
               liquidez: list[Liquidez] | None = None,
-              simulado: bool | None = None
+              simulado: bool | None = False
               ) -> float:
         prods = self._filtro(riesgo, plazo, liquidez, simulado)
         return prods.select(pl.col("intereses")).sum().collect().item()
@@ -111,7 +111,7 @@ class Portafolio:
               riesgo: list[Riesgo] | None = None,
               plazo: list[Plazo] | None = None,
               liquidez: list[Liquidez] | None = None,
-              simulado: bool | None = None
+              simulado: bool | None = False
               ) -> pl.DataFrame:
         prods = self._filtro(riesgo, plazo, liquidez, simulado)
         total = self.total(riesgo = riesgo, plazo = plazo, liquidez = liquidez,
@@ -126,7 +126,7 @@ class Portafolio:
               riesgo: list[Riesgo] | None = None,
               plazo: list[Plazo] | None = None,
               liquidez: list[Liquidez] | None = None,
-              simulado: bool | None = None
+              simulado: bool | None = False
               ) -> pl.DataFrame:
         prods = self._filtro(riesgo, plazo, liquidez, simulado)
         return (prods.select(pl.col("saldo"), pl.col("xirr"))
