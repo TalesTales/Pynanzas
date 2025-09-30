@@ -164,3 +164,15 @@ def _actualizar_prod(prod: ProductoFinanciero,
             print(f"Actualizado {prod.producto_id}")
         except Exception as e:
             raise e
+
+def actualizar_prods(prod_id: str = PROD_ID,
+                     nom_tabla_prods: NomTabla = NomTabla.PRODS,
+                     path_bd: PathBD = PATH_DDB)->None:
+    with duckdb.connect(path_bd) as con:
+        rango = len(con.execute(f"select {prod_id} "
+                            f"from {nom_tabla_prods}").fetchall())
+        con.execute("BEGIN TRANSACTION;\n")
+        for p in range(rango-1):
+            prod = fabrica_prod(p,nom_tabla_prods,path_bd)
+            _actualizar_prod(prod, con, False, prod_id, nom_tabla_prods)
+        con.execute("COMMIT;")
