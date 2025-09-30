@@ -13,12 +13,13 @@ from pynanzas.duck.esquemas import EsquemaMovs
 from pynanzas.io.cargar_data import (
     _cargar_tabla_ddb_a_relation,
 )
-from pynanzas.modelos.producto import ProductoFinanciero
+from pynanzas.modelos.producto import ProductoFinanciero, fabrica_prod
 
 
 def _insertar_mov_ddb(
         movimientos: list[EsquemaMovs],
         nom_tabla_movs: NomTabla = NomTabla.MOVS,
+        nom_tabla_prods: NomTabla = NomTabla.PRODS,
         path_db: PathBD = PATH_DDB) -> None:
     print("Insertar movimientos\n")
     try:
@@ -36,9 +37,12 @@ def _insertar_mov_ddb(
 
                 query = (f"INSERT INTO {nom_tabla_movs}\n"
                           f"({columnas}) VALUES ({placeholders});\n")
-                print(query)
-                print(valores)
+                # print(query)
+                # print(valores)
                 local_con.execute(query, valores)
+            for m in movimientos:
+                print(m)
+
             commit = input('commit? s/n: ')
             if commit == 's':
                 local_con.execute("COMMIT;")
@@ -49,8 +53,12 @@ def _insertar_mov_ddb(
                     prods.append(asdict(mov)[PROD_ID])
                 prods_unique = set(prods)
                 local_con.execute(inicio_transaccion)
+                prods = local_con.execute("select producto_id from prods;").fetchall()
+                lista_prods = [row[0] for row in prods]
                 for prod in prods_unique:
-                    _update_prod_ddb(prod,
+                    i = lista_prods.index(prod)
+                    p = fabrica_prod(i,nom_tabla_prods,path_db)
+                    _actualizar_prod(p,
                                      ask_commit=False,
                                      local_con=local_con)
                 local_con.execute("COMMIT;")
@@ -65,14 +73,28 @@ def _insertar_mov_ddb(
 
 
 def fabricar_movs(nom_tabla_movs: NomTabla= NomTabla.MOVS,
+                  nom_tabla_prods: NomTabla = NomTabla.PRODS,
                   path_db: PathBD = PATH_DDB) -> None:
     insertar: bool = True
     movs: list[EsquemaMovs] = []
+    lista_prods: list[str] = []
+    with duckdb.connect(path_db) as con:
+        prods =  con.execute("select producto_id from prods;").fetchall()
+        lista_prods = [row[0] for row in prods]
     while insertar:
+        print(lista_prods)
         producto_id: str = input("producto_id: ")
+        if producto_id.strip() not in lista_prods:
+            print("Producto no encontrado")
+            continue
         fecha: str = input("fecha: ")
         tipo: str = input("tipo: ")
-        valor: float = float(input("valor: "))
+        valor_str: str | float = input("valor: ")
+        try:
+            valor = float(valor_str)
+        except Exception:
+            print("Error en el valor")
+            continue
         crear_mov: str = (f"¿Insertar: {producto_id}, {fecha}, {tipo},"
                           f" {valor}? s/n: ")
         append: str = input(crear_mov)
@@ -80,8 +102,6 @@ def fabricar_movs(nom_tabla_movs: NomTabla= NomTabla.MOVS,
             mov: EsquemaMovs = EsquemaMovs(producto_id, fecha, tipo, valor)
             movs.append(mov)
             print(movs)
-        else:
-            pass
 
         insertar_otro: str = input("¿Insertar otro movimiento? s/n: ")
         if insertar_otro == "s":
@@ -89,16 +109,15 @@ def fabricar_movs(nom_tabla_movs: NomTabla= NomTabla.MOVS,
         else:
             insertar = False
         print("========")
-        print("\n")
-    _insertar_mov_ddb(movs, nom_tabla_movs, path_db)
+    _insertar_mov_ddb(movs, nom_tabla_movs,nom_tabla_prods, path_db)
 
 
-def _update_prod_ddb(prod: ProductoFinanciero,
+def _actualizar_prod(prod: ProductoFinanciero,
                      local_con: duckdb.DuckDBPyConnection,
                      ask_commit: bool= True,
                      prod_id: str = PROD_ID,
                      nom_tabl_prod: NomTabla = NomTabla.PRODS,
-                     ):
+                     ) -> None:
     query: str = (f"""UPDATE {nom_tabl_prod}
                   SET abierto = ?,
                       aportes = ?,
