@@ -128,9 +128,29 @@ class Portafolio:
               liquidez: list[Liquidez] | None = None,
               simulado: bool | None = False
               ) -> pl.DataFrame:
-        prods = self._filtro(riesgo, plazo, liquidez, simulado)
-        return (prods.select(pl.col("saldo"), pl.col("xirr"))
-                .collect())
+        prods = set(self._filtro(riesgo, plazo, liquidez, simulado).select(
+            pl.col(PROD_ID)).collect().to_series().to_list())
+        
+        return pl.DataFrame({PROD_ID : p.producto_id, 'xirr' :p.xirr} for p in
+                             self.prods.values()
+                             if p.producto_id in prods)
+
+    def xirr_hist(self, *,
+                  riesgo: list[Riesgo] | None = None,
+                  plazo: list[Plazo] | None = None,
+                  liquidez: list[Liquidez] | None = None,
+                  simulado: bool | None = False
+                  ) -> pl.DataFrame:
+        prods = set(self._filtro(riesgo, plazo, liquidez, simulado).select(
+            pl.col(PROD_ID)).collect().to_series().to_list())
+
+        lista_xirr = [p.xirr_hist.rename({'xirr_hist':p.producto_id})
+                      for p in self.prods.values()
+                      if p.producto_id in prods]
+
+        xirr_hist = pl.concat(lista_xirr, how='align')
+        return xirr_hist
+
 
     #     # Extraer la xirr desde Producto Financierto
     #     # Apendizarla en un df que sea fecha y add column producto id
