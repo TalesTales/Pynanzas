@@ -62,12 +62,19 @@ class Portafolio:
 
     def _filtro(
         self,
+        abierto: bool | None  = True,
         riesgo: list[Riesgo] | None = None,
         plazo: list[Plazo] | None = None,
         liquidez: list[Liquidez] | None = None,
         simulado: bool | None = None,
     ) -> pl.LazyFrame:
         prods_lz = self.prods_lz
+
+        if abierto is not None:
+            prods_lz = (prods_lz
+                        .filter(pl.col(PROD_ID).is_in([p.producto_id for p
+                                                    in self.prods.values()
+                                                    if p.abierto == abierto])))
 
         if riesgo is not None:
             valores_riesgo = [r.value for r in riesgo]
@@ -88,61 +95,72 @@ class Portafolio:
 
     def total(self,
               *,
+              abierto: bool | None  = True,
               riesgo: list[Riesgo] | None = None,
               plazo: list[Plazo] | None = None,
               liquidez: list[Liquidez] | None = None,
               simulado: bool | None = False
               ) -> float:
-        prods = self._filtro(riesgo, plazo, liquidez, simulado)
+        prods = self._filtro(abierto, riesgo, plazo, liquidez, simulado)
         return prods.select(pl.col("saldo")).sum().collect().item()
 
     def intereses(self,
               *,
+              abierto: bool | None = True,
               riesgo: list[Riesgo] | None = None,
               plazo: list[Plazo] | None = None,
               liquidez: list[Liquidez] | None = None,
               simulado: bool | None = False
               ) -> float:
-        prods = self._filtro(riesgo, plazo, liquidez, simulado)
+        prods = self._filtro(abierto, riesgo, plazo, liquidez, simulado)
         return prods.select(pl.col("intereses")).sum().collect().item()
 
     def pesos(self,
               *,
+              abierto: bool | None = True,
               riesgo: list[Riesgo] | None = None,
               plazo: list[Plazo] | None = None,
               liquidez: list[Liquidez] | None = None,
               simulado: bool | None = False
               ) -> pl.DataFrame:
-        prods = self._filtro(riesgo, plazo, liquidez, simulado)
-        total = self.total(riesgo = riesgo, plazo = plazo, liquidez = liquidez,
+        prods = self._filtro(abierto, riesgo, plazo, liquidez, simulado)
+        total = self.total(abierto = abierto, riesgo = riesgo,
+                           plazo = plazo, liquidez = liquidez,
                            simulado = simulado)
-        return (prods.with_columns(((pl.col("saldo").cast(Decimal) / total)).alias(
-            "peso"))
+        return (prods.with_columns(((pl.col("saldo").cast(Decimal)/total))
+                                   .alias("peso"))
                 .select(pl.col(PROD_ID), pl.col("peso"))
                 .collect())
 
     def xirr(self,
               *,
+              abierto: bool | None  = True,
               riesgo: list[Riesgo] | None = None,
               plazo: list[Plazo] | None = None,
               liquidez: list[Liquidez] | None = None,
               simulado: bool | None = False
               ) -> pl.DataFrame:
-        prods = set(self._filtro(riesgo, plazo, liquidez, simulado).select(
-            pl.col(PROD_ID)).collect().to_series().to_list())
+        prods = set(self._filtro(abierto, riesgo, plazo, liquidez,
+                              simulado)
+                    .select(pl.col(PROD_ID))
+                    .collect().to_series().to_list())
         
         return pl.DataFrame({PROD_ID : p.producto_id, 'xirr' :p.xirr} for p in
                              self.prods.values()
                              if p.producto_id in prods)
 
-    def xirr_hist(self, *,
+    def xirr_hist(self,
+                  *,
+                  abierto: bool | None  = True,
                   riesgo: list[Riesgo] | None = None,
                   plazo: list[Plazo] | None = None,
                   liquidez: list[Liquidez] | None = None,
-                  simulado: bool | None = False
-                  ) -> pl.DataFrame:
-        prods = set(self._filtro(riesgo, plazo, liquidez, simulado).select(
-            pl.col(PROD_ID)).collect().to_series().to_list())
+                  simulado: bool | None = False ) -> pl.DataFrame:
+
+        prods = set(self._filtro(abierto, riesgo, plazo, liquidez,
+                              simulado)
+                    .select(pl.col(PROD_ID))
+                    .collect().to_series().to_list())
 
         lista_xirr = [p.xirr_hist.rename({'xirr_hist':p.producto_id})
                       for p in self.prods.values()
