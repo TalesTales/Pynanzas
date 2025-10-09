@@ -114,7 +114,11 @@ class Portafolio:
               simulado: bool | None = False
               ) -> float:
         prods = self._filtro(abierto, riesgo, plazo, liquidez, simulado)
-        return prods.select(pl.col("intereses")).sum().collect().item()
+        intereses = [prod.intereses for prod in self.prods.values()
+                     if prod.producto_id in (prods
+                    .select(pl.col(PROD_ID))
+                    .collect().to_series().to_list())]
+        return sum(intereses)
 
     def pesos(self,
               *,
