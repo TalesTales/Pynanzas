@@ -33,7 +33,7 @@ class ProductoFinanciero:
     plataforma: str
     tipo_producto: str
     tipo_inversion: str
-    asignacion: float = 0
+    asignacion: float
     saldo: float = field(init=False)
     saldo_inicial: float  = field(init = False, default = 0)
 
