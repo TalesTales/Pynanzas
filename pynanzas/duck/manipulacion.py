@@ -125,7 +125,6 @@ def _actualizar_prod(prod: ProductoFinanciero,
                       saldo = ?,
                       xirr = ?,
                       fecha_actualizacion = ?,
-                      asignacion = ?
                   WHERE {prod_id} = ?
                   """)
     valores: tuple = (prod.abierto,
@@ -134,7 +133,6 @@ def _actualizar_prod(prod: ProductoFinanciero,
                       prod.saldo,
                       prod.xirr,
                       datetime.now(),
-                      prod.asignacion,
                       prod.producto_id)
     if ask_commit:
         print(query, valores)
