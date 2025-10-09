@@ -199,7 +199,8 @@ def fabrica_prod(i,
                 administrador,
                 plataforma,
                 tipo_producto,
-                tipo_inversion
+                tipo_inversion,
+                asignacion
             FROM {nom_tabla_prods}
         """).fetchall()
         return ProductoFinanciero(*prods[i])
