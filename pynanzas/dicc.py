@@ -21,6 +21,7 @@ class MovsNoAportes(StrEnum):
     INTERESES = "intereses"
     DIVIDENDOS = "dividendos"
     RENDIMIENTOS = "rendimientos"
+    AJUSTE = "ajuste"
 
 class Riesgo(IntEnum):
     Nulo = 0
