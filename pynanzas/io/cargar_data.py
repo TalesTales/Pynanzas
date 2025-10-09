@@ -4,7 +4,7 @@ from pathlib import Path
 import duckdb
 import polars as pl
 
-from pynanzas.duck.con import MD_GLOBAL, MD_TOKEN
+from pynanzas.duck.con import MD_TOKEN
 from pynanzas.duck.dicc import PATH_DDB, NomTabla, PathBD
 from pynanzas.io.export import _exportar_ddb_parquet, _exportar_remoto
 
@@ -74,15 +74,6 @@ def _cargar_tabla_ddb_a_lf(nom_tabla: NomTabla,
                            local_con: duckdb.DuckDBPyConnection | None = None,
                            *,
                            md: bool = False) -> pl.LazyFrame:
-    global MD_GLOBAL
-    print(f"md= {md}, MD_GLOBAL= {MD_GLOBAL}, ddb= {os.path.exists(path_bd)}")
-    if md or MD_GLOBAL or not os.path.exists(path_bd):
-        print("sincronizando")
-        _synch_ddb_local_md(path_bd)
-        MD_GLOBAL = False
-        print(f"md= {md}, y MD_GLOBAL= {MD_GLOBAL}")
-    else:
-        print("local")
     if local_con:
         return local_con.execute(f"""SELECT * FROM {nom_tabla};""").pl().lazy()
     else:

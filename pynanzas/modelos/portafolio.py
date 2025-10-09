@@ -401,30 +401,27 @@ class Portafolio:
 
             return df_prods
 
-
+        
    # diferencia entre pesos y distribucion a df
    # si valor = 0 devuelve filtro quieto
-
+   
    # si valor en menos 0
    # si balanear = True
    # sumar total portafolio + monto y distribuirlo
    # else
    # distribuir monto
-
+   
    # si valor es mayor a cero
    # distribuir entre los pesos
    # si balanear = True
    # sumar total portafolio + monto y distribuirlo
    # else
    # distribuir monto
-
+   
    # devuelve pl.dataframe(prod_id, saldo, variacion, nuevo saldo,
     # asignacion, peso)
 
 if __name__ == '__main__':
     port = Portafolio()
-    print(port.xirr(abierto=None))
-    print(port.xirr_hist(abierto=None))
-    print(port.saldos(abierto=None))
-    print(port.saldo_hist(abierto=None))
-    print(port.pesos(abierto=None))
+    print(port.invertir_monto(106354,abierto=None).filter(pl.col(
+        'asignacion') > 0))

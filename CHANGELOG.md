@@ -1,3 +1,17 @@
+## 3.10.0 (2025-10-09)
+
+### Feat
+
+- **portafolio**: Agregada la función "invertir monto"
+
+### Fix
+
+- **manipulacion**: Ahora se lee correctamente la asignacion de cada producto cuando se quiere actualizar el mismo
+- **producto**: corregido un error que impedia leer la asignacion en una instancia del producto
+- **producto**: Corregido un error que impedia leer correctamente las asignaciones de cada producto
+- **portafolio**: Corregido un error que impedia calcular correctamente los intereses
+- **dicc**: Agregado "Ajuste" a la Enumeración MovsNoAporte
+
 ## 3.9.0 (2025-09-30)
 
 ### Feat
