@@ -28,7 +28,8 @@ def _crear_portafolio(nom_tabla_prods: NomTabla = NomTabla.PRODS,
                 administrador,
                 plataforma,
                 tipo_producto,
-                tipo_inversion
+                tipo_inversion,
+                asignacion
             FROM {nom_tabla_prods}
         """).fetchall()
     return {str(prod[0]) : ProductoFinanciero(*prod) for prod in prods}
@@ -211,6 +212,210 @@ class Portafolio:
 
         saldo_hist = pl.concat(lista_saldo, how='align')
         return saldo_hist
+
+    def invertir_monto(
+        self,
+        monto: float,
+        balancear: bool = False,
+        *,
+        abierto: bool | None = True,
+        riesgo: list[Riesgo] | None = None,
+        plazo: list[Plazo] | None = None,
+        liquidez: list[Liquidez] | None = None,
+        simulado: bool | None = False,
+    ) -> pl.DataFrame:
+        # Obtener productos filtrados
+        prods = (
+            self._filtro(abierto, riesgo, plazo, liquidez, simulado)
+            .select(pl.col(PROD_ID), pl.col("saldo"), pl.col("asignacion"))
+        ).collect()
+
+        total = prods.select(pl.col("asignacion")).sum().item()
+        pesos = self.pesos(
+            abierto=abierto,
+            riesgo=riesgo,
+            plazo=plazo,
+            liquidez=liquidez,
+            simulado=simulado,
+        )
+
+        # Concatenar y calcular diferencias iniciales
+        df_prods: pl.DataFrame = pl.concat(
+            [prods, pesos], how="align"
+        ).with_columns(
+            (pl.col("asignacion") / total).alias("asignacion"),
+            (pl.col("peso") - (pl.col("asignacion") / total)).alias(
+                "diferencia_peso"
+            ),
+        )
+
+        saldo: float = df_prods.select(pl.col("saldo")).sum().item()
+        saldo_final: float = saldo + monto
+
+        if monto == 0:
+            return df_prods
+
+        elif monto < 0:
+            monto_abs = abs(monto)
+
+            if monto_abs > saldo:
+                df_prods = df_prods.with_columns(
+                    (pl.col("saldo") * -1).alias("variación"),
+                    pl.lit(0).alias("nuevo_saldo"),
+                    pl.lit(0.0).alias("nuevo_peso"),
+                )
+            else:
+                df_prods = df_prods.with_columns(
+                    (monto * pl.col("asignacion")).round(0).alias("variación")
+                )
+                df_prods = df_prods.with_columns(
+                    (pl.col("saldo") + pl.col("variación")).alias(
+                        "nuevo_saldo"
+                    )
+                )
+                df_prods = df_prods.with_columns(
+                    (pl.col("nuevo_saldo") / pl.col("nuevo_saldo").sum())
+                    .round(4)
+                    .alias("nuevo_peso")
+                )
+
+            return df_prods
+
+        else:
+            if balancear:
+                monto_total = saldo_final
+                df_prods = df_prods.with_columns(
+                    (
+                        (monto_total * pl.col("asignacion")).round(0)
+                        - pl.col("saldo")
+                    ).alias("variación")
+                )
+                df_prods = df_prods.with_columns(
+                    (pl.col("saldo") + pl.col("variación")).alias(
+                        "nuevo_saldo"
+                    )
+                )
+                df_prods = df_prods.with_columns(
+                    (pl.col("nuevo_saldo") / pl.col("nuevo_saldo").sum())
+                    .round(4)
+                    .alias("nuevo_peso")
+                )
+
+            else:
+                df_prods = df_prods.with_columns(
+                    (saldo_final * pl.col("asignacion"))
+                    .round(0)
+                    .alias("saldo_objetivo")
+                )
+                df_prods = df_prods.with_columns(
+                    (pl.col("saldo_objetivo") - pl.col("saldo")).alias(
+                        "brecha"
+                    )
+                )
+
+                suma_brechas = (
+                    df_prods.filter(pl.col("brecha") > 0)
+                    .select(pl.col("brecha"))
+                    .sum()
+                    .item()
+                )
+
+                if suma_brechas <= monto:
+                    excedente = monto - suma_brechas
+                    df_prods = df_prods.with_columns(
+                        pl.when(pl.col("brecha") > 0)
+                        .then(
+                            pl.col("brecha")
+                            + (excedente * pl.col("asignacion"))
+                        )
+                        .otherwise(excedente * pl.col("asignacion"))
+                        .round(0)
+                        .alias("inversion")
+                    )
+
+                else:
+                    df_prods = df_prods.with_columns(
+                        pl.when(pl.col("brecha") > 0)
+                        .then(
+                            (monto * pl.col("brecha") / suma_brechas).round(0)
+                        )
+                        .otherwise(0)
+                        .alias("inversion")
+                    )
+
+                suma_inversiones = (
+                    df_prods.select(pl.col("inversion")).sum().item()
+                )
+                diferencia_redondeo = monto - suma_inversiones
+
+                if diferencia_redondeo != 0:
+                    # Ajustar en el producto con mayor brecha positiva
+                    max_brecha_filter = df_prods.filter(pl.col("brecha") > 0)
+
+                    if len(max_brecha_filter) > 0:
+                        idx_max_brecha = (
+                            df_prods.with_row_index()
+                            .filter(pl.col("brecha") > 0)
+                            .sort("brecha", descending=True)
+                            .select("index")
+                            .head(1)
+                            .item()
+                        )
+
+                        df_prods = df_prods.with_columns(
+                            pl.when(pl.int_range(pl.len()) == idx_max_brecha)
+                            .then(pl.col("inversion") + diferencia_redondeo)
+                            .otherwise(pl.col("inversion"))
+                            .alias("inversion")
+                        )
+                    else:
+                        idx_max_asig = (
+                            df_prods.with_row_index()
+                            .sort("asignacion", descending=True)
+                            .select("index")
+                            .head(1)
+                            .item()
+                        )
+
+                        df_prods = df_prods.with_columns(
+                            pl.when(pl.int_range(pl.len()) == idx_max_asig)
+                            .then(pl.col("inversion") + diferencia_redondeo)
+                            .otherwise(pl.col("inversion"))
+                            .alias("inversion")
+                        )
+
+                df_prods = df_prods.with_columns(
+                    (pl.col("saldo") + pl.col("inversion")).alias(
+                        "nuevo_saldo"
+                    )
+                )
+                df_prods = df_prods.with_columns(
+                    (pl.col("nuevo_saldo") / pl.col("nuevo_saldo").sum())
+                    .round(4)
+                    .alias("nuevo_peso")
+                )
+
+            return df_prods
+
+
+   # diferencia entre pesos y distribucion a df
+   # si valor = 0 devuelve filtro quieto
+
+   # si valor en menos 0
+   # si balanear = True
+   # sumar total portafolio + monto y distribuirlo
+   # else
+   # distribuir monto
+
+   # si valor es mayor a cero
+   # distribuir entre los pesos
+   # si balanear = True
+   # sumar total portafolio + monto y distribuirlo
+   # else
+   # distribuir monto
+
+   # devuelve pl.dataframe(prod_id, saldo, variacion, nuevo saldo,
+    # asignacion, peso)
 
 if __name__ == '__main__':
     port = Portafolio()
