@@ -12,6 +12,8 @@ class MovsAportes(StrEnum):
     VENTA = "venta"
     RETIRO = "retiro"
     APERTURA = "apertura"
+    Aporte = "aporte"
+
 
 class MovsNoAportes(StrEnum):
     SALDO_INICIAL = "saldo_inicial"
