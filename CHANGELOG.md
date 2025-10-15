@@ -1,3 +1,9 @@
+## 3.10.1 (2025-10-14)
+
+### Fix
+
+- **dicc**: Se agregó Aporte a MovAportes para que se calcule correctamente la xirr en todos los productos
+
 ## 3.10.0 (2025-10-09)
 
 ### Feat
