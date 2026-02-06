@@ -35,7 +35,7 @@ class ProductoFinanciero:
     tipo_inversion: str
     asignacion: float
     saldo: float = field(init=False)
-    saldo_inicial: float  = field(init = False, default = 0)
+    saldo_inicial: float = field(init=False, default=0)
 
     def __post_init__(self):
         self.saldo = self._saldo()
@@ -50,68 +50,81 @@ class ProductoFinanciero:
 
     @override
     def __repr__(self) -> str:
-        return (f"<pynanzas.producto.ProductoFinanciero: {self.producto_id} "
-                f"en {hex(id(self))}>")
+        return (
+            f"<pynanzas.producto.ProductoFinanciero: {self.producto_id} "
+            f"en {hex(id(self))}>"
+        )
 
     @override
     def __str__(self) -> str:
         abierto_tag: str = "[ABIERTO]" if self.abierto else "[CERRADO]"
-        string: str = (
-            f"{self.nombre}: {self.ticker} | {abierto_tag} |")
+        string: str = f"{self.nombre}: {self.ticker} | {abierto_tag} |"
         if self.abierto:
             xirr_display = (
-                f"{self.xirr:.2%}"
-                if (self.xirr is not None)
-                else "N/A"
+                f"{self.xirr:.2%}" if (self.xirr is not None) else "N/A"
             )
-            string += f"\nSaldo: COP ${self.saldo:,.2f}"  # TODO: Modificar moneda
+            string += (
+                f"\nSaldo: COP ${self.saldo:,.2f}"  # TODO: Modificar moneda
+            )
             string += f" | XIRR: {xirr_display}"
             string += (
                 f" | Asignación: {self.asignacion:.2%}"
                 if (self.asignacion is not None)
                 else "N/A"
             )
-        string +=(f"\nPlataforma: {self.plataforma}, Tipo: {self.tipo_producto}, "
+        string += (
+            f"\nPlataforma: {self.plataforma}, Tipo: {self.tipo_producto}, "
             f"\nAdministrado por {self.administrador}"
             f"\nRiesgo: {Riesgo(self.riesgo).name}, Plazo: "
-                  f"{Plazo(self.plazo).name}"
+            f"{Plazo(self.plazo).name}"
         )
         return string
 
     @cached_property
-    def movs_hist(self)-> pl.DataFrame:
-        return self._movs_hist.collect().with_columns(self.xirr_hist.select(
-            pl.col("xirr_hist")))
+    def movs_hist(self) -> pl.DataFrame:
+        return self._movs_hist.collect().with_columns(
+            self.xirr_hist.select(pl.col("xirr_hist"))
+        )
 
     @cached_property
-    def _movs_hist(self)-> pl.LazyFrame:
-        return (_tabla_lf(NomTabla.MOVS)
-                .filter(pl.col(PROD_ID) == self.producto_id)
-                .sort("fecha")
-                .with_columns((pl.col("valor").cum_sum()).alias("saldo_hist")))
+    def _movs_hist(self) -> pl.LazyFrame:
+        return (
+            _tabla_lf(NomTabla.MOVS)
+            .filter(pl.col(PROD_ID) == self.producto_id)
+            .sort("fecha")
+            .with_columns((pl.col("valor").cum_sum()).alias("saldo_hist"))
+        )
 
     @cached_property
     def aportes(self) -> float:
-        return (self._movs_hist.filter(
-        pl.col("tipo").is_in([m.value for m in MovsAportes]))
-                    .select(pl.col("valor").sum().round(2))
-                    .collect().item())
+        return (
+            self._movs_hist.filter(
+                pl.col("tipo").is_in([m.value for m in MovsAportes])
+            )
+            .select(pl.col("valor").sum().round(2))
+            .collect()
+            .item()
+        )
 
     @cached_property
-    def intereses (self) -> float:
-        return (self._movs_hist
-                .filter(pl.col("tipo").is_in([m.value for m in MovsIntereses]))
-                .select(pl.col("valor").sum()).collect().item())
+    def intereses(self) -> float:
+        return (
+            self._movs_hist.filter(
+                pl.col("tipo").is_in([m.value for m in MovsIntereses])
+            )
+            .select(pl.col("valor").sum())
+            .collect()
+            .item()
+        )
 
     def _saldo(self) -> float:
-        return (self._movs_hist.select(pl.col("valor"))
-                .sum().collect().item())
+        return self._movs_hist.select(pl.col("valor")).sum().collect().item()
 
     @cached_property
     def saldo_hist(self) -> pl.DataFrame:
-        return (self._movs_hist
-                .select(pl.col('fecha'), pl.col('saldo_hist'))
-                .collect())
+        return self._movs_hist.select(
+            pl.col("fecha"), pl.col("saldo_hist")
+        ).collect()
 
     @cached_property
     def abierto(self) -> bool:
@@ -121,19 +134,24 @@ class ProductoFinanciero:
             return True
 
     @cached_property
-    def rent_acum (self) -> float:
+    def rent_acum(self) -> float:
         return float(self.saldo) - float(self.aportes)
 
     @cached_property
     def xirr(self) -> float | None:
-        df_flujos: pl.LazyFrame = (self._movs_hist
-                .filter(pl.col("tipo").is_in([m.value for m in MovsAportes])))
+        df_flujos: pl.LazyFrame = self._movs_hist.filter(
+            pl.col("tipo").is_in([m.value for m in MovsAportes])
+        )
 
-        fechas: list = (df_flujos.select(pl.col("fecha"))
-                             .collect().to_series().to_list())
-        valores: list[float] = (df_flujos.select(-pl.col("valor"))
-                          .collect().to_series().to_list())
-        saldo: float = self._movs_hist.select(pl.col("valor")).sum().collect().item()
+        fechas: list = (
+            df_flujos.select(pl.col("fecha")).collect().to_series().to_list()
+        )
+        valores: list[float] = (
+            df_flujos.select(-pl.col("valor")).collect().to_series().to_list()
+        )
+        saldo: float = (
+            self._movs_hist.select(pl.col("valor")).sum().collect().item()
+        )
         fechas.append(fechas[-1])
         valores.append(saldo)
         try:
@@ -147,17 +165,17 @@ class ProductoFinanciero:
     def xirr_hist(self) -> pl.DataFrame:
         movs_hist = self._movs_hist.collect()
         valores: list[float] = []
-        xirr_hist: list[float|None] = []
+        xirr_hist: list[float | None] = []
         fechas_xirr = []
         valores_xirr = []
         for mov in movs_hist.rows(named=True):
             valores.append(mov["valor"])
             saldo = sum(valores)
-            if mov['tipo'] in [m.value for m in MovsAportes]:
+            if mov["tipo"] in [m.value for m in MovsAportes]:
                 try:
                     fechas_xirr.append(mov["fecha"])
                     valores_xirr.append(mov["valor"] * -1)
-                    
+
                     fechas_xirr.append(mov["fecha"])
                     valores_xirr.append(saldo)
                     xirr_hist.append(pyxirr.xirr(fechas_xirr, valores_xirr))
@@ -170,10 +188,15 @@ class ProductoFinanciero:
                     xirr_hist.append(xirr_hist[-1])
                 else:
                     xirr_hist.append(None)
-        fechas = self._movs_hist.select(pl.col("fecha")).collect().to_series().to_list()
-        return pl.DataFrame([fechas,xirr_hist]).rename({"column_0":"fecha",
-                                                        "column_1":"xirr_hist"}
-                                                       )
+        fechas = (
+            self._movs_hist.select(pl.col("fecha"))
+            .collect()
+            .to_series()
+            .to_list()
+        )
+        return pl.DataFrame([fechas, xirr_hist]).rename(
+            {"column_0": "fecha", "column_1": "xirr_hist"}
+        )
 
     def _reset_cache(self) -> None:
         for attr in list(self.__dict__):
@@ -181,9 +204,9 @@ class ProductoFinanciero:
                 self.__dict__.pop(attr, None)
 
 
-def fabrica_prod(i,
-                 nom_tabla_prods: NomTabla = NomTabla.PRODS,
-                 path_bd: PathBD = PATH_DDB):
+def fabrica_prod(
+    i, nom_tabla_prods: NomTabla = NomTabla.PRODS, path_bd: PathBD = PATH_DDB
+):
     with duckdb.connect(path_bd) as con:
         prods = con.sql(f"""
             SELECT
@@ -205,6 +228,7 @@ def fabrica_prod(i,
         """).fetchall()
         return ProductoFinanciero(*prods[i])
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     a = fabrica_prod(0)
-    print(a.movs_hist)
+    print(a.saldo)

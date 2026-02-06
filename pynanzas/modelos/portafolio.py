@@ -423,5 +423,4 @@ class Portafolio:
 
 if __name__ == '__main__':
     port = Portafolio()
-    print(port.invertir_monto(106354,abierto=None).filter(pl.col(
-        'asignacion') > 0))
+    print(port.invertir_monto(15799))

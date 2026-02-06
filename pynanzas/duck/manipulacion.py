@@ -17,10 +17,11 @@ from pynanzas.modelos.producto import ProductoFinanciero, fabrica_prod
 
 
 def _insertar_mov_ddb(
-        movimientos: list[EsquemaMovs],
-        nom_tabla_movs: NomTabla = NomTabla.MOVS,
-        nom_tabla_prods: NomTabla = NomTabla.PRODS,
-        path_db: PathBD = PATH_DDB) -> None:
+    movimientos: list[EsquemaMovs],
+    nom_tabla_movs: NomTabla = NomTabla.MOVS,
+    nom_tabla_prods: NomTabla = NomTabla.PRODS,
+    path_db: PathBD = PATH_DDB,
+) -> None:
     print("Insertar movimientos\n")
     try:
         with duckdb.connect(path_db) as local_con:
@@ -29,57 +30,66 @@ def _insertar_mov_ddb(
             print(inicio_transaccion)
             for mov in movimientos:
                 m = asdict(mov)
-                m.pop('id', None)
-                m.pop('fecha_agregada', None)
-                columnas: str = ','.join(m.keys())
-                placeholders: str = ','.join(['?'] * len(m.keys()))
+                m.pop("id", None)
+                m.pop("fecha_agregada", None)
+                columnas: str = ",".join(m.keys())
+                placeholders: str = ",".join(["?"] * len(m.keys()))
                 valores: tuple = tuple(m.values())
 
-                query = (f"INSERT INTO {nom_tabla_movs}\n"
-                          f"({columnas}) VALUES ({placeholders});\n")
+                query = (
+                    f"INSERT INTO {nom_tabla_movs}\n"
+                    f"({columnas}) VALUES ({placeholders});\n"
+                )
                 # print(query)
                 # print(valores)
                 local_con.execute(query, valores)
             for m in movimientos:
                 print(m)
 
-            commit = input('commit? s/n: ')
-            if commit == 's':
+            commit = input("commit? s/n: ")
+            if commit == "s":
                 local_con.execute("COMMIT;")
-                print('commit;')
-                print('Actualizando')
+                print("commit;")
+                print("Actualizando")
                 prods = []
                 for mov in movimientos:
                     prods.append(asdict(mov)[PROD_ID])
                 prods_unique = set(prods)
                 local_con.execute(inicio_transaccion)
-                prods = local_con.execute("select producto_id from prods;").fetchall()
+                prods = local_con.execute(
+                    "select producto_id from prods;"
+                ).fetchall()
                 lista_prods = [row[0] for row in prods]
                 for prod in prods_unique:
                     i = lista_prods.index(prod)
-                    p = fabrica_prod(i,nom_tabla_prods,path_db)
-                    _actualizar_prod(p,
-                                     ask_commit=False,
-                                     local_con=local_con)
+                    p = fabrica_prod(i, nom_tabla_prods, path_db)
+                    _actualizar_prod(p, ask_commit=False, local_con=local_con)
                 local_con.execute("COMMIT;")
             else:
                 local_con.execute("ROLLBACK;")
-                print('rollback;')
-            print(_cargar_tabla_ddb_a_relation(nom_tabla_movs, path_db,
-                                         local_con).select("producto_id","fecha","tipo","valor","id").order("id "
-                                                          "desc").limit(len(movimientos)+3))
+                print("rollback;")
+            print(
+                _cargar_tabla_ddb_a_relation(
+                    nom_tabla_movs, path_db, local_con
+                )
+                .select("producto_id", "fecha", "tipo", "valor", "id")
+                .order("id desc")
+                .limit(len(movimientos) + 3)
+            )
     except Exception as e:
         print(f"sql.insertar_mov_ddb: error sql {e}")
 
 
-def fabricar_movs(nom_tabla_movs: NomTabla= NomTabla.MOVS,
-                  nom_tabla_prods: NomTabla = NomTabla.PRODS,
-                  path_db: PathBD = PATH_DDB) -> None:
+def fabricar_movs(
+    nom_tabla_movs: NomTabla = NomTabla.MOVS,
+    nom_tabla_prods: NomTabla = NomTabla.PRODS,
+    path_db: PathBD = PATH_DDB,
+) -> None:
     insertar: bool = True
     movs: list[EsquemaMovs] = []
     lista_prods: list[str] = []
     with duckdb.connect(path_db) as con:
-        prods =  con.execute("select producto_id from prods;").fetchall()
+        prods = con.execute("select producto_id from prods;").fetchall()
         lista_prods = [row[0] for row in prods]
     while insertar:
         print(lista_prods)
@@ -87,7 +97,7 @@ def fabricar_movs(nom_tabla_movs: NomTabla= NomTabla.MOVS,
         if producto_id.strip() not in lista_prods:
             print("Producto no encontrado")
             continue
-        fecha: str = input("fecha: ")
+        fecha: str = input("fecha (YYYY-MM-DD): ")
         tipo: str = input("tipo: ")
         valor_str: str | float = input("valor: ")
         try:
@@ -95,8 +105,9 @@ def fabricar_movs(nom_tabla_movs: NomTabla= NomTabla.MOVS,
         except Exception:
             print("Error en el valor")
             continue
-        crear_mov: str = (f"¿Insertar: {producto_id}, {fecha}, {tipo},"
-                          f" {valor}? s/n: ")
+        crear_mov: str = (
+            f"¿Insertar: {producto_id}, {fecha}, {tipo}, {valor}? s/n: "
+        )
         append: str = input(crear_mov)
         if append == "s":
             mov: EsquemaMovs = EsquemaMovs(producto_id, fecha, tipo, valor)
@@ -109,16 +120,17 @@ def fabricar_movs(nom_tabla_movs: NomTabla= NomTabla.MOVS,
         else:
             insertar = False
         print("========")
-    _insertar_mov_ddb(movs, nom_tabla_movs,nom_tabla_prods, path_db)
+    _insertar_mov_ddb(movs, nom_tabla_movs, nom_tabla_prods, path_db)
 
 
-def _actualizar_prod(prod: ProductoFinanciero,
-                     local_con: duckdb.DuckDBPyConnection,
-                     ask_commit: bool= True,
-                     prod_id: str = PROD_ID,
-                     nom_tabl_prod: NomTabla = NomTabla.PRODS,
-                     ) -> None:
-    query: str = (f"""UPDATE {nom_tabl_prod}
+def _actualizar_prod(
+    prod: ProductoFinanciero,
+    local_con: duckdb.DuckDBPyConnection,
+    ask_commit: bool = True,
+    prod_id: str = PROD_ID,
+    nom_tabl_prod: NomTabla = NomTabla.PRODS,
+) -> None:
+    query: str = f"""UPDATE {nom_tabl_prod}
                   SET abierto = ?,
                       aportes = ?,
                       intereses = ?,
@@ -126,21 +138,24 @@ def _actualizar_prod(prod: ProductoFinanciero,
                       xirr = ?,
                       fecha_actualizacion = ?,
                   WHERE {prod_id} = ?
-                  """)
-    valores: tuple = (prod.abierto,
-                      prod.aportes,
-                      prod.intereses,
-                      prod.saldo,
-                      prod.xirr,
-                      datetime.now(),
-                      prod.producto_id)
+                  """
+    valores: tuple = (
+        prod.abierto,
+        prod.aportes,
+        prod.intereses,
+        prod.saldo,
+        prod.xirr,
+        datetime.now(),
+        prod.producto_id,
+    )
     if ask_commit:
         print(query, valores)
         commit = input("Confirmar UPDATE? s/n: ")
         if commit == "s":
             try:
                 local_con.execute(query, valores)
-                print(local_con.sql(f"""SELECT
+                print(
+                    local_con.sql(f"""SELECT
                                 abierto,
                                 aportes,
                                 intereses,
@@ -150,7 +165,8 @@ def _actualizar_prod(prod: ProductoFinanciero,
                                 asignacion
                               FROM {nom_tabl_prod}
                                 WHERE {prod_id}
-                                = '{prod.producto_id}'"""))
+                                = '{prod.producto_id}'""")
+                )
             except:
                 raise
         else:
@@ -163,14 +179,18 @@ def _actualizar_prod(prod: ProductoFinanciero,
         except Exception as e:
             raise e
 
-def actualizar_prods(prod_id: str = PROD_ID,
-                     nom_tabla_prods: NomTabla = NomTabla.PRODS,
-                     path_bd: PathBD = PATH_DDB)->None:
+
+def actualizar_prods(
+    prod_id: str = PROD_ID,
+    nom_tabla_prods: NomTabla = NomTabla.PRODS,
+    path_bd: PathBD = PATH_DDB,
+) -> None:
     with duckdb.connect(path_bd) as con:
-        rango = len(con.execute(f"select {prod_id} "
-                            f"from {nom_tabla_prods}").fetchall())
+        rango = len(
+            con.execute(f"select {prod_id} from {nom_tabla_prods}").fetchall()
+        )
         con.execute("BEGIN TRANSACTION;\n")
-        for p in range(rango-1):
-            prod = fabrica_prod(p,nom_tabla_prods,path_bd)
+        for p in range(rango - 1):
+            prod = fabrica_prod(p, nom_tabla_prods, path_bd)
             _actualizar_prod(prod, con, False, prod_id, nom_tabla_prods)
         con.execute("COMMIT;")
