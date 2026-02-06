@@ -1,3 +1,9 @@
+## 3.10.2 (2026-02-06)
+
+### Fix
+
+- **manipulacion**: Se agregó una descripción al print de la fecha cuando se intenta agregar un movimiento, de forma que se especifica el formato de fecha esperado
+
 ## 3.10.1 (2025-10-14)
 
 ### Fix
