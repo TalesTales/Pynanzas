@@ -3,6 +3,7 @@
 ## En Desarrollo
 
 - [ ] El cálculo de los intereses en ProductoFinanciero es equivocado. Revisar.
+- [ ] Cuando se agregan varios movimientos en el print de consola aparecen seguidos, tipo EsquemaMovs y no se entiende.
 
 ## Hecho
 
